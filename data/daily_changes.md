@@ -1,5 +1,8 @@
-# Job Watcher — 2026-11-09
+# Job Watcher changes — 2026-11-09
 
-This was the initial data collection, so it establishes a baseline rather than sending a new-job alert.
+New local finance matches: **0**  
+Removed local finance matches: **0**
 
-Successful employer boards: **16 of 17**.
+## Sources that need attention
+
+- **Walmart** (`walmart`): SourceFetchError: Fetched 1998 of 2000 Workday postings for walmart
