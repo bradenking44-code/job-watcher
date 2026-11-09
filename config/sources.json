@@ -228,6 +228,17 @@
       "career_url": "https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers"
     },
     {
+      "id": "one_gas",
+      "employer": "ONE Gas",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa-area openings",
+      "ats": "Oracle Cloud Recruiting",
+      "api_type": "oracle_candidate_experience",
+      "site_number": "ONEGas-Careers",
+      "api_endpoint": "https://ibedqy.fa.ocs.oraclecloud.com/hcmRestApi/resources/latest/recruitingCEJobRequisitions",
+      "career_url": "https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs"
+    },
+    {
       "id": "cherokee_nation_businesses_corporate",
       "employer": "Cherokee Nation Businesses",
       "board_name": "Corporate careers",
@@ -258,7 +269,7 @@
       "employer": "BOK Financial",
       "markets": ["tulsa_ok"],
       "ats": "SAP SuccessFactors Recruiting Marketing",
-      "career_url": "https://jobs.bokf.com/tulsa-jobs",
+      "career_url": "https://jobs.bokf.com/go/",
       "status": "pending_public_json_endpoint_validation"
     },
     {

@@ -8,7 +8,7 @@ A daily job-market tracker for finance students looking for finance and accounti
 
 ## Target roles and locations
 
-The active watchlist covers 17 public job-board endpoints across 16 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank remain discovery candidates while their public JSON endpoints are checked. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
+The active watchlist covers 18 public job-board endpoints across 17 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are also linked from the homepage while their public JSON endpoints are checked. The homepage has 20 tiles: 18 monitored boards and two clearly marked discovery links. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
 
 The title rule is intentionally broad and flags roles with finance, financial, FP&A, accounting, accounts payable or receivable, treasury, tax, audit, controller, credit, underwriting, investment, portfolio, wealth, banking, loan, budget, billing, payroll, or revenue-accounting language. It is a title-based screen, so flagged postings should be reviewed before applying.
 
@@ -21,7 +21,7 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the exact public JSON endpoint for each employer and is the machine-readable source of truth. The Workday endpoints were checked for unauthenticated access on 2026-11-09; each was returning fewer than 5,000 postings without a search term at that time. Cherokee Nation Businesses uses Oracle Candidate Experience, with separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
+The source registry contains the exact public JSON endpoint for each active employer board and is the machine-readable source of truth. The Workday endpoints were checked for unauthenticated access on 2026-11-09; each was returning fewer than 5,000 postings without a search term at that time. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
 
 | Market | Employer | Local coverage |
 | --- | --- | --- |
@@ -40,6 +40,7 @@ The source registry contains the exact public JSON endpoint for each employer an
 | Northwest Arkansas | [University of Arkansas](https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site) | Fayetteville |
 | Northwest Arkansas | [George's Inc.](https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges) | Springdale |
 | Tulsa | [Ingredion](https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers) | Tulsa-area openings |
+| Tulsa | [ONE Gas](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs) | Tulsa |
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Tulsa, Owasso, Tahlequah |
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Catoosa, Claremore, Tahlequah, and other business locations |
 
@@ -47,10 +48,10 @@ The job boards can also return jobs outside the target cities. The location rule
 
 ### Next sources to validate
 
-- [BOK Financial](https://jobs.bokf.com/tulsa-jobs) has Tulsa banking, finance, treasury, and early-career roles.
+- [BOK Financial](https://jobs.bokf.com/go/) has Tulsa banking, finance, treasury, and early-career roles.
 - [Arvest Bank](https://www.arvest.com/careers) hires across Oklahoma and Arkansas, including Northwest Arkansas.
 
-Their career pages are included in `config/sources.json`, but the boards are not active sources until an unauthenticated JSON endpoint is verified.
+Their career pages are included in the homepage tiles and `config/sources.json`, but they are not active collection sources until an unauthenticated JSON endpoint is verified. The collector continues to avoid HTML scraping.
 
 ## Data and rebuild command
 
@@ -94,7 +95,7 @@ pytest
 
 ## Project requirements
 
-- Fetch all 17 active public ATS JSON endpoints without logging in or scraping HTML.
+- Fetch all 18 active public ATS JSON endpoints without logging in or scraping HTML.
 - Keep each source response in raw data; apply the documented role and location rules when building local finance results.
 - Continue when a source fails and record each source's result.
 - Rebuild history deterministically from raw data, including first-seen, last-seen, and removed dates.

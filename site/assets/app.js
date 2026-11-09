@@ -124,10 +124,12 @@ function emptyState(title, message, linkText = 'Browse employer boards', linkHre
 function sourceCard(source) {
   const href = safeUrl(source.career_url);
   const card = document.createElement(href ? 'a' : 'div');
-  card.className = 'source-card';
+  const pending = Boolean(source.status);
+  card.className = `source-card${pending ? ' source-card-pending' : ''}`;
   if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
   const label = source.board_name ? `${source.employer} · ${source.board_name}` : source.employer;
-  card.innerHTML = `<strong>${escapeHtml(label)}</strong><span class="source-arrow" aria-hidden="true">↗</span>`;
+  const state = pending ? '<span class="source-status">DISCOVERY</span>' : '';
+  card.innerHTML = `<strong>${escapeHtml(label)}</strong><span class="source-card-meta">${state}<span class="source-arrow" aria-hidden="true">↗</span></span>`;
   return card;
 }
 
@@ -158,7 +160,7 @@ function renderToday() {
     else jobs.slice(0, 5).forEach((job) => list.append(jobLink(job, true)));
   }
   const sources = document.getElementById('source-cards');
-  if (sources) { sources.replaceChildren(); DATA.sources.forEach((source) => sources.append(sourceCard(source))); }
+  if (sources) { sources.replaceChildren(); [...DATA.sources, ...DATA.candidates].forEach((source) => sources.append(sourceCard(source))); }
 }
 
 function renderBrowse() {

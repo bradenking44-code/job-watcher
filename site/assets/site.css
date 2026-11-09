@@ -116,7 +116,10 @@ h1, h2, p { margin-top: 0; }
 .source-card { display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: 57px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 5px; background: #fff; text-decoration: none; transition: border-color .16s ease, transform .16s ease; }
 .source-card:hover { transform: translateY(-2px); border-color: #90ab96; }
 .source-card strong { font-size: 11px; line-height: 1.4; }
-.source-card span { color: #7f8a83; font: 10px var(--mono); }
+.source-card-meta { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; }
+.source-card .source-arrow { color: var(--green-2); font: 15px var(--mono); }
+.source-card .source-status { padding: 3px 5px; border-radius: 3px; background: #f1efe6; color: #796b3f; font: 8px var(--mono); letter-spacing: .02em; }
+.source-card-pending { border-style: dashed; }
 .source-arrow { color: var(--green-2) !important; font-size: 15px !important; }
 .notice-bar { margin: 0 0 35px; padding: 13px 16px; border-left: 3px solid var(--orange); background: #fff0e6; color: #70462f; font-size: 12px; line-height: 1.55; }
 .notice-bar[hidden] { display: none; }
