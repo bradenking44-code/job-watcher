@@ -108,6 +108,48 @@ def test_workday_advances_past_overlapping_pages_until_unique_total(monkeypatch)
     assert result["warnings"] == ["Skipped 1 duplicate postings returned across overlapping pages"]
 
 
+def test_workday_repeats_the_sweep_if_offset_drift_leaves_a_short_count(monkeypatch):
+    calls = []
+    pages = [
+        {"total": 4, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("A", "B")
+        ]},
+        {"total": 0, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("B", "C")
+        ]},
+        {"total": 0, "jobPostings": []},
+        {"total": 4, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("A", "B")
+        ]},
+        {"total": 0, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("C", "D")
+        ]},
+    ]
+
+    def fake_request(url, body=None):
+        calls.append(body["offset"])
+        return pages[len(calls) - 1]
+
+    monkeypatch.setattr("job_watcher.sources.request_json", fake_request)
+    source = {
+        "id": "sample",
+        "employer": "Sample Co.",
+        "ats": "Workday",
+        "api_endpoint": "https://example.test/wday/cxs/sample/Sample/jobs",
+        "career_url": "https://example.test/en-US/Sample",
+    }
+    result = fetch_workday(source, {"body_template": {"limit": 2}}, date(2026, 11, 9))
+
+    assert calls == [0, 2, 3, 0, 2]
+    assert len(result["postings"]) == 4
+    assert result["total"] == 4
+    assert result["warnings"][0].startswith("Repeated the board scan after 3 of 4 unique postings")
+
+
 def test_workday_enriches_generic_multi_location_results(monkeypatch):
     requests = []
     page = {

@@ -112,7 +112,6 @@ def fetch_workday(
     endpoint = source["api_endpoint"]
     body_template = request_config.get("body_template", {})
     page_size = max(1, int(body_template.get("limit", 100)))
-    offset = 0
     pages: list[dict[str, Any]] = []
     raw_details: list[dict[str, Any]] = []
     postings: list[dict[str, Any]] = []
@@ -121,88 +120,100 @@ def fetch_workday(
     warnings: list[str] = []
     duplicate_items = 0
 
-    for _ in range(MAX_PAGES):
-        body = dict(body_template)
-        body["limit"] = page_size
-        body["offset"] = offset
-        try:
-            page = request_json(endpoint, body)
-        except SourceFetchError as exc:
-            partial = {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total}
-            raise SourceFetchError(str(exc), partial) from exc
-        pages.append(page)
-        items = page.get("jobPostings")
-        if not isinstance(items, list):
-            raise SourceFetchError(f"Workday response did not contain jobPostings for {source['id']}")
-        # Some Workday boards report their real count only on the first page
-        # and return 0 on subsequent pages. Keep the largest positive count.
-        try:
-            reported_total = int(page.get("total", 0))
-        except (TypeError, ValueError):
-            reported_total = 0
-        if reported_total > 0:
-            total = max(total or 0, reported_total)
-        if not items:
-            break
+    sweep = 0
+    while True:
+        offset = 0
+        pass_ids: set[str] = set()
+        for _ in range(MAX_PAGES):
+            body = dict(body_template)
+            body["limit"] = page_size
+            body["offset"] = offset
+            try:
+                page = request_json(endpoint, body)
+            except SourceFetchError as exc:
+                partial = {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total}
+                raise SourceFetchError(str(exc), partial) from exc
+            pages.append(page)
+            items = page.get("jobPostings")
+            if not isinstance(items, list):
+                raise SourceFetchError(f"Workday response did not contain jobPostings for {source['id']}")
+            # Some Workday boards report their real count only on the first page
+            # and return 0 on subsequent pages. Keep the largest positive count.
+            try:
+                reported_total = int(page.get("total", 0))
+            except (TypeError, ValueError):
+                reported_total = 0
+            if reported_total > 0:
+                total = max(total or 0, reported_total)
+            if not items:
+                break
 
-        page_new_ids = 0
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            external_id = _workday_id(item)
-            unique_id = f"{source['id']}:{external_id}"
-            if unique_id in seen_ids:
-                duplicate_items += 1
-                continue
-            seen_ids.add(unique_id)
-            page_new_ids += 1
-            external_path = str(item.get("externalPath") or "")
-            location = str(item.get("locationsText") or "").strip()
-            if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
-                detail_url = endpoint.rsplit("/jobs", 1)[0] + external_path
-                try:
-                    detail = request_json(detail_url)
-                    raw_details.append({"external_path": external_path, "response": detail})
-                    detailed_locations = _location_from_workday_detail(detail)
-                    if detailed_locations:
-                        location = detailed_locations
-                except SourceFetchError as exc:
-                    warnings.append(f"Location detail unavailable for {external_id}: {exc}")
+            page_new_ids = 0
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                external_id = _workday_id(item)
+                unique_id = f"{source['id']}:{external_id}"
+                if unique_id in pass_ids:
+                    duplicate_items += 1
+                    continue
+                pass_ids.add(unique_id)
+                page_new_ids += 1
+                if unique_id in seen_ids:
+                    continue
+                seen_ids.add(unique_id)
+                external_path = str(item.get("externalPath") or "")
+                location = str(item.get("locationsText") or "").strip()
+                if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
+                    detail_url = endpoint.rsplit("/jobs", 1)[0] + external_path
+                    try:
+                        detail = request_json(detail_url)
+                        raw_details.append({"external_path": external_path, "response": detail})
+                        detailed_locations = _location_from_workday_detail(detail)
+                        if detailed_locations:
+                            location = detailed_locations
+                    except SourceFetchError as exc:
+                        warnings.append(f"Location detail unavailable for {external_id}: {exc}")
 
-            career_url = str(source.get("career_url") or "").rstrip("/")
-            job_url = f"{career_url}{external_path}" if external_path else career_url
-            posted_on = item.get("postedOn")
-            postings.append(
-                {
-                    "posting_id": unique_id,
-                    "external_id": external_id,
-                    "title": str(item.get("title") or "").strip(),
-                    "location": location,
-                    "department": str(item.get("department") or item.get("jobFamilyGroup") or "").strip(),
-                    "posted_date": parse_posted_date(posted_on, run_date),
-                    "posted_label": str(posted_on or ""),
-                    "url": job_url,
-                }
+                career_url = str(source.get("career_url") or "").rstrip("/")
+                job_url = f"{career_url}{external_path}" if external_path else career_url
+                posted_on = item.get("postedOn")
+                postings.append(
+                    {
+                        "posting_id": unique_id,
+                        "external_id": external_id,
+                        "title": str(item.get("title") or "").strip(),
+                        "location": location,
+                        "department": str(item.get("department") or item.get("jobFamilyGroup") or "").strip(),
+                        "posted_date": parse_posted_date(posted_on, run_date),
+                        "posted_label": str(posted_on or ""),
+                        "url": job_url,
+                    }
+                )
+
+            # Offset results can overlap while a large board changes. Move by
+            # the new IDs within this sweep, and repeat the sweep once if that
+            # drift still leaves fewer unique postings than Workday reported.
+            offset += max(page_new_ids, 1)
+            if total is not None and len(pass_ids) >= total:
+                break
+            if total is None and len(items) < page_size:
+                break
+        else:
+            raise SourceFetchError(
+                f"Pagination safety limit reached for {source['id']}",
+                {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
             )
 
-        # Large boards can change while we page through them. When new or
-        # reordered postings shift an offset window, the next response can
-        # overlap IDs from the previous page. Advance by unique results so we
-        # read farther into the board instead of stopping short of its total.
-        offset += max(page_new_ids, 1)
-        if (total is not None and offset >= total) or (total is None and len(items) < page_size):
+        if total is None or len(pass_ids) >= total:
             break
-    else:
-        raise SourceFetchError(
-            f"Pagination safety limit reached for {source['id']}",
-            {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
-        )
-
-    if total is not None and len(seen_ids) < total:
-        raise SourceFetchError(
-            f"Fetched {len(seen_ids)} of {total} Workday postings for {source['id']}",
-            {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
-        )
+        if sweep >= 1:
+            raise SourceFetchError(
+                f"Fetched {len(seen_ids)} of {total} Workday postings for {source['id']} after a repeat scan",
+                {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
+            )
+        sweep += 1
+        warnings.append(f"Repeated the board scan after {len(pass_ids)} of {total} unique postings were found")
 
     if duplicate_items:
         warnings.append(f"Skipped {duplicate_items} duplicate postings returned across overlapping pages")
