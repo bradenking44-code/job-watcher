@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-09T22:40:19Z",
+  "run_time": "2026-11-09T22:54:25Z",
   "run_date": "2026-11-09",
   "first_run_date": "2026-11-09",
   "days_with_success": 1,
-  "open": 27,
-  "new_today": 0,
+  "open": 36,
+  "new_today": 9,
   "removed_today": 0,
   "sources": [
     {
@@ -15,7 +15,7 @@
       "total": 103,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 9.91
+      "elapsed_seconds": 7.41
     },
     {
       "source_id": "williams",
@@ -25,7 +25,7 @@
       "total": 126,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 35.87
+      "elapsed_seconds": 47.81
     },
     {
       "source_id": "helmerich_payne",
@@ -35,7 +35,7 @@
       "total": 61,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.62
+      "elapsed_seconds": 9.93
     },
     {
       "source_id": "aaon",
@@ -45,7 +45,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.94
+      "elapsed_seconds": 6.6
     },
     {
       "source_id": "td_williamson",
@@ -55,7 +55,7 @@
       "total": 55,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.39
+      "elapsed_seconds": 3.01
     },
     {
       "source_id": "simmons_bank",
@@ -65,17 +65,17 @@
       "total": 153,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 19.54
+      "elapsed_seconds": 17.5
     },
     {
       "source_id": "airgas",
       "employer": "Airgas",
       "success": true,
-      "postings": 419,
-      "total": 419,
+      "postings": 420,
+      "total": 420,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 58.05
+      "elapsed_seconds": 50.38
     },
     {
       "source_id": "conocophillips",
@@ -85,7 +85,7 @@
       "total": 23,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.69
+      "elapsed_seconds": 3.95
     },
     {
       "source_id": "umb_bank",
@@ -95,17 +95,17 @@
       "total": 165,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 32.49
+      "elapsed_seconds": 23.67
     },
     {
       "source_id": "walmart",
       "employer": "Walmart",
-      "success": false,
-      "postings": 1998,
+      "success": true,
+      "postings": 2000,
       "total": 2000,
-      "warnings": 0,
-      "error": "SourceFetchError: Fetched 1998 of 2000 Workday postings for walmart",
-      "elapsed_seconds": 201.6
+      "warnings": 1,
+      "error": "",
+      "elapsed_seconds": 169.61
     },
     {
       "source_id": "tyson_foods",
@@ -115,7 +115,7 @@
       "total": 13,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.17
+      "elapsed_seconds": 1.08
     },
     {
       "source_id": "jb_hunt",
@@ -125,7 +125,7 @@
       "total": 447,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 30.99
+      "elapsed_seconds": 32.18
     },
     {
       "source_id": "university_of_arkansas",
@@ -135,7 +135,7 @@
       "total": 127,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.72
+      "elapsed_seconds": 8.12
     },
     {
       "source_id": "georges",
@@ -145,7 +145,7 @@
       "total": 120,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.93
+      "elapsed_seconds": 6.89
     },
     {
       "source_id": "ingredion",
@@ -155,7 +155,7 @@
       "total": 227,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 17.08
+      "elapsed_seconds": 15.99
     },
     {
       "source_id": "cherokee_nation_businesses_corporate",
@@ -165,17 +165,17 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.01
+      "elapsed_seconds": 0.72
     },
     {
       "source_id": "cherokee_nation_businesses_enterprises",
       "employer": "Cherokee Nation Businesses",
-      "success": true,
+      "success": false,
       "postings": 100,
-      "total": 100,
+      "total": 101,
       "warnings": 0,
-      "error": "",
-      "elapsed_seconds": 1.68
+      "error": "SourceFetchError: Fetched 100 of 101 Oracle postings for cherokee_nation_businesses_enterprises",
+      "elapsed_seconds": 1.47
     }
   ]
 }
