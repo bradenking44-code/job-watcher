@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-11-09",
+  "markets": {
+    "tulsa_ok": {
+      "name": "Tulsa area",
+      "state": "Oklahoma",
+      "cities": [
+        "Tulsa",
+        "Broken Arrow",
+        "Owasso",
+        "Jenks",
+        "Bixby",
+        "Sand Springs",
+        "Sapulpa",
+        "Catoosa",
+        "Bartlesville"
+      ],
+      "outer_area_cities": ["Bartlesville"]
+    },
+    "northwest_ar": {
+      "name": "Northwest Arkansas",
+      "state": "Arkansas",
+      "cities": [
+        "Bentonville",
+        "Fayetteville",
+        "Springdale",
+        "Rogers",
+        "Lowell",
+        "Siloam Springs",
+        "Bella Vista",
+        "Centerton",
+        "Cave Springs",
+        "Johnson",
+        "Farmington",
+        "Prairie Grove",
+        "Pea Ridge"
+      ]
+    }
+  },
+  "location_rule": {
+    "match_job_location_to_market_city": true,
+    "include_remote_only_when_state_eligibility_is_explicit": ["Oklahoma", "Arkansas"]
+  },
+  "finance_title_terms": [
+    "finance",
+    "financial",
+    "FP&A",
+    "accounting",
+    "accountant",
+    "accounts payable",
+    "accounts receivable",
+    "treasury",
+    "tax",
+    "audit",
+    "auditor",
+    "controller",
+    "controllership",
+    "credit analyst",
+    "credit underwriter",
+    "underwriting",
+    "investment",
+    "portfolio",
+    "wealth management",
+    "banking",
+    "banker",
+    "loan officer",
+    "loan analyst",
+    "budget analyst",
+    "billing",
+    "payroll",
+    "revenue accounting",
+    "cost accounting",
+    "financial planner",
+    "financial advisor"
+  ],
+  "workday_request": {
+    "method": "POST",
+    "body_template": {
+      "appliedFacets": {},
+      "limit": 20,
+      "offset": 0,
+      "searchText": ""
+    },
+    "pagination": "Increase offset by the requested limit until all postings have been fetched."
+  },
+  "sources": [
+    {
+      "id": "oneok",
+      "employer": "ONEOK",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa",
+      "ats": "Workday",
+      "api_endpoint": "https://oneok.wd1.myworkdayjobs.com/wday/cxs/oneok/ONEOK/jobs",
+      "career_url": "https://oneok.wd1.myworkdayjobs.com/en-US/ONEOK"
+    },
+    {
+      "id": "williams",
+      "employer": "Williams",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa",
+      "ats": "Workday",
+      "api_endpoint": "https://williams.wd5.myworkdayjobs.com/wday/cxs/williams/External/jobs",
+      "career_url": "https://williams.wd5.myworkdayjobs.com/en-US/External"
+    },
+    {
+      "id": "helmerich_payne",
+      "employer": "Helmerich & Payne",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa",
+      "ats": "Workday",
+      "api_endpoint": "https://hpinc.wd5.myworkdayjobs.com/wday/cxs/hpinc/HPINC/jobs",
+      "career_url": "https://hpinc.wd5.myworkdayjobs.com/en-US/HPINC"
+    },
+    {
+      "id": "aaon",
+      "employer": "AAON",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa",
+      "ats": "Workday",
+      "api_endpoint": "https://aaon.wd108.myworkdayjobs.com/wday/cxs/aaon/AAON/jobs",
+      "career_url": "https://aaon.wd108.myworkdayjobs.com/en-US/AAON"
+    },
+    {
+      "id": "td_williamson",
+      "employer": "TD Williamson",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa",
+      "ats": "Workday",
+      "api_endpoint": "https://tdwilliamson.wd1.myworkdayjobs.com/wday/cxs/tdwilliamson/TDWCareers/jobs",
+      "career_url": "https://tdwilliamson.wd1.myworkdayjobs.com/en-US/TDWCareers"
+    },
+    {
+      "id": "simmons_bank",
+      "employer": "Simmons Bank",
+      "markets": ["tulsa_ok", "northwest_ar"],
+      "locality_hint": "Tulsa and Northwest Arkansas branches",
+      "ats": "Workday",
+      "api_endpoint": "https://simmonsbank.wd5.myworkdayjobs.com/wday/cxs/simmonsbank/SimmonsCareers/jobs",
+      "career_url": "https://simmonsbank.wd5.myworkdayjobs.com/en-US/SimmonsCareers"
+    },
+    {
+      "id": "airgas",
+      "employer": "Airgas",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa-area openings",
+      "ats": "Workday",
+      "api_endpoint": "https://airliquidehr.wd3.myworkdayjobs.com/wday/cxs/airliquidehr/AirgasExternalCareer/jobs",
+      "career_url": "https://airliquidehr.wd3.myworkdayjobs.com/en-US/AirgasExternalCareer"
+    },
+    {
+      "id": "conocophillips",
+      "employer": "ConocoPhillips",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Bartlesville (outer Tulsa area)",
+      "ats": "Workday",
+      "api_endpoint": "https://conocophillips.wd1.myworkdayjobs.com/wday/cxs/conocophillips/External/jobs",
+      "career_url": "https://conocophillips.wd1.myworkdayjobs.com/en-US/External"
+    },
+    {
+      "id": "umb_bank",
+      "employer": "UMB Bank",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa-area openings",
+      "ats": "Workday",
+      "api_endpoint": "https://umb.wd1.myworkdayjobs.com/wday/cxs/umb/UMBExternal/jobs",
+      "career_url": "https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal"
+    },
+    {
+      "id": "walmart",
+      "employer": "Walmart",
+      "markets": ["northwest_ar"],
+      "locality_hint": "Bentonville and Northwest Arkansas",
+      "ats": "Workday",
+      "api_endpoint": "https://walmart.wd504.myworkdayjobs.com/wday/cxs/walmart/WalmartExternal/jobs",
+      "career_url": "https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal"
+    },
+    {
+      "id": "tyson_foods",
+      "employer": "Tyson Foods",
+      "markets": ["northwest_ar"],
+      "locality_hint": "Springdale and Northwest Arkansas",
+      "ats": "Workday",
+      "api_endpoint": "https://tysonfoods.wd5.myworkdayjobs.com/wday/cxs/tysonfoods/TSN1/jobs",
+      "career_url": "https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1"
+    },
+    {
+      "id": "jb_hunt",
+      "employer": "J.B. Hunt",
+      "markets": ["northwest_ar"],
+      "locality_hint": "Lowell and Northwest Arkansas",
+      "ats": "Workday",
+      "api_endpoint": "https://jbhunt.wd501.myworkdayjobs.com/wday/cxs/jbhunt/Careers/jobs",
+      "career_url": "https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers"
+    },
+    {
+      "id": "university_of_arkansas",
+      "employer": "University of Arkansas",
+      "markets": ["northwest_ar"],
+      "locality_hint": "Fayetteville",
+      "ats": "Workday",
+      "api_endpoint": "https://uasys.wd5.myworkdayjobs.com/wday/cxs/uasys/UAF_External_Career_Site/jobs",
+      "career_url": "https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site"
+    },
+    {
+      "id": "georges",
+      "employer": "George's Inc.",
+      "markets": ["northwest_ar"],
+      "locality_hint": "Springdale and Northwest Arkansas",
+      "ats": "Workday",
+      "api_endpoint": "https://georgesinc.wd5.myworkdayjobs.com/wday/cxs/georgesinc/JoinGeorges/jobs",
+      "career_url": "https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges"
+    },
+    {
+      "id": "ingredion",
+      "employer": "Ingredion",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa-area openings",
+      "ats": "Workday",
+      "api_endpoint": "https://ingredion.wd1.myworkdayjobs.com/wday/cxs/ingredion/IngredionCareers/jobs",
+      "career_url": "https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers"
+    }
+  ],
+  "discovery_candidates": [
+    {
+      "id": "bok_financial",
+      "employer": "BOK Financial",
+      "markets": ["tulsa_ok"],
+      "ats": "SAP SuccessFactors Recruiting Marketing",
+      "career_url": "https://jobs.bokf.com/tulsa-jobs",
+      "status": "pending_public_json_endpoint_validation"
+    },
+    {
+      "id": "arvest_bank",
+      "employer": "Arvest Bank",
+      "markets": ["tulsa_ok", "northwest_ar"],
+      "ats": "Infor CloudSuite HCM",
+      "career_url": "https://www.arvest.com/careers",
+      "status": "pending_public_json_endpoint_validation"
+    }
+  ]
+}
