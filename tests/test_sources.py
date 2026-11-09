@@ -75,6 +75,39 @@ def test_workday_keeps_first_page_total_when_later_pages_report_zero(monkeypatch
     assert result["total"] == 40
 
 
+def test_workday_advances_past_overlapping_pages_until_unique_total(monkeypatch):
+    calls = []
+    pages = {
+        0: {"total": 5, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("A", "B", "C")
+        ]},
+        3: {"total": 0, "jobPostings": [
+            {"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}", "bulletFields": [key]}
+            for key in ("C", "D", "E")
+        ]},
+    }
+
+    def fake_request(url, body=None):
+        calls.append(body["offset"])
+        return pages[body["offset"]]
+
+    monkeypatch.setattr("job_watcher.sources.request_json", fake_request)
+    source = {
+        "id": "sample",
+        "employer": "Sample Co.",
+        "ats": "Workday",
+        "api_endpoint": "https://example.test/wday/cxs/sample/Sample/jobs",
+        "career_url": "https://example.test/en-US/Sample",
+    }
+    result = fetch_workday(source, {"body_template": {"limit": 3}}, date(2026, 11, 9))
+
+    assert calls == [0, 3]
+    assert len(result["postings"]) == 5
+    assert result["total"] == 5
+    assert result["warnings"] == ["Skipped 1 duplicate postings returned across overlapping pages"]
+
+
 def test_workday_enriches_generic_multi_location_results(monkeypatch):
     requests = []
     page = {

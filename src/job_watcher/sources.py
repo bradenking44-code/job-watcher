@@ -119,6 +119,7 @@ def fetch_workday(
     seen_ids: set[str] = set()
     total: int | None = None
     warnings: list[str] = []
+    duplicate_items = 0
 
     for _ in range(MAX_PAGES):
         body = dict(body_template)
@@ -144,14 +145,17 @@ def fetch_workday(
         if not items:
             break
 
+        page_new_ids = 0
         for item in items:
             if not isinstance(item, dict):
                 continue
             external_id = _workday_id(item)
             unique_id = f"{source['id']}:{external_id}"
             if unique_id in seen_ids:
+                duplicate_items += 1
                 continue
             seen_ids.add(unique_id)
+            page_new_ids += 1
             external_path = str(item.get("externalPath") or "")
             location = str(item.get("locationsText") or "").strip()
             if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
@@ -181,8 +185,12 @@ def fetch_workday(
                 }
             )
 
-        offset += len(items)
-        if (total is not None and offset >= total) or len(items) < page_size:
+        # Large boards can change while we page through them. When new or
+        # reordered postings shift an offset window, the next response can
+        # overlap IDs from the previous page. Advance by unique results so we
+        # read farther into the board instead of stopping short of its total.
+        offset += max(page_new_ids, 1)
+        if (total is not None and offset >= total) or (total is None and len(items) < page_size):
             break
     else:
         raise SourceFetchError(
@@ -195,6 +203,9 @@ def fetch_workday(
             f"Fetched {len(seen_ids)} of {total} Workday postings for {source['id']}",
             {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
         )
+
+    if duplicate_items:
+        warnings.append(f"Skipped {duplicate_items} duplicate postings returned across overlapping pages")
 
     return {
         "postings": postings,

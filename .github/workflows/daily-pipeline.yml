@@ -35,7 +35,7 @@ jobs:
         run: python -m pip install -e .
       - name: Collect job boards and rebuild history
         id: collect
-        run: python -m job_watcher.pipeline
+        run: python -u -m job_watcher.pipeline
         continue-on-error: true
       - name: Open a dated issue for local job changes
         if: steps.collect.outcome == 'success' && steps.collect.outputs.changes == 'true'
