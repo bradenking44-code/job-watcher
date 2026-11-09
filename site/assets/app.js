@@ -126,17 +126,18 @@ function sourceCard(source) {
   const card = document.createElement(href ? 'a' : 'div');
   card.className = 'source-card';
   if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
-  card.innerHTML = `<strong>${escapeHtml(source.employer)}</strong><span class="source-arrow" aria-hidden="true">↗</span>`;
+  const label = source.board_name ? `${source.employer} · ${source.board_name}` : source.employer;
+  card.innerHTML = `<strong>${escapeHtml(label)}</strong><span class="source-arrow" aria-hidden="true">↗</span>`;
   return card;
 }
 
 function renderFooter() {
   const status = document.getElementById('footer-data-state');
   if (!status) return;
-  status.textContent = DATA.status.run_time ? `Last data run: ${localDate(DATA.status.run_time)}` : 'Site is live; the job collector is still being built.';
+  status.textContent = DATA.status.run_time ? `Last data run: ${localDate(DATA.status.run_time)}` : 'Waiting for the first successful data run.';
   const updated = document.getElementById('last-updated');
   if (updated) updated.textContent = DATA.status.run_time ? `Last run · ${localDate(DATA.status.run_time)}` : 'Awaiting first data run';
-  if (!DATA.status.run_time && !DATA.jobs.length) showNotice('The site is published, but the automated job collector is not running yet. Listings will appear here after that project step is complete.');
+  if (!DATA.status.run_time && !DATA.jobs.length) showNotice('The site is published. Listings will appear after the collector completes its first successful run.');
 }
 
 function renderToday() {
@@ -147,6 +148,8 @@ function renderToday() {
   const removed = regional.filter((job) => !isOpen(job) && roleMatch(job) && text(job.removed_date).slice(0, 10) === day);
   const values = { 'metric-open': active.length, 'metric-new': fresh.length, 'metric-removed': removed.length, 'metric-sources': DATA.sources.length };
   for (const [id, value] of Object.entries(values)) { const node = document.getElementById(id); if (node) node.textContent = String(value); }
+  const heroSourceCount = document.getElementById('hero-source-count');
+  if (heroSourceCount) heroSourceCount.textContent = String(DATA.sources.length);
   const list = document.getElementById('today-list');
   if (list) {
     list.replaceChildren();
@@ -155,7 +158,7 @@ function renderToday() {
     else jobs.slice(0, 5).forEach((job) => list.append(jobLink(job, true)));
   }
   const sources = document.getElementById('source-cards');
-  if (sources) { sources.replaceChildren(); DATA.sources.slice(0, 15).forEach((source) => sources.append(sourceCard(source))); }
+  if (sources) { sources.replaceChildren(); DATA.sources.forEach((source) => sources.append(sourceCard(source))); }
 }
 
 function renderBrowse() {
@@ -179,7 +182,7 @@ function renderBrowse() {
     jobs.sort(newestFirst);
     count.textContent = `${jobs.length} ${finance.checked ? 'finance ' : ''}listing${jobs.length === 1 ? '' : 's'} · ${market.value === 'all' ? 'all markets' : marketLabel(market.value)}`;
     results.replaceChildren();
-    if (!jobs.length) results.append(emptyState(DATA.jobs.length ? 'No matching jobs found' : 'Job history is not populated yet', DATA.jobs.length ? 'Try another market or remove a filter.' : 'The board is ready for listings. The daily collector is the next project step.', 'Open employer boards', '#browse-source-links'));
+    if (!jobs.length) results.append(emptyState(DATA.jobs.length ? 'No matching jobs found' : 'Job history is not populated yet', DATA.jobs.length ? 'Try another market or remove a filter.' : 'The daily collector will populate this list after its first successful run.', 'Open employer boards', '#browse-source-links'));
     else jobs.forEach((job) => results.append(jobLink(job)));
   };
   [query, market, status, finance].forEach((input) => input.addEventListener(input === query ? 'input' : 'change', draw));
@@ -217,7 +220,7 @@ function renderMarket() {
   const grid = document.getElementById('market-grid');
   if (grid) {
     grid.replaceChildren();
-    grid.append(renderMarketCard('tulsa_ok', 'Tulsa area', 'Tulsa · Broken Arrow · Bartlesville', true));
+    grid.append(renderMarketCard('tulsa_ok', 'Tulsa area', 'Tulsa · Broken Arrow · Tahlequah · Bartlesville', true));
     grid.append(renderMarketCard('northwest_ar', 'Northwest Arkansas', 'Bentonville · Fayetteville · Springdale'));
   }
   const sources = document.getElementById('market-source-list');

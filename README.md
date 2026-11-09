@@ -4,9 +4,11 @@ A daily job-market tracker for finance students looking for finance and accounti
 
 **Published site:** [bradenking44-code.github.io/job-watcher](https://bradenking44-code.github.io/job-watcher/)
 
+[![Tests](https://github.com/bradenking44-code/job-watcher/actions/workflows/tests.yml/badge.svg)](https://github.com/bradenking44-code/job-watcher/actions/workflows/tests.yml)
+
 ## Target roles and locations
 
-The active watchlist covers 15 employers with a public Workday JSON job-board endpoint. It includes employers whose own finance teams hire locally and banks with local finance and banking roles. Two more local financial employers, BOK Financial and Arvest Bank, are listed as discovery candidates while their public JSON endpoints are checked. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
+The active watchlist covers 17 public job-board endpoints across 16 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank remain discovery candidates while their public JSON endpoints are checked. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
 
 The title rule is intentionally broad and flags roles with finance, financial, FP&A, accounting, accounts payable or receivable, treasury, tax, audit, controller, credit, underwriting, investment, portfolio, wealth, banking, loan, budget, billing, payroll, or revenue-accounting language. It is a title-based screen, so flagged postings should be reviewed before applying.
 
@@ -19,7 +21,7 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the exact public JSON endpoint for each employer and is the machine-readable source of truth. The endpoints were checked for unauthenticated access on 2026-11-09; each was returning fewer than 5,000 postings without a search term at that time. Job counts change, so the pipeline should paginate and record the result of each run.
+The source registry contains the exact public JSON endpoint for each employer and is the machine-readable source of truth. The Workday endpoints were checked for unauthenticated access on 2026-11-09; each was returning fewer than 5,000 postings without a search term at that time. Cherokee Nation Businesses uses Oracle Candidate Experience, with separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
 
 | Market | Employer | Local coverage |
 | --- | --- | --- |
@@ -38,6 +40,8 @@ The source registry contains the exact public JSON endpoint for each employer an
 | Northwest Arkansas | [University of Arkansas](https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site) | Fayetteville |
 | Northwest Arkansas | [George's Inc.](https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges) | Springdale |
 | Tulsa | [Ingredion](https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers) | Tulsa-area openings |
+| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Tulsa, Owasso, Tahlequah |
+| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Catoosa, Claremore, Tahlequah, and other business locations |
 
 The job boards can also return jobs outside the target cities. The location rule above applies across all sources, rather than assuming every job from a listed employer is local.
 
@@ -50,15 +54,15 @@ Their career pages are included in `config/sources.json`, but the boards are not
 
 ## Data and rebuild command
 
-The pipeline will save compressed source responses under `data/raw/<UTC date>/<source>.json.gz`. `data/history.csv` is the reproducible posting history and `data/status.json` describes the latest run.
+The daily collector saves compressed source responses under `data/raw/<UTC date>/<source>.json.gz`. `data/history.csv` is deterministically rebuilt from those raw snapshots and `data/status.json` describes the latest run. The first successful collection establishes a baseline; later runs open one dated GitHub issue when local finance postings are added or removed. Source failures are recorded and do not cause postings to be marked removed.
 
-Planned history rebuild command (to be implemented):
+Run the collector manually:
 
 ```bash
-python -m job_watcher.build_history --raw-dir data/raw --output data/history.csv
+python -m job_watcher.pipeline
 ```
 
-The history must be rebuilt from raw files alone. Dates use UTC and the history rows are sorted by `posting_id`.
+The scheduled GitHub Actions workflow runs it daily in UTC, commits compressed snapshots and rebuilt history, and triggers a site refresh. Dates use UTC and history rows are sorted by `posting_id`.
 
 ## Development
 
@@ -74,7 +78,9 @@ pytest
 | Path | Purpose |
 | --- | --- |
 | `.gitignore` | Excludes local environments, caches, and build output. |
+| `.github/workflows/daily-pipeline.yml` | Daily collection, dated change issue, and data commit. |
 | `.github/workflows/pages.yml` | Builds and publishes the static site with GitHub Pages. |
+| `.github/workflows/tests.yml` | Runs pytest on pushes and pull requests. |
 | `pyproject.toml` | Python project metadata and pytest configuration. |
 | `README.md` | Project setup, target role and market, and operating instructions. |
 | `config/sources.json` | Employer endpoints, target markets, and title terms. |
@@ -88,10 +94,10 @@ pytest
 
 ## Project requirements
 
-- Watch at least 15 employers through their ATS JSON endpoints without logging in or scraping HTML.
+- Fetch all 17 active public ATS JSON endpoints without logging in or scraping HTML.
 - Keep each source response in raw data; apply the documented role and location rules when building local finance results.
 - Continue when a source fails and record each source's result.
 - Rebuild history deterministically from raw data, including first-seen, last-seen, and removed dates.
-- Run the pipeline daily with GitHub Actions, open a dated issue for changes, and commit the raw, history, and status files.
+- Run the pipeline daily with GitHub Actions, open a dated issue for local finance job changes, and commit the raw, history, and status files.
 - Publish Today, Browse, and Markets pages with GitHub Pages. The initial site includes offline support, a manifest, and a service worker.
 - Run pytest on every push and show the test workflow badge here once it exists.
