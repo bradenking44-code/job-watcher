@@ -2,6 +2,8 @@
 
 A daily job-market tracker for finance students looking for finance and accounting jobs in the Tulsa, Oklahoma and Northwest Arkansas job markets. It will collect public job-board JSON, rebuild a posting history, report daily changes, and publish a small site with GitHub Pages.
 
+**Published site:** [bradenking44-code.github.io/job-watcher](https://bradenking44-code.github.io/job-watcher/)
+
 ## Target roles and locations
 
 The active watchlist covers 15 employers with a public Workday JSON job-board endpoint. It includes employers whose own finance teams hire locally and banks with local finance and banking roles. Two more local financial employers, BOK Financial and Arvest Bank, are listed as discovery candidates while their public JSON endpoints are checked. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
@@ -72,6 +74,7 @@ pytest
 | Path | Purpose |
 | --- | --- |
 | `.gitignore` | Excludes local environments, caches, and build output. |
+| `.github/workflows/pages.yml` | Builds and publishes the static site with GitHub Pages. |
 | `pyproject.toml` | Python project metadata and pytest configuration. |
 | `README.md` | Project setup, target role and market, and operating instructions. |
 | `config/sources.json` | Employer endpoints, target markets, and title terms. |
@@ -81,7 +84,7 @@ pytest
 | `data/history.csv` | Canonical posting history. |
 | `data/status.json` | Latest run summary and per-source results. |
 | `.github/workflows/` | Daily pipeline, tests, and site publishing workflows. |
-| `site/` | Today, Browse, and Market pages plus installable web-app assets. |
+| `site/` | Today, Browse, and Markets pages plus installable, offline-capable web-app assets. |
 
 ## Project requirements
 
@@ -90,5 +93,5 @@ pytest
 - Continue when a source fails and record each source's result.
 - Rebuild history deterministically from raw data, including first-seen, last-seen, and removed dates.
 - Run the pipeline daily with GitHub Actions, open a dated issue for changes, and commit the raw, history, and status files.
-- Publish Today, Browse, and Market pages with GitHub Pages. Include offline support, a manifest, and a service worker.
+- Publish Today, Browse, and Markets pages with GitHub Pages. The initial site includes offline support, a manifest, and a service worker.
 - Run pytest on every push and show the test workflow badge here once it exists.

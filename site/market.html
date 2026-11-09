@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142923">
+  <meta name="description" content="Explore finance job activity across Tulsa and Northwest Arkansas.">
+  <title>Markets · Ledgerline Job Watcher</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./assets/site.css">
+  <script src="./assets/app.js" defer></script>
+</head>
+<body data-page="market">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="./index.html" aria-label="Ledgerline Job Watcher home"><span class="brand-mark" aria-hidden="true">L</span><span><strong>Ledgerline</strong><small>JOB WATCHER</small></span></a>
+    <nav class="main-nav" aria-label="Main navigation"><a href="./index.html">Today</a><a href="./browse.html">Browse</a><a class="active" href="./market.html" aria-current="page">Markets</a></nav>
+    <span class="header-status"><i></i> Regional watchlist</span>
+  </header>
+  <main id="main" class="page-shell">
+    <section class="page-intro market-intro">
+      <p class="eyebrow eyebrow-dark">THE REGIONAL PICTURE</p>
+      <h1>Two markets.<br><em>Room to grow.</em></h1>
+      <p class="intro-subtitle">Compare local finance openings and the employers shaping each job market.</p>
+    </section>
+    <section class="market-grid" id="market-grid" aria-live="polite">
+      <div class="loading-state">Loading market activity…</div>
+    </section>
+    <section class="section-block watchlist-section">
+      <div class="section-heading"><div><p class="eyebrow eyebrow-dark">SOURCE COVERAGE</p><h2>Employers in the watchlist</h2></div><span class="updated-label" id="market-source-count">15 active boards</span></div>
+      <div id="market-source-list" class="market-source-list"></div>
+    </section>
+    <div class="notice-bar" id="data-notice" hidden></div>
+  </main>
+  <footer class="site-footer"><a class="footer-brand" href="./index.html">LEDGERLINE <span>·</span> JOB WATCHER</a><span>Regional finance opportunities, organized for your next step.</span><span id="footer-data-state">Data refreshes with the project’s daily job scan.</span></footer>
+</body>
+</html>
