@@ -9,7 +9,7 @@ This repository is scaffolding. The target role, employer list, title rule, sour
 - Target role and title rule: to be selected.
 - Employers: at least 15; to be selected and checked for unauthenticated JSON endpoints.
 - First-run date and due date: check Blackboard.
-- Repository: public GitHub repository; enable GitHub Pages from the `main` branch and `/site` when the site is ready.
+- Repository: public GitHub repository; configure GitHub Pages to deploy `site/` with a GitHub Actions workflow when the site is ready.
 
 ## Sources
 
