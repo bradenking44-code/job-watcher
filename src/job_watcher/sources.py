@@ -263,80 +263,102 @@ def fetch_oracle_candidate_experience(
     page_size = max(1, int(request_config.get("page_size", 100)))
     expand = str(request_config.get("expand", "requisitionList.secondaryLocations"))
     sort_by = str(request_config.get("sort_by", "POSTING_DATES_DESC"))
-    offset = 0
     total: int | None = None
     pages: list[dict[str, Any]] = []
     postings: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
+    warnings: list[str] = []
+    duplicate_items = 0
 
-    for _ in range(MAX_PAGES):
-        finder = f"findReqs;siteNumber={site_number},limit={page_size},offset={offset},sortBy={sort_by}"
-        query = f"onlyData=true&expand={quote(expand, safe='')}&finder={quote(finder, safe=';,=')}"
-        try:
-            page = request_json(f"{endpoint}?{query}")
-        except SourceFetchError as exc:
-            partial = {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": []}
-            raise SourceFetchError(str(exc), partial) from exc
-        pages.append(page)
-        envelopes = page.get("items") or []
-        if not envelopes:
-            break
-        envelope = envelopes[0]
-        rows = envelope.get("requisitionList") or []
-        try:
-            reported_total = int(envelope.get("TotalJobsCount", page.get("count", 0)))
-        except (TypeError, ValueError):
-            reported_total = 0
-        if reported_total > 0:
-            total = max(total or 0, reported_total)
-        if not rows:
-            break
+    sweep = 0
+    while True:
+        offset = 0
+        pass_ids: set[str] = set()
+        for _ in range(MAX_PAGES):
+            finder = f"findReqs;siteNumber={site_number},limit={page_size},offset={offset},sortBy={sort_by}"
+            query = f"onlyData=true&expand={quote(expand, safe='')}&finder={quote(finder, safe=';,=')}"
+            try:
+                page = request_json(f"{endpoint}?{query}")
+            except SourceFetchError as exc:
+                partial = {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": warnings}
+                raise SourceFetchError(str(exc), partial) from exc
+            pages.append(page)
+            envelopes = page.get("items") or []
+            if not envelopes:
+                break
+            envelope = envelopes[0]
+            rows = envelope.get("requisitionList") or []
+            try:
+                reported_total = int(envelope.get("TotalJobsCount", page.get("count", 0)))
+            except (TypeError, ValueError):
+                reported_total = 0
+            if reported_total > 0:
+                total = max(total or 0, reported_total)
+            if not rows:
+                break
 
-        career_url = str(source.get("career_url") or "").rstrip("/")
-        for item in rows:
-            if not isinstance(item, dict):
-                continue
-            external_id = str(item.get("Id") or item.get("RequisitionNumber") or "").strip()
-            if not external_id:
-                continue
-            unique_id = f"{source['id']}:{external_id}"
-            if unique_id in seen_ids:
-                continue
-            seen_ids.add(unique_id)
-            locations = _oracle_locations(item)
-            department = item.get("Department") or item.get("JobFamily") or item.get("JobFunction") or ""
-            postings.append(
-                {
-                    "posting_id": unique_id,
-                    "external_id": external_id,
-                    "title": str(item.get("Title") or "").strip(),
-                    "location": locations,
-                    "department": str(department).strip(),
-                    "posted_date": parse_posted_date(item.get("PostedDate"), run_date),
-                    "posted_label": str(item.get("PostedDate") or ""),
-                    "url": f"{career_url}/job/{quote(external_id)}",
-                }
+            page_new_ids = 0
+            career_url = str(source.get("career_url") or "").rstrip("/")
+            for item in rows:
+                if not isinstance(item, dict):
+                    continue
+                external_id = str(item.get("Id") or item.get("RequisitionNumber") or "").strip()
+                if not external_id:
+                    continue
+                unique_id = f"{source['id']}:{external_id}"
+                if unique_id in pass_ids:
+                    duplicate_items += 1
+                    continue
+                pass_ids.add(unique_id)
+                page_new_ids += 1
+                if unique_id in seen_ids:
+                    continue
+                seen_ids.add(unique_id)
+                locations = _oracle_locations(item)
+                department = item.get("Department") or item.get("JobFamily") or item.get("JobFunction") or ""
+                postings.append(
+                    {
+                        "posting_id": unique_id,
+                        "external_id": external_id,
+                        "title": str(item.get("Title") or "").strip(),
+                        "location": locations,
+                        "department": str(department).strip(),
+                        "posted_date": parse_posted_date(item.get("PostedDate"), run_date),
+                        "posted_label": str(item.get("PostedDate") or ""),
+                        "url": f"{career_url}/job/{quote(external_id)}",
+                    }
+                )
+
+            # Trust a positive total over Oracle's hasMore flag, which can be
+            # false before the last offset page during a changing job board.
+            offset += max(page_new_ids, 1)
+            has_more = page.get("hasMore")
+            if total is not None and len(pass_ids) >= total:
+                break
+            if total is None and has_more is False:
+                break
+            if total is None and has_more is None and len(rows) < page_size:
+                break
+        else:
+            raise SourceFetchError(
+                f"Pagination safety limit reached for {source['id']}",
+                {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": warnings},
             )
 
-        offset += len(rows)
-        has_more = page.get("hasMore")
-        if has_more is False or (total is not None and offset >= total):
+        if total is None or len(pass_ids) >= total:
             break
-        if has_more is None and len(rows) < page_size:
-            break
-    else:
-        raise SourceFetchError(
-            f"Pagination safety limit reached for {source['id']}",
-            {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": []},
-        )
+        if sweep >= 1:
+            raise SourceFetchError(
+                f"Fetched {len(seen_ids)} of {total} Oracle postings for {source['id']} after a repeat scan",
+                {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": warnings},
+            )
+        sweep += 1
+        warnings.append(f"Repeated the board scan after {len(pass_ids)} of {total} unique postings were found")
 
-    if total is not None and len(seen_ids) < total:
-        raise SourceFetchError(
-            f"Fetched {len(seen_ids)} of {total} Oracle postings for {source['id']}",
-            {"raw_pages": pages, "raw_details": [], "postings": postings, "total": total, "warnings": []},
-        )
+    if duplicate_items:
+        warnings.append(f"Skipped {duplicate_items} duplicate postings returned across overlapping pages")
 
-    return {"postings": postings, "total": total if total is not None else len(postings), "raw_pages": pages, "raw_details": [], "warnings": []}
+    return {"postings": postings, "total": total if total is not None else len(postings), "raw_pages": pages, "raw_details": [], "warnings": warnings}
 
 
 def fetch_source(source: dict[str, Any], config: dict[str, Any], run_date: date) -> dict[str, Any]:

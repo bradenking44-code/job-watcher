@@ -217,6 +217,34 @@ def test_oracle_candidate_experience_paginates_and_builds_job_links(monkeypatch)
     assert result["postings"][0]["posted_date"] == "2026-11-08"
 
 
+def test_oracle_continues_past_false_has_more_when_total_is_larger(monkeypatch):
+    calls = []
+    pages = [
+        {"hasMore": False, "items": [{"TotalJobsCount": 2, "requisitionList": [{"Id": "101", "Title": "Finance Analyst", "PrimaryLocation": "Tulsa, OK"}]}]},
+        {"hasMore": False, "items": [{"TotalJobsCount": 2, "requisitionList": [{"Id": "102", "Title": "Staff Accountant", "PrimaryLocation": "Tahlequah, OK"}]}]},
+    ]
+
+    def fake_request(url, body=None):
+        calls.append(url)
+        return pages[len(calls) - 1]
+
+    monkeypatch.setattr("job_watcher.sources.request_json", fake_request)
+    source = {
+        "id": "cherokee",
+        "employer": "Cherokee Nation Businesses",
+        "api_type": "oracle_candidate_experience",
+        "site_number": "CX_4001",
+        "api_endpoint": "https://example.test/hcmRestApi/resources/latest/recruitingCEJobRequisitions",
+        "career_url": "https://example.test/hcmUI/CandidateExperience/en/sites/CX_4001",
+    }
+    result = fetch_oracle_candidate_experience(source, {"page_size": 1}, date(2026, 11, 9))
+
+    assert "offset=0" in unquote(urlparse(calls[0]).query)
+    assert "offset=1" in unquote(urlparse(calls[1]).query)
+    assert len(result["postings"]) == 2
+    assert result["total"] == 2
+
+
 def test_parse_posted_date_handles_relative_labels():
     assert parse_posted_date("Posted Today", date(2026, 11, 9)) == "2026-11-09"
     assert parse_posted_date("Posted 3 Days Ago", date(2026, 11, 9)) == "2026-11-06"
