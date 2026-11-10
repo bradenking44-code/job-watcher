@@ -1,8 +1,8 @@
 {
-  "run_time": "2026-11-09T23:03:44Z",
-  "run_date": "2026-11-09",
+  "run_time": "2026-11-10T00:27:10Z",
+  "run_date": "2026-11-10",
   "first_run_date": "2026-11-09",
-  "days_with_success": 1,
+  "days_with_success": 2,
   "open": 36,
   "new_today": 0,
   "removed_today": 0,
@@ -11,11 +11,11 @@
       "source_id": "oneok",
       "employer": "ONEOK",
       "success": true,
-      "postings": 103,
-      "total": 103,
+      "postings": 102,
+      "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 17.15
+      "elapsed_seconds": 7.68
     },
     {
       "source_id": "williams",
@@ -25,7 +25,7 @@
       "total": 126,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 68.42
+      "elapsed_seconds": 40.45
     },
     {
       "source_id": "helmerich_payne",
@@ -35,7 +35,7 @@
       "total": 61,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 8.83
+      "elapsed_seconds": 6.68
     },
     {
       "source_id": "aaon",
@@ -45,27 +45,27 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 9.21
+      "elapsed_seconds": 7.13
     },
     {
       "source_id": "td_williamson",
       "employer": "TD Williamson",
       "success": true,
-      "postings": 55,
-      "total": 55,
+      "postings": 57,
+      "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.28
+      "elapsed_seconds": 2.64
     },
     {
       "source_id": "simmons_bank",
       "employer": "Simmons Bank",
       "success": true,
-      "postings": 153,
-      "total": 153,
+      "postings": 152,
+      "total": 152,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 16.25
+      "elapsed_seconds": 16.26
     },
     {
       "source_id": "airgas",
@@ -75,7 +75,7 @@
       "total": 420,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 65.08
+      "elapsed_seconds": 47.15
     },
     {
       "source_id": "conocophillips",
@@ -85,7 +85,7 @@
       "total": 23,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.39
+      "elapsed_seconds": 3.92
     },
     {
       "source_id": "umb_bank",
@@ -95,7 +95,27 @@
       "total": 165,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 34.06
+      "elapsed_seconds": 17.96
+    },
+    {
+      "source_id": "bok_financial",
+      "employer": "BOK Financial",
+      "success": true,
+      "postings": 198,
+      "total": 198,
+      "warnings": 0,
+      "error": "",
+      "elapsed_seconds": 0.55
+    },
+    {
+      "source_id": "arvest_bank",
+      "employer": "Arvest Bank",
+      "success": false,
+      "postings": 0,
+      "total": 0,
+      "warnings": 0,
+      "error": "SourceFetchError: Expected JSON from Infor resource https://css-arvest-prd.inforcloudsuite.com/hcm/Jobs/list/JobPosting.SearchForJobsResults?pageop=sort&pagesize=100&sortOrderName=JobPosting.ByPostDateBeginSet&isAscending=false&csk.JobBoard=EXTERNAL&csk.showusingxi=true&csk.HROrganization=ARV",
+      "elapsed_seconds": 0.1
     },
     {
       "source_id": "walmart",
@@ -105,7 +125,7 @@
       "total": 2000,
       "warnings": 1,
       "error": "",
-      "elapsed_seconds": 169.07
+      "elapsed_seconds": 168.4
     },
     {
       "source_id": "tyson_foods",
@@ -115,17 +135,17 @@
       "total": 13,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.08
+      "elapsed_seconds": 1.04
     },
     {
       "source_id": "jb_hunt",
       "employer": "J.B. Hunt",
       "success": true,
-      "postings": 448,
-      "total": 448,
+      "postings": 446,
+      "total": 446,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 29.73
+      "elapsed_seconds": 23.62
     },
     {
       "source_id": "university_of_arkansas",
@@ -135,27 +155,37 @@
       "total": 127,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.3
+      "elapsed_seconds": 6.7
     },
     {
       "source_id": "georges",
       "employer": "George's Inc.",
       "success": true,
-      "postings": 120,
-      "total": 120,
+      "postings": 121,
+      "total": 121,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 8.06
+      "elapsed_seconds": 5.87
     },
     {
       "source_id": "ingredion",
       "employer": "Ingredion",
       "success": true,
-      "postings": 227,
-      "total": 227,
+      "postings": 229,
+      "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 15.27
+      "elapsed_seconds": 11.43
+    },
+    {
+      "source_id": "one_gas",
+      "employer": "ONE Gas",
+      "success": true,
+      "postings": 28,
+      "total": 28,
+      "warnings": 0,
+      "error": "",
+      "elapsed_seconds": 0.92
     },
     {
       "source_id": "cherokee_nation_businesses_corporate",
@@ -165,7 +195,7 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.93
+      "elapsed_seconds": 0.65
     },
     {
       "source_id": "cherokee_nation_businesses_enterprises",
@@ -175,7 +205,7 @@
       "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.18
+      "elapsed_seconds": 2.08
     }
   ]
 }
