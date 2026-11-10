@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-10T01:35:12Z",
+  "run_time": "2026-11-10T01:42:48Z",
   "run_date": "2026-11-10",
   "first_run_date": "2026-11-09",
   "days_with_success": 2,
   "open": 38,
-  "new_today": 2,
+  "new_today": 0,
   "removed_today": 0,
   "sources": [
     {
@@ -15,7 +15,7 @@
       "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.2
+      "elapsed_seconds": 4.72
     },
     {
       "source_id": "williams",
@@ -25,7 +25,7 @@
       "total": 126,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 10.97
+      "elapsed_seconds": 14.52
     },
     {
       "source_id": "helmerich_payne",
@@ -35,7 +35,7 @@
       "total": 61,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.68
+      "elapsed_seconds": 6.52
     },
     {
       "source_id": "aaon",
@@ -45,7 +45,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.9
+      "elapsed_seconds": 5.73
     },
     {
       "source_id": "td_williamson",
@@ -55,7 +55,7 @@
       "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.56
+      "elapsed_seconds": 2.89
     },
     {
       "source_id": "simmons_bank",
@@ -65,7 +65,7 @@
       "total": 152,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 8.22
+      "elapsed_seconds": 11.73
     },
     {
       "source_id": "airgas",
@@ -75,7 +75,7 @@
       "total": 420,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 42.67
+      "elapsed_seconds": 36.36
     },
     {
       "source_id": "conocophillips",
@@ -85,7 +85,7 @@
       "total": 23,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.37
+      "elapsed_seconds": 1.9
     },
     {
       "source_id": "umb_bank",
@@ -95,7 +95,7 @@
       "total": 165,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 12.12
+      "elapsed_seconds": 12.63
     },
     {
       "source_id": "bok_financial",
@@ -105,7 +105,7 @@
       "total": 198,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.96
+      "elapsed_seconds": 0.41
     },
     {
       "source_id": "arvest_bank",
@@ -115,17 +115,17 @@
       "total": 27,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.24
+      "elapsed_seconds": 0.51
     },
     {
       "source_id": "walmart",
       "employer": "Walmart",
-      "success": false,
-      "postings": 1998,
+      "success": true,
+      "postings": 2000,
       "total": 2000,
-      "warnings": 1,
-      "error": "SourceFetchError: Fetched 1998 of 2000 Workday postings for walmart after a repeat scan",
-      "elapsed_seconds": 107.76
+      "warnings": 0,
+      "error": "",
+      "elapsed_seconds": 68.69
     },
     {
       "source_id": "tyson_foods",
@@ -135,7 +135,7 @@
       "total": 13,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.08
+      "elapsed_seconds": 1.37
     },
     {
       "source_id": "jb_hunt",
@@ -145,7 +145,7 @@
       "total": 446,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 22.86
+      "elapsed_seconds": 22.44
     },
     {
       "source_id": "university_of_arkansas",
@@ -155,7 +155,7 @@
       "total": 127,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.13
+      "elapsed_seconds": 7.14
     },
     {
       "source_id": "georges",
@@ -165,7 +165,7 @@
       "total": 121,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.44
+      "elapsed_seconds": 4.28
     },
     {
       "source_id": "ingredion",
@@ -175,7 +175,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 15.71
+      "elapsed_seconds": 13.07
     },
     {
       "source_id": "one_gas",
@@ -185,7 +185,7 @@
       "total": 28,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.14
+      "elapsed_seconds": 0.86
     },
     {
       "source_id": "cherokee_nation_businesses_corporate",
@@ -195,7 +195,7 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.87
+      "elapsed_seconds": 0.69
     },
     {
       "source_id": "cherokee_nation_businesses_enterprises",
@@ -205,7 +205,7 @@
       "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.84
+      "elapsed_seconds": 1.78
     }
   ]
 }
