@@ -145,6 +145,8 @@ def fetch_workday(
     endpoint = source["api_endpoint"]
     body_template = request_config.get("body_template", {})
     page_size = max(1, int(body_template.get("limit", 100)))
+    page_concurrency = max(1, int(request_config.get("page_concurrency", 1)))
+    parallel_min_total = max(page_size, int(request_config.get("parallel_min_total", 500)))
     pages: list[dict[str, Any]] = []
     raw_details: list[dict[str, Any]] = []
     postings: list[dict[str, Any]] = []
@@ -153,110 +155,152 @@ def fetch_workday(
     warnings: list[str] = []
     duplicate_items = 0
 
+    def partial_state() -> dict[str, Any]:
+        return {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total}
+
+    def fetch_page(offset: int) -> dict[str, Any]:
+        body = dict(body_template)
+        body["limit"] = page_size
+        body["offset"] = offset
+        try:
+            return request_json(endpoint, body)
+        except SourceFetchError as exc:
+            raise SourceFetchError(str(exc), partial_state()) from exc
+
+    def process_page(page: dict[str, Any], pass_ids: set[str]) -> tuple[int, int]:
+        nonlocal total, duplicate_items
+
+        pages.append(page)
+        items = page.get("jobPostings")
+        if not isinstance(items, list):
+            raise SourceFetchError(f"Workday response did not contain jobPostings for {source['id']}")
+
+        # Some Workday boards report their real count only on the first page
+        # and return 0 on subsequent pages. Keep the largest positive count.
+        try:
+            reported_total = int(page.get("total", 0))
+        except (TypeError, ValueError):
+            reported_total = 0
+        if reported_total > 0:
+            total = max(total or 0, reported_total)
+        if not items:
+            return 0, 0
+
+        page_new_ids = 0
+        detail_tasks: list[tuple[int, str, str, str]] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            external_id = _workday_id(item)
+            unique_id = f"{source['id']}:{external_id}"
+            if unique_id in pass_ids:
+                duplicate_items += 1
+                continue
+            pass_ids.add(unique_id)
+            page_new_ids += 1
+            if unique_id in seen_ids:
+                continue
+            seen_ids.add(unique_id)
+            external_path = str(item.get("externalPath") or "")
+            location = str(item.get("locationsText") or "").strip()
+            if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
+                detail_url = endpoint.rsplit("/jobs", 1)[0] + external_path
+                detail_tasks.append((len(postings), external_id, external_path, detail_url))
+
+            career_url = str(source.get("career_url") or "").rstrip("/")
+            job_url = f"{career_url}{external_path}" if external_path else career_url
+            posted_on = item.get("postedOn")
+            postings.append(
+                {
+                    "posting_id": unique_id,
+                    "external_id": external_id,
+                    "title": str(item.get("title") or "").strip(),
+                    "location": location,
+                    "department": str(item.get("department") or item.get("jobFamilyGroup") or "").strip(),
+                    "posted_date": parse_posted_date(posted_on, run_date),
+                    "posted_label": str(posted_on or ""),
+                    "url": job_url,
+                }
+            )
+
+        # Large boards can have hundreds of generic multi-location labels.
+        # Fetch each page's details with a small concurrency cap instead of
+        # serializing every extra request across the entire board.
+        if detail_tasks:
+            with ThreadPoolExecutor(max_workers=min(4, len(detail_tasks))) as detail_pool:
+                futures = [
+                    (posting_index, external_id, external_path, detail_pool.submit(request_json, detail_url))
+                    for posting_index, external_id, external_path, detail_url in detail_tasks
+                ]
+                for posting_index, external_id, external_path, future in futures:
+                    try:
+                        detail = future.result()
+                        raw_details.append({"external_path": external_path, "response": detail})
+                        detailed_locations = _location_from_workday_detail(detail)
+                        if detailed_locations:
+                            postings[posting_index]["location"] = detailed_locations
+                    except SourceFetchError as exc:
+                        warnings.append(f"Location detail unavailable for {external_id}: {exc}")
+
+        return page_new_ids, len(items)
+
     sweep = 0
     while True:
-        offset = 0
         pass_ids: set[str] = set()
-        for _ in range(MAX_PAGES):
-            body = dict(body_template)
-            body["limit"] = page_size
-            body["offset"] = offset
-            try:
-                page = request_json(endpoint, body)
-            except SourceFetchError as exc:
-                partial = {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total}
-                raise SourceFetchError(str(exc), partial) from exc
-            pages.append(page)
-            items = page.get("jobPostings")
-            if not isinstance(items, list):
-                raise SourceFetchError(f"Workday response did not contain jobPostings for {source['id']}")
-            # Some Workday boards report their real count only on the first page
-            # and return 0 on subsequent pages. Keep the largest positive count.
-            try:
-                reported_total = int(page.get("total", 0))
-            except (TypeError, ValueError):
-                reported_total = 0
-            if reported_total > 0:
-                total = max(total or 0, reported_total)
-            if not items:
-                break
+        first_page = fetch_page(0)
+        first_new_ids, first_item_count = process_page(first_page, pass_ids)
+        page_count = 1
 
-            page_new_ids = 0
-            detail_tasks: list[tuple[int, str, str, str]] = []
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
-                external_id = _workday_id(item)
-                unique_id = f"{source['id']}:{external_id}"
-                if unique_id in pass_ids:
-                    duplicate_items += 1
-                    continue
-                pass_ids.add(unique_id)
-                page_new_ids += 1
-                if unique_id in seen_ids:
-                    continue
-                seen_ids.add(unique_id)
-                external_path = str(item.get("externalPath") or "")
-                location = str(item.get("locationsText") or "").strip()
-                if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
-                    detail_url = endpoint.rsplit("/jobs", 1)[0] + external_path
-                    detail_tasks.append((len(postings), external_id, external_path, detail_url))
-
-                career_url = str(source.get("career_url") or "").rstrip("/")
-                job_url = f"{career_url}{external_path}" if external_path else career_url
-                posted_on = item.get("postedOn")
-                postings.append(
-                    {
-                        "posting_id": unique_id,
-                        "external_id": external_id,
-                        "title": str(item.get("title") or "").strip(),
-                        "location": location,
-                        "department": str(item.get("department") or item.get("jobFamilyGroup") or "").strip(),
-                        "posted_date": parse_posted_date(posted_on, run_date),
-                        "posted_label": str(posted_on or ""),
-                        "url": job_url,
-                    }
-                )
-
-            # Large boards can have hundreds of generic multi-location labels.
-            # Fetch each page's details with a small concurrency cap instead of
-            # serializing every extra request across the entire board.
-            if detail_tasks:
-                with ThreadPoolExecutor(max_workers=min(4, len(detail_tasks))) as detail_pool:
-                    futures = [
-                        (posting_index, external_id, external_path, detail_pool.submit(request_json, detail_url))
-                        for posting_index, external_id, external_path, detail_url in detail_tasks
-                    ]
-                    for posting_index, external_id, external_path, future in futures:
-                        try:
-                            detail = future.result()
-                            raw_details.append({"external_path": external_path, "response": detail})
-                            detailed_locations = _location_from_workday_detail(detail)
-                            if detailed_locations:
-                                postings[posting_index]["location"] = detailed_locations
-                        except SourceFetchError as exc:
-                            warnings.append(f"Location detail unavailable for {external_id}: {exc}")
-
-            # Offset results can overlap while a large board changes. Move by
-            # the new IDs within this sweep, and repeat the sweep once if that
-            # drift still leaves fewer unique postings than Workday reported.
-            offset += max(page_new_ids, 1)
-            if total is not None and len(pass_ids) >= total:
-                break
-            if total is None and len(items) < page_size:
-                break
+        if total is not None and total >= parallel_min_total and page_concurrency > 1:
+            # Workday caps page size, so large boards can require many slow
+            # round trips. Fetch a few known offsets at once, then process them
+            # in order and repeat the scan if postings drifted between pages.
+            next_offset = page_size
+            exhausted = first_item_count == 0
+            with ThreadPoolExecutor(max_workers=page_concurrency) as page_pool:
+                while total is not None and next_offset < total and page_count < MAX_PAGES and not exhausted:
+                    batch_size = min(page_concurrency, MAX_PAGES - page_count)
+                    offsets = [next_offset + (index * page_size) for index in range(batch_size)]
+                    offsets = [offset for offset in offsets if offset < total]
+                    futures = [(offset, page_pool.submit(fetch_page, offset)) for offset in offsets]
+                    for offset, future in futures:
+                        page = future.result()
+                        _, item_count = process_page(page, pass_ids)
+                        page_count += 1
+                        if item_count == 0:
+                            exhausted = True
+                    next_offset += page_size * len(offsets)
+                    if len(pass_ids) >= total:
+                        break
+            if page_count >= MAX_PAGES and total is not None and len(pass_ids) < total and not exhausted:
+                raise SourceFetchError(f"Pagination safety limit reached for {source['id']}", partial_state())
         else:
-            raise SourceFetchError(
-                f"Pagination safety limit reached for {source['id']}",
-                {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
-            )
+            # Smaller or uncounted boards retain the drift-aware sequential
+            # offset strategy, advancing by newly returned IDs.
+            offset = max(first_new_ids, 1)
+            previous_item_count = first_item_count
+            if first_item_count:
+                for _ in range(1, MAX_PAGES):
+                    if total is not None and len(pass_ids) >= total:
+                        break
+                    if total is None and previous_item_count < page_size:
+                        break
+                    page = fetch_page(offset)
+                    page_new_ids, item_count = process_page(page, pass_ids)
+                    page_count += 1
+                    if item_count == 0:
+                        break
+                    offset += max(page_new_ids, 1)
+                    previous_item_count = item_count
+                else:
+                    raise SourceFetchError(f"Pagination safety limit reached for {source['id']}", partial_state())
 
         if total is None or len(pass_ids) >= total:
             break
         if sweep >= 1:
             raise SourceFetchError(
                 f"Fetched {len(seen_ids)} of {total} Workday postings for {source['id']} after a repeat scan",
-                {"raw_pages": pages, "raw_details": raw_details, "postings": postings, "warnings": warnings, "total": total},
+                partial_state(),
             )
         sweep += 1
         warnings.append(f"Repeated the board scan after {len(pass_ids)} of {total} unique postings were found")

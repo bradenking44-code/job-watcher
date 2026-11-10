@@ -77,6 +77,8 @@
   ],
   "workday_request": {
     "method": "POST",
+    "page_concurrency": 3,
+    "parallel_min_total": 500,
     "body_template": {
       "appliedFacets": {},
       "limit": 20,
