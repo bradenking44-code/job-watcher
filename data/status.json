@@ -1,81 +1,81 @@
 {
-  "run_time": "2026-11-10T16:43:22Z",
+  "run_time": "2026-11-10T19:50:44Z",
   "run_date": "2026-11-10",
   "first_run_date": "2026-11-09",
   "days_with_success": 2,
-  "open": 37,
+  "open": 36,
   "new_today": 1,
-  "removed_today": 1,
+  "removed_today": 2,
   "sources": [
     {
       "source_id": "oneok",
       "employer": "ONEOK",
       "success": true,
-      "postings": 101,
-      "total": 101,
+      "postings": 102,
+      "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 11.57
+      "elapsed_seconds": 7.81
     },
     {
       "source_id": "williams",
       "employer": "Williams",
       "success": true,
-      "postings": 125,
-      "total": 125,
+      "postings": 126,
+      "total": 126,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 14.98
+      "elapsed_seconds": 10.73
     },
     {
       "source_id": "helmerich_payne",
       "employer": "Helmerich & Payne",
       "success": true,
-      "postings": 61,
-      "total": 61,
+      "postings": 62,
+      "total": 62,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.16
+      "elapsed_seconds": 8.91
     },
     {
       "source_id": "aaon",
       "employer": "AAON",
       "success": true,
-      "postings": 228,
-      "total": 228,
+      "postings": 227,
+      "total": 227,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.68
+      "elapsed_seconds": 7.89
     },
     {
       "source_id": "td_williamson",
       "employer": "TD Williamson",
       "success": true,
-      "postings": 58,
-      "total": 58,
+      "postings": 57,
+      "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.5
+      "elapsed_seconds": 6.27
     },
     {
       "source_id": "simmons_bank",
       "employer": "Simmons Bank",
       "success": true,
-      "postings": 152,
-      "total": 152,
+      "postings": 151,
+      "total": 151,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 9.18
+      "elapsed_seconds": 9.91
     },
     {
       "source_id": "airgas",
       "employer": "Airgas",
       "success": true,
-      "postings": 417,
-      "total": 417,
+      "postings": 411,
+      "total": 411,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 46.19
+      "elapsed_seconds": 42.24
     },
     {
       "source_id": "conocophillips",
@@ -85,47 +85,47 @@
       "total": 21,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.05
+      "elapsed_seconds": 3.71
     },
     {
       "source_id": "umb_bank",
       "employer": "UMB Bank",
       "success": true,
-      "postings": 165,
-      "total": 165,
+      "postings": 162,
+      "total": 162,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 15.0
+      "elapsed_seconds": 14.76
     },
     {
       "source_id": "bok_financial",
       "employer": "BOK Financial",
       "success": true,
-      "postings": 198,
-      "total": 198,
+      "postings": 199,
+      "total": 199,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.06
+      "elapsed_seconds": 3.42
     },
     {
       "source_id": "arvest_bank",
       "employer": "Arvest Bank",
       "success": true,
-      "postings": 17,
-      "total": 17,
+      "postings": 20,
+      "total": 20,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.0
+      "elapsed_seconds": 0.93
     },
     {
       "source_id": "walmart",
       "employer": "Walmart",
       "success": false,
-      "postings": 2001,
+      "postings": 1999,
       "total": 2000,
       "warnings": 1,
-      "error": "SourceFetchError: Fetched 2001 of 2000 Workday postings for walmart after a repeat scan",
-      "elapsed_seconds": 437.63
+      "error": "SourceFetchError: Fetched 1999 of 2000 Workday postings for walmart after a repeat scan",
+      "elapsed_seconds": 636.03
     },
     {
       "source_id": "tyson_foods",
@@ -135,57 +135,57 @@
       "total": 12,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.6
+      "elapsed_seconds": 2.29
     },
     {
       "source_id": "jb_hunt",
       "employer": "J.B. Hunt",
       "success": true,
-      "postings": 438,
-      "total": 438,
+      "postings": 448,
+      "total": 448,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 20.93
+      "elapsed_seconds": 21.81
     },
     {
       "source_id": "university_of_arkansas",
       "employer": "University of Arkansas",
       "success": true,
-      "postings": 127,
-      "total": 127,
+      "postings": 130,
+      "total": 130,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.96
+      "elapsed_seconds": 8.85
     },
     {
       "source_id": "georges",
       "employer": "George's Inc.",
       "success": true,
-      "postings": 120,
-      "total": 120,
+      "postings": 118,
+      "total": 118,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 4.21
+      "elapsed_seconds": 4.41
     },
     {
       "source_id": "ingredion",
       "employer": "Ingredion",
       "success": true,
-      "postings": 225,
-      "total": 225,
+      "postings": 226,
+      "total": 226,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 20.13
+      "elapsed_seconds": 32.81
     },
     {
       "source_id": "one_gas",
       "employer": "ONE Gas",
       "success": true,
-      "postings": 27,
-      "total": 27,
+      "postings": 26,
+      "total": 26,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.02
+      "elapsed_seconds": 0.91
     },
     {
       "source_id": "cherokee_nation_businesses_corporate",
@@ -195,17 +195,17 @@
       "total": 5,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.71
+      "elapsed_seconds": 0.68
     },
     {
       "source_id": "cherokee_nation_businesses_enterprises",
       "employer": "Cherokee Nation Businesses",
       "success": true,
-      "postings": 99,
-      "total": 99,
+      "postings": 109,
+      "total": 109,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.48
+      "elapsed_seconds": 1.87
     }
   ]
 }
