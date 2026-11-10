@@ -91,6 +91,11 @@
     "expand": "requisitionList.secondaryLocations",
     "sort_by": "POSTING_DATES_DESC"
   },
+  "infor_request": {
+    "page_size": 100,
+    "sort_order_name": "JobPosting.ByPostDateBeginSet",
+    "sort_ascending": false
+  },
   "sources": [
     {
       "id": "oneok",
@@ -172,6 +177,28 @@
       "ats": "Workday",
       "api_endpoint": "https://umb.wd1.myworkdayjobs.com/wday/cxs/umb/UMBExternal/jobs",
       "career_url": "https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal"
+    },
+    {
+      "id": "bok_financial",
+      "employer": "BOK Financial",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa-area openings",
+      "ats": "SAP SuccessFactors Recruiting Marketing",
+      "api_type": "successfactors_rss",
+      "api_endpoint": "https://jobs.bokf.com/xml/",
+      "career_url": "https://jobs.bokf.com/go/"
+    },
+    {
+      "id": "arvest_bank",
+      "employer": "Arvest Bank",
+      "markets": ["tulsa_ok", "northwest_ar"],
+      "locality_hint": "Oklahoma and Northwest Arkansas openings",
+      "ats": "Infor CloudSuite HCM",
+      "api_type": "infor_cloudsuite",
+      "api_endpoint": "https://css-arvest-prd.inforcloudsuite.com/hcm/Jobs/list/JobPosting.SearchForJobsResults",
+      "career_url": "https://css-arvest-prd.inforcloudsuite.com/hcm/Jobs",
+      "job_board": "EXTERNAL",
+      "hr_organization": "ARV"
     },
     {
       "id": "walmart",
@@ -263,22 +290,5 @@
       "career_url": "https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001"
     }
   ],
-  "discovery_candidates": [
-    {
-      "id": "bok_financial",
-      "employer": "BOK Financial",
-      "markets": ["tulsa_ok"],
-      "ats": "SAP SuccessFactors Recruiting Marketing",
-      "career_url": "https://jobs.bokf.com/go/",
-      "status": "pending_public_json_endpoint_validation"
-    },
-    {
-      "id": "arvest_bank",
-      "employer": "Arvest Bank",
-      "markets": ["tulsa_ok", "northwest_ar"],
-      "ats": "Infor CloudSuite HCM",
-      "career_url": "https://www.arvest.com/careers",
-      "status": "pending_public_json_endpoint_validation"
-    }
-  ]
+  "discovery_candidates": []
 }

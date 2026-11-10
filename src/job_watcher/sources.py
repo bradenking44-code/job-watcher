@@ -1,15 +1,17 @@
-"""Public job-board adapters for Workday CXS and Oracle Candidate Experience."""
+"""Public structured-data adapters for supported employer job boards."""
 
 from __future__ import annotations
 
+import http.cookiejar
 import json
 import re
 import time
 from datetime import date, timedelta
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
-from urllib.request import Request, urlopen
+from urllib.parse import quote, urlencode, urljoin, urlparse
+from urllib.request import HTTPRedirectHandler, HTTPCookieProcessor, Request, build_opener, urlopen
+from xml.etree import ElementTree
 
 
 USER_AGENT = "job-watcher/0.1 (+https://github.com/bradenking44-code/job-watcher)"
@@ -23,6 +25,13 @@ class SourceFetchError(RuntimeError):
     def __init__(self, message: str, partial: dict[str, Any] | None = None) -> None:
         super().__init__(message)
         self.partial = partial or {}
+
+
+class _NoRedirectHandler(HTTPRedirectHandler):
+    """Leave redirects visible so Infor's anonymous assertion can reuse cookies."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 def request_json(url: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -54,6 +63,28 @@ def request_json(url: str, body: dict[str, Any] | None = None) -> dict[str, Any]
                 raise SourceFetchError(f"Could not read JSON from {url}: {exc}") from exc
         time.sleep(min(2**attempt, 8))
     raise SourceFetchError(f"Could not read JSON from {url}")
+
+
+def request_text(url: str) -> str:
+    """Read a public text feed, retrying transient HTTP and network failures."""
+
+    request = Request(
+        url,
+        headers={"Accept": "application/rss+xml, application/xml, text/xml", "User-Agent": USER_AGENT},
+    )
+    for attempt in range(4):
+        try:
+            with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+                return response.read().decode("utf-8-sig")
+        except HTTPError as exc:
+            transient = exc.code == 429 or 500 <= exc.code < 600
+            if not transient or attempt == 3:
+                raise SourceFetchError(f"HTTP {exc.code} from {url}") from exc
+        except (URLError, TimeoutError) as exc:
+            if attempt == 3:
+                raise SourceFetchError(f"Could not read feed from {url}: {exc}") from exc
+        time.sleep(min(2**attempt, 8))
+    raise SourceFetchError(f"Could not read feed from {url}")
 
 
 def parse_posted_date(value: Any, run_date: date) -> str:
@@ -361,10 +392,245 @@ def fetch_oracle_candidate_experience(
     return {"postings": postings, "total": total if total is not None else len(postings), "raw_pages": pages, "raw_details": [], "warnings": warnings}
 
 
+def fetch_successfactors_rss(source: dict[str, Any]) -> dict[str, Any]:
+    """Fetch the public SAP SuccessFactors RSS/XML job feed."""
+
+    feed_text = request_text(source["api_endpoint"])
+    try:
+        root = ElementTree.fromstring(feed_text)
+    except ElementTree.ParseError as exc:
+        raise SourceFetchError(f"Invalid RSS/XML response from {source['api_endpoint']}: {exc}") from exc
+
+    channel = root.find("channel")
+    if channel is None:
+        raise SourceFetchError(f"RSS response did not contain a channel for {source['id']}")
+
+    postings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    for item in channel.findall("item"):
+        external_id = str(item.findtext("id") or item.findtext("guid") or "").strip()
+        if not external_id:
+            continue
+        if external_id in seen_ids:
+            continue
+        seen_ids.add(external_id)
+
+        title = str(item.findtext("title") or "").strip()
+        location = str(item.findtext("location") or "").strip()
+        # BOK includes the full location in parentheses in RSS titles as well
+        # as in its separate location field. Keep the title clean for role matching.
+        location_suffix = f" ({location})" if location else ""
+        if location_suffix and title.endswith(location_suffix):
+            title = title[: -len(location_suffix)].strip()
+
+        postings.append(
+            {
+                "posting_id": f"{source['id']}:{external_id}",
+                "external_id": external_id,
+                "title": title,
+                "location": location,
+                "department": str(item.findtext("job_function") or "").strip(),
+                "posted_date": "",
+                "posted_label": "",
+                "url": str(item.findtext("link") or source.get("career_url") or "").strip(),
+            }
+        )
+
+    return {
+        "postings": postings,
+        "total": len(postings),
+        # Preserve the source response as received; the pipeline compresses it
+        # with the other public API snapshots.
+        "raw_pages": [{"xml": feed_text}],
+        "warnings": [],
+    }
+
+
+def request_infor_json(url: str, opener: Any, expected_host: str) -> dict[str, Any]:
+    """Read Infor's anonymous JSON resource, following its cookie-backed SSO assertion."""
+
+    headers = {"Accept": "application/json", "User-Agent": USER_AGENT}
+    for attempt in range(4):
+        current_url = url
+        redirect_count = 0
+        retry = False
+        while True:
+            if (urlparse(current_url).hostname or "").lower() != expected_host.lower():
+                raise SourceFetchError(f"Infor pagination left the public host for {url}")
+            request = Request(current_url, headers=headers)
+            try:
+                with opener.open(request, timeout=TIMEOUT_SECONDS) as response:
+                    status = response.status
+                    location = response.headers.get("Location")
+                    decoded = response.read().decode("utf-8")
+            except HTTPError as exc:
+                status = exc.code
+                location = exc.headers.get("Location")
+                decoded = exc.read().decode("utf-8", "replace")
+            except (URLError, TimeoutError) as exc:
+                if attempt == 3:
+                    raise SourceFetchError(f"Could not read Infor JSON from {url}: {exc}") from exc
+                retry = True
+                break
+
+            if status in {301, 302, 303, 307, 308} and location:
+                redirect_count += 1
+                if redirect_count > 8:
+                    raise SourceFetchError(f"Too many redirects from Infor JSON resource {url}")
+                current_url = urljoin(current_url, location)
+                continue
+            if status == 429 or 500 <= status < 600:
+                if attempt == 3:
+                    raise SourceFetchError(f"HTTP {status} from Infor JSON resource {url}")
+                retry = True
+                break
+            if not 200 <= status < 300:
+                raise SourceFetchError(f"HTTP {status} from Infor JSON resource {url}")
+            try:
+                result = json.loads(decoded)
+            except json.JSONDecodeError as exc:
+                raise SourceFetchError(f"Expected JSON from Infor resource {url}") from exc
+            if not isinstance(result, dict):
+                raise SourceFetchError(f"Expected a JSON object from Infor resource {url}")
+            return result
+
+        if retry:
+            time.sleep(min(2**attempt, 8))
+    raise SourceFetchError(f"Could not read Infor JSON from {url}")
+
+
+def _infor_value(item: dict[str, Any], field_name: str) -> Any:
+    field = (item.get("fields") or {}).get(field_name)
+    return field.get("value") if isinstance(field, dict) else None
+
+
+def _infor_location(item: dict[str, Any]) -> str:
+    parts = [
+        str(_infor_value(item, f"LocationOfJob_prd_Location_ohb_{index}_chb_") or "").strip()
+        for index in range(1, 5)
+    ]
+    parts = [part for part in parts if part]
+    if len(parts) >= 3 and parts[0].upper() in {"US", "USA"}:
+        city, state = parts[2].replace("_", " ").title(), parts[1].upper()
+        extra = f" ({parts[3].replace('_', ' ').title()})" if len(parts) > 3 else ""
+        return f"{city}, {state}{extra}"
+    if parts:
+        return ", ".join(part.replace("_", " ").title() for part in parts)
+    raw = str(_infor_value(item, "LocationOfJob") or "").strip()
+    return ", ".join(part.title() for part in raw.split(":") if part.strip())
+
+
+def fetch_infor_cloudsuite(
+    source: dict[str, Any],
+    request_config: dict[str, Any],
+    run_date: date,
+) -> dict[str, Any]:
+    """Fetch public Infor Candidate Experience listings using its JSON list resource."""
+
+    endpoint = source["api_endpoint"]
+    expected_host = urlparse(endpoint).hostname or ""
+    organization = str(source["hr_organization"])
+    job_board = str(source.get("job_board") or "EXTERNAL")
+    params = {
+        "pageop": "sort",
+        "pagesize": max(1, int(request_config.get("page_size", 100))),
+        "sortOrderName": str(request_config.get("sort_order_name", "JobPosting.ByPostDateBeginSet")),
+        "isAscending": str(bool(request_config.get("sort_ascending", False))).lower(),
+        "csk.JobBoard": job_board,
+        "csk.showusingxi": "true",
+        "csk.HROrganization": organization,
+    }
+    page_url = f"{endpoint}?{urlencode(params)}"
+    jar = http.cookiejar.CookieJar()
+    opener = build_opener(_NoRedirectHandler(), HTTPCookieProcessor(jar))
+    pages: list[dict[str, Any]] = []
+    postings: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    duplicate_items = 0
+
+    for _ in range(MAX_PAGES):
+        page = request_infor_json(page_url, opener, expected_host)
+        pages.append(page)
+        data_view = page.get("dataViewSet") or {}
+        rows = data_view.get("data")
+        if not isinstance(rows, list):
+            raise SourceFetchError(f"Infor response did not contain a data list for {source['id']}")
+
+        for item in rows:
+            if not isinstance(item, dict):
+                continue
+            job_id = str(_infor_value(item, "JobRequisition") or _infor_value(item, "JobId") or "").strip()
+            posting_number = str(_infor_value(item, "JobPosting") or "").strip()
+            if not job_id or not posting_number:
+                continue
+            external_id = f"{job_id}:{posting_number}"
+            unique_id = f"{source['id']}:{external_id}"
+            if unique_id in seen_ids:
+                duplicate_items += 1
+                continue
+            seen_ids.add(unique_id)
+
+            posted_raw = str(
+                _infor_value(item, "PostingDateRange_prd_Begin")
+                or _infor_value(item, "PostingDateRange")
+                or ""
+            ).strip()
+            if re.fullmatch(r"\d{8}", posted_raw):
+                posted_raw = f"{posted_raw[:4]}-{posted_raw[4:6]}-{posted_raw[6:8]}"
+            posting_route = f"JobPosting[JobPostingSet]({organization},{job_id},{posting_number}).JobPostingDisplay"
+            posting_path = quote(posting_route, safe=",")
+            posting_url = (
+                f"{source['career_url'].rstrip('/')}/form/{posting_path}?"
+                + urlencode(
+                    {
+                        "csk.JobBoard": job_board,
+                        "csk.HROrganization": organization,
+                        "csk.showusingxi": "true",
+                    }
+                )
+            )
+            category = (
+                _infor_value(item, "CategoryDescriptionForSort")
+                or _infor_value(item, "_op_Category_prd_Description_spc_translation_cp_")
+                or _infor_value(item, "Category")
+                or ""
+            )
+            postings.append(
+                {
+                    "posting_id": unique_id,
+                    "external_id": external_id,
+                    "title": str(_infor_value(item, "Description") or "").strip(),
+                    "location": _infor_location(item),
+                    "department": str(category).strip(),
+                    "posted_date": parse_posted_date(posted_raw, run_date),
+                    "posted_label": str(_infor_value(item, "_op_DisplayDuration_spc_translation_cp_") or "").strip(),
+                    "url": posting_url,
+                }
+            )
+
+        paging = data_view.get("pagingInfo") or {}
+        has_next = paging.get("hasNext") is True
+        if not has_next:
+            break
+        next_url = (data_view.get("pagingUrls") or {}).get("nextPageUrl")
+        if not isinstance(next_url, str) or not next_url.strip():
+            raise SourceFetchError(f"Infor response omitted the next-page URL for {source['id']}")
+        page_url = urljoin(endpoint, next_url)
+    else:
+        raise SourceFetchError(f"Pagination safety limit reached for {source['id']}")
+
+    warnings = [f"Skipped {duplicate_items} duplicate postings across pages"] if duplicate_items else []
+    return {"postings": postings, "total": len(postings), "raw_pages": pages, "warnings": warnings}
+
+
 def fetch_source(source: dict[str, Any], config: dict[str, Any], run_date: date) -> dict[str, Any]:
     api_type = source.get("api_type")
     if api_type == "oracle_candidate_experience":
         return fetch_oracle_candidate_experience(source, config.get("oracle_request", {}), run_date)
+    if api_type == "successfactors_rss":
+        return fetch_successfactors_rss(source)
+    if api_type == "infor_cloudsuite":
+        return fetch_infor_cloudsuite(source, config.get("infor_request", {}), run_date)
     if api_type == "workday_cxs" or source.get("ats", "").lower() == "workday":
         return fetch_workday(source, config.get("workday_request", {}), run_date)
     raise SourceFetchError(f"Unsupported public job-board adapter: {api_type or source.get('ats')} for {source['id']}")

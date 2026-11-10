@@ -1,6 +1,6 @@
 # Job Watcher
 
-A daily job-market tracker for finance students looking for finance and accounting jobs in the Tulsa, Oklahoma and Northwest Arkansas job markets. It will collect public job-board JSON, rebuild a posting history, report daily changes, and publish a small site with GitHub Pages.
+A daily job-market tracker for finance students looking for finance and accounting jobs in the Tulsa, Oklahoma and Northwest Arkansas job markets. It collects public structured job-board feeds, rebuilds a posting history, reports daily changes, and publishes a small site with GitHub Pages.
 
 **Published site:** [bradenking44-code.github.io/job-watcher](https://bradenking44-code.github.io/job-watcher/)
 
@@ -8,7 +8,7 @@ A daily job-market tracker for finance students looking for finance and accounti
 
 ## Target roles and locations
 
-The active watchlist covers 18 public job-board endpoints across 17 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are also linked from the homepage while their public JSON endpoints are checked. The homepage has 20 tiles: 18 monitored boards and two clearly marked discovery links. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
+The active watchlist covers 20 public job-board feeds across 19 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are now monitored alongside the other employers. The homepage has 20 monitored employer-board tiles. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
 
 The title rule is intentionally broad and flags roles with finance, financial, FP&A, accounting, accounts payable or receivable, treasury, tax, audit, controller, credit, underwriting, investment, portfolio, wealth, banking, loan, budget, billing, payroll, or revenue-accounting language. It is a title-based screen, so flagged postings should be reviewed before applying.
 
@@ -21,7 +21,7 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the exact public JSON endpoint for each active employer board and is the machine-readable source of truth. The Workday endpoints were checked for unauthenticated access on 2026-11-09; each was returning fewer than 5,000 postings without a search term at that time. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
+The source registry contains the exact public structured-data endpoint for each active employer board and is the machine-readable source of truth. Workday and Oracle boards use JSON APIs. BOK Financial uses its public SuccessFactors RSS/XML feed, and Arvest uses the public JSON list resource from its Infor Candidate Experience board. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. The collector does not parse job-board HTML. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
 
 | Market | Employer | Local coverage |
 | --- | --- | --- |
@@ -34,6 +34,8 @@ The source registry contains the exact public JSON endpoint for each active empl
 | Tulsa | [Airgas](https://airliquidehr.wd3.myworkdayjobs.com/en-US/AirgasExternalCareer) | Tulsa-area openings |
 | Tulsa outer area | [ConocoPhillips](https://conocophillips.wd1.myworkdayjobs.com/en-US/External) | Bartlesville |
 | Tulsa | [UMB Bank](https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal) | Tulsa-area openings |
+| Tulsa | [BOK Financial](https://jobs.bokf.com/go/) | Tulsa banking, finance, treasury, and early-career roles |
+| Tulsa and Northwest Arkansas | [Arvest Bank](https://www.arvest.com/careers) | Oklahoma and Northwest Arkansas openings |
 | Northwest Arkansas | [Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal) | Bentonville and nearby offices |
 | Northwest Arkansas | [Tyson Foods](https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1) | Springdale and nearby offices |
 | Northwest Arkansas | [J.B. Hunt](https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers) | Lowell and nearby offices |
@@ -45,13 +47,6 @@ The source registry contains the exact public JSON endpoint for each active empl
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Catoosa, Claremore, Tahlequah, and other business locations |
 
 The job boards can also return jobs outside the target cities. The location rule above applies across all sources, rather than assuming every job from a listed employer is local.
-
-### Next sources to validate
-
-- [BOK Financial](https://jobs.bokf.com/go/) has Tulsa banking, finance, treasury, and early-career roles.
-- [Arvest Bank](https://www.arvest.com/careers) hires across Oklahoma and Arkansas, including Northwest Arkansas.
-
-Their career pages are included in the homepage tiles and `config/sources.json`, but they are not active collection sources until an unauthenticated JSON endpoint is verified. The collector continues to avoid HTML scraping.
 
 ## Data and rebuild command
 
@@ -95,7 +90,7 @@ pytest
 
 ## Project requirements
 
-- Fetch all 18 active public ATS JSON endpoints without logging in or scraping HTML.
+- Fetch all 20 active public feeds (19 JSON endpoints and one RSS/XML feed) anonymously, without parsing HTML.
 - Keep each source response in raw data; apply the documented role and location rules when building local finance results.
 - Continue when a source fails and record each source's result.
 - Rebuild history deterministically from raw data, including first-seen, last-seen, and removed dates.
