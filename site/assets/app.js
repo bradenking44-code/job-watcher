@@ -148,7 +148,13 @@ function renderToday() {
   const day = runDay();
   const fresh = active.filter((job) => (text(job.first_seen) || text(job.posted_date)).slice(0, 10) === day);
   const removed = regional.filter((job) => !isOpen(job) && roleMatch(job) && text(job.removed_date).slice(0, 10) === day);
-  const values = { 'metric-open': active.length, 'metric-new': fresh.length, 'metric-removed': removed.length, 'metric-sources': DATA.sources.length };
+  const values = {
+    'metric-open': DATA.status.open ?? active.length,
+    'metric-new': DATA.status.new_today ?? fresh.length,
+    'metric-removed': DATA.status.removed_today ?? removed.length,
+    'metric-sources': DATA.sources.length,
+    'metric-days': DATA.status.days_with_success ?? 0
+  };
   for (const [id, value] of Object.entries(values)) { const node = document.getElementById(id); if (node) node.textContent = String(value); }
   const heroSourceCount = document.getElementById('hero-source-count');
   if (heroSourceCount) heroSourceCount.textContent = String(DATA.sources.length);

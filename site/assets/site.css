@@ -80,7 +80,7 @@ h1, h2, p { margin-top: 0; }
 .section-heading .eyebrow, .panel-heading .eyebrow { margin-bottom: 9px; }
 .section-heading h2, .panel-heading h2, .employer-strip h2 { margin: 0; font: 600 23px var(--display); letter-spacing: -.05em; }
 .updated-label { margin: 0 0 3px; color: #818b84; font: 10px var(--mono); }
-.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+.metric-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 13px; }
 .metric-card { position: relative; min-height: 138px; padding: 21px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
 .metric-primary { border-color: var(--green); background: var(--green); color: #fff; }
 .metric-label, .metric-foot { display: block; }
@@ -254,6 +254,10 @@ h1, h2, p { margin-top: 0; }
   .market-card { min-height: 320px; padding: 20px; }
   .market-source-list { grid-template-columns: repeat(2, 1fr); }
   .site-footer { align-items: start; flex-direction: column; gap: 8px; padding: 19px 18px; }
+}
+
+@media (min-width: 681px) and (max-width: 1050px) {
+  .metric-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
