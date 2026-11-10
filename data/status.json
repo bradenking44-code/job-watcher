@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-10T00:27:10Z",
+  "run_time": "2026-11-10T01:35:12Z",
   "run_date": "2026-11-10",
   "first_run_date": "2026-11-09",
   "days_with_success": 2,
-  "open": 36,
-  "new_today": 0,
+  "open": 38,
+  "new_today": 2,
   "removed_today": 0,
   "sources": [
     {
@@ -15,7 +15,7 @@
       "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.68
+      "elapsed_seconds": 6.2
     },
     {
       "source_id": "williams",
@@ -25,7 +25,7 @@
       "total": 126,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 40.45
+      "elapsed_seconds": 10.97
     },
     {
       "source_id": "helmerich_payne",
@@ -35,7 +35,7 @@
       "total": 61,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.68
+      "elapsed_seconds": 4.68
     },
     {
       "source_id": "aaon",
@@ -45,7 +45,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.13
+      "elapsed_seconds": 6.9
     },
     {
       "source_id": "td_williamson",
@@ -55,7 +55,7 @@
       "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.64
+      "elapsed_seconds": 3.56
     },
     {
       "source_id": "simmons_bank",
@@ -65,7 +65,7 @@
       "total": 152,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 16.26
+      "elapsed_seconds": 8.22
     },
     {
       "source_id": "airgas",
@@ -75,7 +75,7 @@
       "total": 420,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 47.15
+      "elapsed_seconds": 42.67
     },
     {
       "source_id": "conocophillips",
@@ -85,7 +85,7 @@
       "total": 23,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.92
+      "elapsed_seconds": 2.37
     },
     {
       "source_id": "umb_bank",
@@ -95,7 +95,7 @@
       "total": 165,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 17.96
+      "elapsed_seconds": 12.12
     },
     {
       "source_id": "bok_financial",
@@ -105,27 +105,27 @@
       "total": 198,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.55
+      "elapsed_seconds": 3.96
     },
     {
       "source_id": "arvest_bank",
       "employer": "Arvest Bank",
-      "success": false,
-      "postings": 0,
-      "total": 0,
+      "success": true,
+      "postings": 27,
+      "total": 27,
       "warnings": 0,
-      "error": "SourceFetchError: Expected JSON from Infor resource https://css-arvest-prd.inforcloudsuite.com/hcm/Jobs/list/JobPosting.SearchForJobsResults?pageop=sort&pagesize=100&sortOrderName=JobPosting.ByPostDateBeginSet&isAscending=false&csk.JobBoard=EXTERNAL&csk.showusingxi=true&csk.HROrganization=ARV",
-      "elapsed_seconds": 0.1
+      "error": "",
+      "elapsed_seconds": 1.24
     },
     {
       "source_id": "walmart",
       "employer": "Walmart",
-      "success": true,
-      "postings": 2000,
+      "success": false,
+      "postings": 1998,
       "total": 2000,
       "warnings": 1,
-      "error": "",
-      "elapsed_seconds": 168.4
+      "error": "SourceFetchError: Fetched 1998 of 2000 Workday postings for walmart after a repeat scan",
+      "elapsed_seconds": 107.76
     },
     {
       "source_id": "tyson_foods",
@@ -135,7 +135,7 @@
       "total": 13,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.04
+      "elapsed_seconds": 1.08
     },
     {
       "source_id": "jb_hunt",
@@ -145,7 +145,7 @@
       "total": 446,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 23.62
+      "elapsed_seconds": 22.86
     },
     {
       "source_id": "university_of_arkansas",
@@ -155,7 +155,7 @@
       "total": 127,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.7
+      "elapsed_seconds": 7.13
     },
     {
       "source_id": "georges",
@@ -165,7 +165,7 @@
       "total": 121,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.87
+      "elapsed_seconds": 3.44
     },
     {
       "source_id": "ingredion",
@@ -175,7 +175,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 11.43
+      "elapsed_seconds": 15.71
     },
     {
       "source_id": "one_gas",
@@ -185,7 +185,7 @@
       "total": 28,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.92
+      "elapsed_seconds": 1.14
     },
     {
       "source_id": "cherokee_nation_businesses_corporate",
@@ -195,7 +195,7 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.65
+      "elapsed_seconds": 0.87
     },
     {
       "source_id": "cherokee_nation_businesses_enterprises",
@@ -205,7 +205,7 @@
       "total": 102,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.08
+      "elapsed_seconds": 1.84
     }
   ]
 }
