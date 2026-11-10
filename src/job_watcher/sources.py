@@ -315,8 +315,15 @@ def fetch_workday(
         if total is None or len(pass_ids) >= total:
             break
         if sweep >= 1:
+            if len(seen_ids) >= total:
+                warnings.append(
+                    f"Workday results changed during pagination; retained {len(seen_ids)} distinct postings "
+                    f"against the latest reported total of {total}"
+                )
+                break
             raise SourceFetchError(
-                f"Fetched {len(seen_ids)} of {total} Workday postings for {source['id']} after a repeat scan",
+                f"Collected {len(seen_ids)} distinct of {total} reported Workday postings "
+                f"for {source['id']} after a repeat scan",
                 partial_state(),
             )
         sweep += 1

@@ -162,6 +162,36 @@ def test_workday_repeats_the_sweep_if_offset_drift_leaves_a_short_count(monkeypa
     assert result["warnings"][0].startswith("Repeated the board scan after 3 of 4 unique postings")
 
 
+def test_workday_keeps_complete_union_when_the_board_changes_during_repeat_scan(monkeypatch):
+    calls = []
+    pages = [
+        {"total": 4, "jobPostings": [{"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}"} for key in ("A", "B")]},
+        {"total": 0, "jobPostings": [{"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}"} for key in ("B", "C")]},
+        {"total": 0, "jobPostings": [{"title": "Finance Analyst", "externalPath": "/job/Tulsa-OK/Analyst_C"}]},
+        {"total": 0, "jobPostings": []},
+        {"total": 4, "jobPostings": [{"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}"} for key in ("A", "B")]},
+        {"total": 0, "jobPostings": [{"title": "Finance Analyst", "externalPath": f"/job/Tulsa-OK/Analyst_{key}"} for key in ("B", "D")]},
+        {"total": 0, "jobPostings": [{"title": "Finance Analyst", "externalPath": "/job/Tulsa-OK/Analyst_D"}]},
+        {"total": 0, "jobPostings": []},
+    ]
+
+    def fake_request(_url, body=None):
+        calls.append(body["offset"])
+        return pages[len(calls) - 1]
+
+    monkeypatch.setattr("job_watcher.sources.request_json", fake_request)
+    source = {
+        "id": "sample", "employer": "Sample Co.", "ats": "Workday",
+        "api_endpoint": "https://example.test/wday/cxs/sample/Sample/jobs",
+        "career_url": "https://example.test/en-US/Sample",
+    }
+    result = fetch_workday(source, {"body_template": {"limit": 2}}, date(2026, 11, 9))
+
+    assert calls == [0, 2, 3, 4, 0, 2, 3, 4]
+    assert len(result["postings"]) == result["total"] == 4
+    assert any("Workday results changed during pagination" in warning for warning in result["warnings"])
+
+
 def test_workday_enriches_generic_multi_location_results(monkeypatch):
     requests = []
     page = {
