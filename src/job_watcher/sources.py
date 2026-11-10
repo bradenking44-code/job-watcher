@@ -15,6 +15,7 @@ from xml.etree import ElementTree
 
 
 USER_AGENT = "job-watcher/0.1 (+https://github.com/bradenking44-code/job-watcher)"
+INFOR_USER_AGENT = "Mozilla/5.0 (compatible; JobWatcher/0.1; +https://github.com/bradenking44-code/job-watcher)"
 TIMEOUT_SECONDS = 30
 MAX_PAGES = 1000
 
@@ -449,7 +450,10 @@ def fetch_successfactors_rss(source: dict[str, Any]) -> dict[str, Any]:
 def request_infor_json(url: str, opener: Any, expected_host: str) -> dict[str, Any]:
     """Read Infor's anonymous JSON resource, following its cookie-backed SSO assertion."""
 
-    headers = {"Accept": "application/json", "User-Agent": USER_AGENT}
+    # Infor returns an empty 200 response to non-browser user-agent strings.
+    # Keep the client identifier while using the browser-compatible prefix its
+    # public Candidate Experience endpoint requires.
+    headers = {"Accept": "application/json", "User-Agent": INFOR_USER_AGENT}
     for attempt in range(4):
         current_url = url
         redirect_count = 0
