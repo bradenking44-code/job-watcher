@@ -255,23 +255,40 @@ def fetch_workday(
             # Workday caps page size, so large boards can require many slow
             # round trips. Fetch a few known offsets at once, then process them
             # in order and repeat the scan if postings drifted between pages.
-            next_offset = page_size
+            next_offset = max(first_new_ids, 1)
             exhausted = first_item_count == 0
             with ThreadPoolExecutor(max_workers=page_concurrency) as page_pool:
                 while total is not None and next_offset < total and page_count < MAX_PAGES and not exhausted:
+                    batch_start = next_offset
                     batch_size = min(page_concurrency, MAX_PAGES - page_count)
-                    offsets = [next_offset + (index * page_size) for index in range(batch_size)]
+                    offsets = [batch_start + (index * page_size) for index in range(batch_size)]
                     offsets = [offset for offset in offsets if offset < total]
                     futures = [(offset, page_pool.submit(fetch_page, offset)) for offset in offsets]
-                    for offset, future in futures:
+                    batch_advance = 0
+                    for _, future in futures:
                         page = future.result()
-                        _, item_count = process_page(page, pass_ids)
+                        page_new_ids, item_count = process_page(page, pass_ids)
+                        page_count += 1
+                        batch_advance += max(page_new_ids, 1)
+                        if item_count == 0:
+                            exhausted = True
+                    next_offset = batch_start + batch_advance
+                    if len(pass_ids) >= total:
+                        break
+                    # Parallel offsets assume full pages. If postings moved
+                    # while the board was scanned, fill any gaps sequentially
+                    # before starting the next batch so no rows are skipped.
+                    batch_end = min(batch_start + page_size * len(offsets), total)
+                    while next_offset < batch_end and page_count < MAX_PAGES and not exhausted:
+                        page = fetch_page(next_offset)
+                        page_new_ids, item_count = process_page(page, pass_ids)
                         page_count += 1
                         if item_count == 0:
                             exhausted = True
-                    next_offset += page_size * len(offsets)
-                    if len(pass_ids) >= total:
-                        break
+                            break
+                        next_offset += max(page_new_ids, 1)
+                        if len(pass_ids) >= total:
+                            break
             if page_count >= MAX_PAGES and total is not None and len(pass_ids) < total and not exhausted:
                 raise SourceFetchError(f"Pagination safety limit reached for {source['id']}", partial_state())
         else:
