@@ -1,6 +1,6 @@
 # Job Watcher
 
-A daily job-market tracker for finance students looking for finance and accounting jobs in the Tulsa, Oklahoma and Northwest Arkansas job markets. It collects public structured job-board feeds, rebuilds a posting history, reports daily changes, and publishes a small site with GitHub Pages.
+A daily job-market tracker for finance students looking for finance and accounting jobs in the Tulsa, Oklahoma and Northwest Arkansas job markets. It collects public applicant-tracking-system feeds, rebuilds a posting history, reports daily changes, and publishes a small site with GitHub Pages.
 
 **Published site:** [bradenking44-code.github.io/job-watcher](https://bradenking44-code.github.io/job-watcher/)
 
@@ -8,7 +8,7 @@ A daily job-market tracker for finance students looking for finance and accounti
 
 ## Target roles and locations
 
-The active watchlist covers 20 public job-board feeds across 19 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are now monitored alongside the other employers. The homepage has 20 monitored employer-board tiles. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` as they are verified.
+The active watchlist covers 20 public job-board feeds across 19 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are monitored alongside the other employers. The homepage displays all 20 boards. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` after their public endpoints are verified.
 
 The title rule is intentionally broad and flags roles with finance, financial, FP&A, accounting, accounts payable or receivable, treasury, tax, audit, controller, credit, underwriting, investment, portfolio, wealth, banking, loan, budget, billing, payroll, or revenue-accounting language. It is a title-based screen, so flagged postings should be reviewed before applying.
 
@@ -21,36 +21,36 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the exact public structured-data endpoint for each active employer board and is the machine-readable source of truth. Workday and Oracle boards use JSON APIs. BOK Financial uses its public SuccessFactors RSS/XML feed, and Arvest uses the public JSON list resource from its Infor Candidate Experience board. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. The collector does not parse job-board HTML. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run.
+The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, and Arvest's Infor CloudSuite endpoint return JSON. BOK Financial's public SuccessFactors feed returns RSS/XML; the collector parses that structured feed and does not read job-board HTML. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. The assignment asks every source to return JSON; BOK's RSS/XML feed is a documented exception to that source-format requirement.
 
-| Market | Employer | Local coverage |
-| --- | --- | --- |
-| Tulsa | [ONEOK](https://oneok.wd1.myworkdayjobs.com/en-US/ONEOK) | Tulsa |
-| Tulsa | [Williams](https://williams.wd5.myworkdayjobs.com/en-US/External) | Tulsa |
-| Tulsa | [Helmerich & Payne](https://hpinc.wd5.myworkdayjobs.com/en-US/HPINC) | Tulsa |
-| Tulsa | [AAON](https://aaon.wd108.myworkdayjobs.com/en-US/AAON) | Tulsa |
-| Tulsa | [TD Williamson](https://tdwilliamson.wd1.myworkdayjobs.com/en-US/TDWCareers) | Tulsa |
-| Tulsa and Northwest Arkansas | [Simmons Bank](https://simmonsbank.wd5.myworkdayjobs.com/en-US/SimmonsCareers) | Tulsa and regional Arkansas openings |
-| Tulsa | [Airgas](https://airliquidehr.wd3.myworkdayjobs.com/en-US/AirgasExternalCareer) | Tulsa-area openings |
-| Tulsa outer area | [ConocoPhillips](https://conocophillips.wd1.myworkdayjobs.com/en-US/External) | Bartlesville |
-| Tulsa | [UMB Bank](https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal) | Tulsa-area openings |
-| Tulsa | [BOK Financial](https://jobs.bokf.com/go/) | Tulsa banking, finance, treasury, and early-career roles |
-| Tulsa and Northwest Arkansas | [Arvest Bank](https://www.arvest.com/careers) | Oklahoma and Northwest Arkansas openings |
-| Northwest Arkansas | [Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal) | Bentonville and nearby offices |
-| Northwest Arkansas | [Tyson Foods](https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1) | Springdale and nearby offices |
-| Northwest Arkansas | [J.B. Hunt](https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers) | Lowell and nearby offices |
-| Northwest Arkansas | [University of Arkansas](https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site) | Fayetteville |
-| Northwest Arkansas | [George's Inc.](https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges) | Springdale |
-| Tulsa | [Ingredion](https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers) | Tulsa-area openings |
-| Tulsa | [ONE Gas](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs) | Tulsa |
-| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Tulsa, Owasso, Tahlequah |
-| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Catoosa, Claremore, Tahlequah, and other business locations |
+| Market | Employer | Applicant tracking system | Local coverage |
+| --- | --- | --- | --- |
+| Tulsa | [ONEOK](https://oneok.wd1.myworkdayjobs.com/en-US/ONEOK) | Workday JSON | Tulsa |
+| Tulsa | [Williams](https://williams.wd5.myworkdayjobs.com/en-US/External) | Workday JSON | Tulsa |
+| Tulsa | [Helmerich & Payne](https://hpinc.wd5.myworkdayjobs.com/en-US/HPINC) | Workday JSON | Tulsa |
+| Tulsa | [AAON](https://aaon.wd108.myworkdayjobs.com/en-US/AAON) | Workday JSON | Tulsa |
+| Tulsa | [TD Williamson](https://tdwilliamson.wd1.myworkdayjobs.com/en-US/TDWCareers) | Workday JSON | Tulsa |
+| Tulsa and Northwest Arkansas | [Simmons Bank](https://simmonsbank.wd5.myworkdayjobs.com/en-US/SimmonsCareers) | Workday JSON | Tulsa and regional Arkansas openings |
+| Tulsa | [Airgas](https://airliquidehr.wd3.myworkdayjobs.com/en-US/AirgasExternalCareer) | Workday JSON | Tulsa-area openings |
+| Tulsa outer area | [ConocoPhillips](https://conocophillips.wd1.myworkdayjobs.com/en-US/External) | Workday JSON | Bartlesville |
+| Tulsa | [UMB Bank](https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal) | Workday JSON | Tulsa-area openings |
+| Tulsa | [BOK Financial](https://jobs.bokf.com/go/) | SuccessFactors public RSS/XML | Tulsa banking, finance, treasury, and early-career roles |
+| Tulsa and Northwest Arkansas | [Arvest Bank](https://www.arvest.com/careers) | Infor CloudSuite JSON | Oklahoma and Northwest Arkansas openings |
+| Northwest Arkansas | [Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal) | Workday JSON | Bentonville and nearby offices |
+| Northwest Arkansas | [Tyson Foods](https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1) | Workday JSON | Springdale and nearby offices |
+| Northwest Arkansas | [J.B. Hunt](https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers) | Workday JSON | Lowell and nearby offices |
+| Northwest Arkansas | [University of Arkansas](https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site) | Workday JSON | Fayetteville |
+| Northwest Arkansas | [George's Inc.](https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges) | Workday JSON | Springdale |
+| Tulsa | [Ingredion](https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers) | Workday JSON | Tulsa-area openings |
+| Tulsa | [ONE Gas](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs) | Oracle Candidate Experience JSON | Tulsa |
+| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Oracle Candidate Experience JSON | Tulsa, Owasso, Tahlequah |
+| Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Oracle Candidate Experience JSON | Catoosa, Claremore, Tahlequah, and other business locations |
 
 The job boards can also return jobs outside the target cities. The location rule above applies across all sources, rather than assuming every job from a listed employer is local.
 
 ## Data and rebuild command
 
-The daily collector saves compressed source responses under `data/raw/<UTC date>/<source>.json.gz`. `data/history.csv` is deterministically rebuilt from those raw snapshots and `data/status.json` describes the latest run. The first successful collection establishes a baseline; later runs open one dated GitHub issue when local finance postings are added or removed. Source failures are recorded and do not cause postings to be marked removed.
+The daily collector saves each successful response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful raw snapshots, so a failed source does not mark its postings removed. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
 
 Run the collector manually:
 
@@ -58,7 +58,13 @@ Run the collector manually:
 python -m job_watcher.pipeline
 ```
 
-The scheduled GitHub Actions workflow runs it daily in UTC, commits compressed snapshots and rebuilt history, and triggers a site refresh. Dates use UTC and history rows are sorted by `posting_id`.
+Rebuild the history from the saved raw files without making network requests:
+
+```bash
+python -m job_watcher.pipeline --build-only
+```
+
+The scheduled GitHub Actions workflow runs daily at 12:17 UTC (6:17 a.m. Central Standard Time or 7:17 a.m. Central Daylight Time), commits raw snapshots, history, status, and the daily change report. The Pages workflow publishes when data changes. Dates use UTC, history rows are sorted by `posting_id`, and a date counts once even if the workflow is rerun.
 
 ## Development
 
@@ -74,26 +80,40 @@ pytest
 | Path | Purpose |
 | --- | --- |
 | `.gitignore` | Excludes local environments, caches, and build output. |
-| `.github/workflows/daily-pipeline.yml` | Daily collection, dated change issue, and data commit. |
+| `.github/workflows/daily-pipeline.yml` | Daily collection, daily issue creation/update, previous-issue close, and data commit. |
 | `.github/workflows/pages.yml` | Builds and publishes the static site with GitHub Pages. |
 | `.github/workflows/tests.yml` | Runs pytest on pushes and pull requests. |
 | `pyproject.toml` | Python project metadata and pytest configuration. |
 | `README.md` | Project setup, target role and market, and operating instructions. |
+| `SUBMISSION.txt` | Four-line course submission with the student name, ID, repository, and live site. |
 | `config/sources.json` | Employer endpoints, target markets, and title terms. |
-| `src/job_watcher/` | Python source adapters, pipeline, and history builder. |
-| `tests/` | pytest coverage for source conversion and history rules. |
-| `data/raw/` | Compressed JSON responses organized by UTC date. |
+| `src/job_watcher/__init__.py` | Marks the Python package. |
+| `src/job_watcher/sources.py` | Anonymous Workday, Oracle, SuccessFactors, and Infor source adapters and field conversion. |
+| `src/job_watcher/history.py` | Title/location matching and deterministic history rebuild from raw snapshots. |
+| `src/job_watcher/pipeline.py` | Daily collection, raw snapshot saving, status, change report, and history build. |
+| `tests/test_sources.py` | Adapter conversion, pagination, posting dates, and source registry checks. |
+| `tests/test_history.py` | Title rule and first-seen, last-seen, removal, reappearance, and reproducibility checks. |
+| `tests/test_pipeline.py` | Source failure handling, required status fields, and same-day rerun replacement. |
+| `data/raw/` | Compressed JSON snapshot envelopes for successful responses, organized by UTC date; the BOK envelope also preserves its source RSS/XML payload. |
 | `data/history.csv` | Canonical posting history. |
 | `data/status.json` | Latest run summary and per-source results. |
-| `.github/workflows/` | Daily pipeline, tests, and site publishing workflows. |
-| `site/` | Today, Browse, and Markets pages plus installable, offline-capable web-app assets. |
+| `data/daily_changes.md` | The current dated report used as the body of the daily GitHub issue. |
+| `data/raw/.gitkeep`, `site/.gitkeep`, `tests/.gitkeep`, `src/job_watcher/.gitkeep`, `.github/workflows/.gitkeep` | Keep required folders visible in Git when they contain no generated files. |
+| `site/index.html` | Today page with run counts, latest changes, source status, and employer links. |
+| `site/browse.html` | Searchable job list with role, employer, location, age, and status filters plus saved stars. |
+| `site/market.html` | Local market summary and six history-based charts. |
+| `site/assets/app.js` | Browser-side data loading, filters, shortlist storage, and report calculations. |
+| `site/assets/site.css` | Shared site colors, fonts, layout, and responsive styles. |
+| `site/sw.js` | Cache-first fallback for offline pages and last-loaded data. |
+| `site/manifest.webmanifest` | Installable web-app metadata. |
+| `site/icon.svg` | App and site icon. |
 
 ## Project requirements
 
-- Fetch all 20 active public feeds (19 JSON endpoints and one RSS/XML feed) anonymously, without parsing HTML.
-- Keep each source response in raw data; apply the documented role and location rules when building local finance results.
-- Continue when a source fails and record each source's result.
-- Rebuild history deterministically from raw data, including first-seen, last-seen, and removed dates.
-- Run the pipeline daily with GitHub Actions, open a dated issue for local finance job changes, and commit the raw, history, and status files.
-- Publish Today, Browse, and Markets pages with GitHub Pages. The initial site includes offline support, a manifest, and a service worker.
-- Run pytest on every push and show the test workflow badge here once it exists.
+- Fetch public feeds anonymously, without parsing job-board HTML. BOK Financial uses RSS/XML rather than the JSON format specified in the assignment.
+- Save successful responses, continue after a source failure, and record every board's success, count, and error in the status file.
+- Rebuild all posting rows and dates deterministically from raw data, including first-seen, last-seen, and removed dates.
+- Run daily with GitHub Actions, create/update a dated issue each day, close the previous day's issue, and commit raw, history, status, and change-report files.
+- Publish Today, Browse, and Markets pages with the required filters, shortlist, six history charts, web-app manifest, and service worker.
+- Run pytest on each push and pull request; the badge above links to the workflow.
+- The course rubric also requires at least seven distinct run dates by the due date. That condition depends on elapsed days and cannot be supplied by a code change.

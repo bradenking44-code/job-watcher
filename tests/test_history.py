@@ -62,3 +62,32 @@ def test_title_matching_uses_word_boundaries():
     assert title_matches("Senior Financial Analyst", ["financial"])
     assert title_matches("Revenue Auditor", ["audit"])
     assert not title_matches("Texas Field Representative", ["tax"])
+
+
+def test_reappearing_posting_keeps_first_seen_and_clears_removed_date(tmp_path):
+    raw = tmp_path / "raw"
+    output = tmp_path / "history.csv"
+    config = {
+        "markets": {"tulsa_ok": {"cities": ["Tulsa"]}},
+        "finance_title_terms": ["finance", "accountant"],
+    }
+    posting = _posting("sample:A", "Finance Analyst")
+    _snapshot(raw, "2026-11-09", True, [posting])
+    _snapshot(raw, "2026-11-10", True, [])
+
+    removed = rebuild_history(raw, output, config)[0]
+    assert removed["first_seen"] == "2026-11-09"
+    assert removed["last_seen"] == "2026-11-09"
+    assert removed["status"] == "removed"
+    assert removed["removed_date"] == "2026-11-10"
+
+    _snapshot(raw, "2026-11-11", True, [posting])
+    reopened = rebuild_history(raw, output, config)[0]
+    assert reopened["first_seen"] == "2026-11-09"
+    assert reopened["last_seen"] == "2026-11-11"
+    assert reopened["status"] == "open"
+    assert reopened["removed_date"] == ""
+
+    first_build = output.read_bytes()
+    rebuild_history(raw, output, config)
+    assert output.read_bytes() == first_build

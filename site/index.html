@@ -57,13 +57,13 @@
       </div>
       <div class="metric-grid">
         <article class="metric-card metric-primary">
-          <span class="metric-label">Local finance roles</span>
+          <span class="metric-label">Open postings tracked</span>
           <strong class="metric-value" id="metric-open">—</strong>
-          <span class="metric-foot">Open listings in both markets</span>
+          <span class="metric-foot">Across all watched employer boards</span>
           <span class="metric-symbol" aria-hidden="true">↗</span>
         </article>
         <article class="metric-card">
-          <span class="metric-label">New this run</span>
+          <span class="metric-label">New or reopened this run</span>
           <strong class="metric-value" id="metric-new">—</strong>
           <span class="metric-foot">First seen in the latest update</span>
         </article>
@@ -85,23 +85,35 @@
       </div>
     </section>
 
-    <section class="content-grid section-block">
+    <section class="content-grid section-block" aria-label="Latest posting changes">
       <div class="panel recent-panel">
         <div class="panel-heading">
-          <div><p class="eyebrow eyebrow-dark">FRESH OPPORTUNITIES</p><h2>New around here</h2></div>
+          <div><p class="eyebrow eyebrow-dark">LATEST RUN</p><h2>New postings</h2></div>
           <a class="text-link" href="./browse.html">View all <span aria-hidden="true">→</span></a>
         </div>
-        <div id="today-list" class="job-list compact-list" aria-live="polite">
-          <div class="loading-state">Loading local opportunities…</div>
+        <div id="today-new-list" class="job-list compact-list" aria-live="polite">
+          <div class="loading-state">Loading new postings…</div>
         </div>
       </div>
-      <aside class="panel note-panel">
-        <p class="eyebrow eyebrow-dark">HOW IT WORKS</p>
-        <h2>Finance roles,<br>without the noise.</h2>
-        <p>We scan employer job boards for finance, accounting, banking, treasury, tax, audit, credit and related roles, then focus results on the cities you care about.</p>
-        <a class="button button-dark" href="./browse.html">See the watchlist <span aria-hidden="true">↗</span></a>
-        <div class="note-mark" aria-hidden="true">L</div>
-      </aside>
+      <div class="panel recent-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow eyebrow-dark">LATEST RUN</p><h2>Removed postings</h2></div>
+          <a class="text-link" href="./browse.html">Browse history <span aria-hidden="true">→</span></a>
+        </div>
+        <div id="today-removed-list" class="job-list compact-list" aria-live="polite">
+          <div class="loading-state">Loading removed postings…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block source-status-section" aria-labelledby="source-status-title">
+      <div class="section-heading">
+        <div><p class="eyebrow eyebrow-dark">PIPELINE HEALTH</p><h2 id="source-status-title">Employer board status</h2></div>
+        <p class="updated-label" id="source-status-summary">Loading source results…</p>
+      </div>
+      <div id="source-status-list" class="source-status-grid" aria-live="polite">
+        <div class="loading-state">Loading board results…</div>
+      </div>
     </section>
 
     <section class="section-block source-section" aria-labelledby="source-title">

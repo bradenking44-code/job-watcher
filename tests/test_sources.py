@@ -1,7 +1,18 @@
 from datetime import date
+import json
+from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from job_watcher.sources import fetch_oracle_candidate_experience, fetch_workday, parse_posted_date
+from job_watcher.sources import (
+    fetch_infor_cloudsuite,
+    fetch_oracle_candidate_experience,
+    fetch_successfactors_rss,
+    fetch_workday,
+    parse_posted_date,
+)
+
+
+COMMON_FIELDS = {"posting_id", "external_id", "title", "location", "department", "posted_date", "url"}
 
 
 def test_workday_paginates_by_returned_count_and_maps_postings(monkeypatch):
@@ -42,6 +53,7 @@ def test_workday_paginates_by_returned_count_and_maps_postings(monkeypatch):
     assert result["postings"][0]["posted_date"] == "2026-11-09"
     assert result["postings"][1]["posted_date"] == "2026-11-08"
     assert result["postings"][0]["url"] == "https://example.test/en-US/Sample/job/Tulsa-OK/Finance-Intern_R1"
+    assert COMMON_FIELDS <= result["postings"][0].keys()
 
 
 def test_workday_keeps_first_page_total_when_later_pages_report_zero(monkeypatch):
@@ -215,6 +227,7 @@ def test_oracle_candidate_experience_paginates_and_builds_job_links(monkeypatch)
     assert len(result["postings"]) == 2
     assert result["postings"][1]["url"].endswith("/job/102")
     assert result["postings"][0]["posted_date"] == "2026-11-08"
+    assert COMMON_FIELDS <= result["postings"][0].keys()
 
 
 def test_oracle_continues_past_false_has_more_when_total_is_larger(monkeypatch):
@@ -248,3 +261,76 @@ def test_oracle_continues_past_false_has_more_when_total_is_larger(monkeypatch):
 def test_parse_posted_date_handles_relative_labels():
     assert parse_posted_date("Posted Today", date(2026, 11, 9)) == "2026-11-09"
     assert parse_posted_date("Posted 3 Days Ago", date(2026, 11, 9)) == "2026-11-06"
+
+
+def test_successfactors_rss_maps_public_bok_postings(monkeypatch):
+    xml = """<?xml version="1.0"?><rss><channel><item>
+      <id>REQ-17</id><title>FP&amp;A Analyst (Tulsa, OK)</title>
+      <location>Tulsa, OK</location><job_function>Finance &amp; Administration</job_function>
+      <link>https://jobs.example.test/job/17</link>
+    </item></channel></rss>"""
+    monkeypatch.setattr("job_watcher.sources.request_text", lambda _url: xml)
+    result = fetch_successfactors_rss({
+        "id": "bok",
+        "employer": "BOK Financial",
+        "career_url": "https://jobs.example.test",
+        "api_endpoint": "https://jobs.example.test/feed.xml",
+    })
+
+    posting = result["postings"][0]
+    assert COMMON_FIELDS <= posting.keys()
+    assert posting["posting_id"] == "bok:REQ-17"
+    assert posting["title"] == "FP&A Analyst"
+    assert posting["location"] == "Tulsa, OK"
+    assert posting["url"] == "https://jobs.example.test/job/17"
+
+
+def test_infor_maps_arvest_json_postings(monkeypatch):
+    page = {
+        "dataViewSet": {
+            "data": [{
+                "fields": {
+                    "JobRequisition": {"value": "1001"},
+                    "JobPosting": {"value": "2001"},
+                    "Description": {"value": "Staff Accountant"},
+                    "PostingDateRange_prd_Begin": {"value": "20261108"},
+                    "CategoryDescriptionForSort": {"value": "Finance"},
+                    "LocationOfJob_prd_Location_ohb_1_chb_": {"value": "US"},
+                    "LocationOfJob_prd_Location_ohb_2_chb_": {"value": "AR"},
+                    "LocationOfJob_prd_Location_ohb_3_chb_": {"value": "Bentonville"},
+                }
+            }],
+            "pagingInfo": {"hasNext": False},
+            "pagingUrls": {},
+        }
+    }
+    monkeypatch.setattr("job_watcher.sources.request_infor_json", lambda *_args: page)
+    source = {
+        "id": "arvest",
+        "employer": "Arvest Bank",
+        "api_endpoint": "https://jobs.example.test/hcm/Jobs/list/JobPosting.SearchForJobsResults",
+        "career_url": "https://jobs.example.test/hcm/Jobs",
+        "hr_organization": "ARV",
+        "job_board": "EXTERNAL",
+    }
+    result = fetch_infor_cloudsuite(source, {"page_size": 100}, date(2026, 11, 9))
+
+    posting = result["postings"][0]
+    assert COMMON_FIELDS <= posting.keys()
+    assert posting["posting_id"] == "arvest:1001:2001"
+    assert posting["title"] == "Staff Accountant"
+    assert posting["location"] == "Bentonville, AR"
+    assert posting["posted_date"] == "2026-11-08"
+    assert posting["url"].startswith("https://jobs.example.test/hcm/Jobs/form/")
+
+
+def test_configured_sources_use_supported_structured_adapters():
+    config_path = Path(__file__).parents[1] / "config" / "sources.json"
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    supported = {"Workday", "Oracle Cloud Recruiting", "SAP SuccessFactors Recruiting Marketing", "Infor CloudSuite HCM"}
+    sources = config["sources"]
+
+    assert len(sources) >= 15
+    assert len({source["employer"] for source in sources}) >= 15
+    assert all(source["ats"] in supported for source in sources)
+    assert all(source.get("api_endpoint", "").startswith("https://") for source in sources)

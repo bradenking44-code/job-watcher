@@ -12,7 +12,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .history import market_ids_for_location, read_history, rebuild_history, successful_run_dates
+from .history import rebuild_history, successful_run_dates
 from .sources import SourceFetchError, fetch_source
 
 
@@ -27,10 +27,6 @@ def _write_json(path: Path, document: dict[str, Any]) -> None:
     path.write_text(json.dumps(document, ensure_ascii=False, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
 
-def _is_local_role(row: dict[str, Any]) -> bool:
-    return row.get("in_role") == "true" and row.get("in_market") == "true"
-
-
 def _change_report(
     run_date: str,
     baseline: bool,
@@ -38,18 +34,14 @@ def _change_report(
     removed_jobs: list[dict[str, str]],
     source_results: list[dict[str, Any]],
 ) -> str:
+    lines = [f"# Job Watcher updates — {run_date}", ""]
+    successes = sum(1 for result in source_results if result["ok"])
+    lines.append(f"Employer boards collected successfully: **{successes} of {len(source_results)}**.")
     if baseline:
-        successes = sum(1 for result in source_results if result["success"])
-        return (
-            f"# Job Watcher — {run_date}\n\n"
-            "This was the initial data collection, so it establishes a baseline rather than sending a new-job alert.\n\n"
-            f"Successful employer boards: **{successes} of {len(source_results)}**.\n"
-        )
-
-    lines = [f"# Job Watcher changes — {run_date}", ""]
-    lines.append(f"New local finance matches: **{len(new_jobs)}**  ")
-    lines.append(f"Removed local finance matches: **{len(removed_jobs)}**")
-    for heading, jobs in (("New postings", new_jobs), ("Removed postings", removed_jobs)):
+        lines.append("This is the initial collection. Existing postings establish the baseline and are not counted as new.")
+    lines.append(f"New or reopened postings: **{len(new_jobs)}**")
+    lines.append(f"Removed postings: **{len(removed_jobs)}**")
+    for heading, jobs in (("New or reopened postings", new_jobs), ("Removed postings", removed_jobs)):
         if not jobs:
             continue
         lines.extend(["", f"## {heading}", ""])
@@ -60,14 +52,70 @@ def _change_report(
             market = job.get("market") or ""
             url = job.get("url") or ""
             label = f"[{title}]({url})" if url.startswith(("https://", "http://")) else title
-            lines.append(f"- {label} — **{employer}** · {location} · {market.replace(';', ', ')}")
+            details = [f"**{employer}**", location]
+            if market:
+                details.append(market.replace(";", ", "))
+            lines.append(f"- {label} — " + " · ".join(details))
         if len(jobs) > 30:
             lines.append(f"- …and {len(jobs) - 30} more. See `data/history.csv` for the full list.")
+    if not new_jobs and not removed_jobs:
+        lines.extend(["", "No new or removed postings were recorded in this run."])
     failed = [result for result in source_results if not result["success"]]
     if failed:
         lines.extend(["", "## Sources that need attention", ""])
         lines.extend(f"- **{item['employer']}** (`{item['source_id']}`): {item.get('error') or 'request failed'}" for item in failed)
     return "\n".join(lines) + "\n"
+
+
+def _new_or_reopened_postings(
+    raw_dir: Path, run_date_text: str, rows: list[dict[str, str]]
+) -> list[dict[str, str]]:
+    """Find IDs newly present in today's successful snapshots vs each source's previous success."""
+
+    changed_ids: set[str] = set()
+    today_dir = raw_dir / run_date_text
+    if not today_dir.exists():
+        return []
+
+    for current_path in today_dir.glob("*.json.gz"):
+        with gzip.open(current_path, "rt", encoding="utf-8") as handle:
+            current = json.load(handle)
+        if not current.get("success"):
+            continue
+        source_id = str(current.get("source_id") or current_path.stem)
+        previous_snapshots = []
+        for path in raw_dir.glob(f"*/{source_id}.json.gz"):
+            if path.parent.name >= run_date_text:
+                continue
+            with gzip.open(path, "rt", encoding="utf-8") as handle:
+                snapshot = json.load(handle)
+            if snapshot.get("success"):
+                previous_snapshots.append((str(snapshot.get("run_date") or path.parent.name), snapshot))
+        if not previous_snapshots:
+            continue
+        previous = max(previous_snapshots, key=lambda item: item[0])[1]
+        previous_ids = {
+            str(posting.get("posting_id") or "")
+            for posting in previous.get("postings", [])
+            if posting.get("posting_id")
+        }
+        current_ids = {
+            str(posting.get("posting_id") or "")
+            for posting in current.get("postings", [])
+            if posting.get("posting_id")
+        }
+        changed_ids.update(current_ids - previous_ids)
+
+    by_id = {row["posting_id"]: row for row in rows}
+    return sorted(
+        (
+            by_id[posting_id]
+            for posting_id in changed_ids
+            if posting_id in by_id
+            and by_id[posting_id]["status"] == "open"
+        ),
+        key=lambda row: row["posting_id"],
+    )
 
 
 def _set_github_output(name: str, value: str) -> None:
@@ -91,10 +139,12 @@ def run_pipeline(
     run_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     previous_success_dates = successful_run_dates(raw_dir) if raw_dir.exists() else []
     baseline = not previous_success_dates
-    prior_rows = read_history(history_path)
-    prior_by_id = {row.get("posting_id", ""): row for row in prior_rows}
     daily_dir = raw_dir / run_date_text
     daily_dir.mkdir(parents=True, exist_ok=True)
+    # A manual or scheduled rerun replaces this date's snapshots. In particular,
+    # an old successful file must not survive a later failed fetch on the same day.
+    for old_snapshot in daily_dir.glob("*.json.gz"):
+        old_snapshot.unlink()
 
     source_results: list[dict[str, Any]] = []
     for source in config.get("sources", []):
@@ -107,9 +157,6 @@ def run_pipeline(
         except Exception as exc:  # Keep the rest of the employer boards running.
             success = False
             error = f"{type(exc).__name__}: {exc}"[:1000]
-            partial = getattr(exc, "partial", None)
-            if isinstance(partial, dict):
-                raw_result.update(partial)
 
         elapsed = round(time.monotonic() - started, 2)
         envelope = {
@@ -127,15 +174,20 @@ def run_pipeline(
             "warnings": raw_result.get("warnings", []),
             "error": error,
         }
-        _write_json_gz(daily_dir / f"{source['id']}.json.gz", envelope)
+        if success:
+            _write_json_gz(daily_dir / f"{source['id']}.json.gz", envelope)
         source_results.append(
             {
+                # Required status fields, plus diagnostic details used by the site.
+                "name": source["employer"],
+                "ok": success,
+                "count": len(envelope["postings"]) if success else 0,
                 "source_id": source["id"],
                 "employer": source["employer"],
                 "success": success,
-                "postings": len(envelope["postings"]),
-                "total": envelope["total"],
-                "warnings": len(envelope["warnings"]),
+                "postings": len(envelope["postings"]) if success else 0,
+                "total": envelope["total"] if success else 0,
+                "warnings": len(envelope["warnings"]) if success else 0,
                 "error": error,
                 "elapsed_seconds": elapsed,
             }
@@ -146,36 +198,27 @@ def run_pipeline(
             print(f"       {error}", file=sys.stderr)
 
     rows = rebuild_history(raw_dir, history_path, config)
-    current_by_id = {row["posting_id"]: row for row in rows}
-    new_jobs = []
-    for posting_id, row in current_by_id.items():
-        prior = prior_by_id.get(posting_id)
-        if not _is_local_role(row) or row["status"] != "open":
-            continue
-        if prior is None or prior.get("status") == "removed" or prior.get("in_role") != "true" or prior.get("in_market") != "true":
-            new_jobs.append(row)
+    new_jobs = _new_or_reopened_postings(raw_dir, run_date_text, rows)
     removed_jobs = [
         row
-        for posting_id, row in current_by_id.items()
+        for row in rows
         if row.get("status") == "removed"
         and row.get("removed_date") == run_date_text
-        and _is_local_role(row)
-        and prior_by_id.get(posting_id, {}).get("status") == "open"
-        and _is_local_role(prior_by_id.get(posting_id, {}))
     ]
 
     dates_with_success = successful_run_dates(raw_dir)
     first_run_date = dates_with_success[0] if dates_with_success else None
-    first_collection = baseline and any(result["success"] for result in source_results)
+    first_collection = baseline and any(result["ok"] for result in source_results)
     issue_changes = bool(new_jobs or removed_jobs) and not first_collection
-    open_local_roles = sum(1 for row in rows if row["status"] == "open" and _is_local_role(row))
+    open_postings = sum(1 for row in rows if row["status"] == "open")
     summary = {
         "run_time": run_time,
         "run_date": run_date_text,
         "first_run_date": first_run_date,
         "days_with_success": len(dates_with_success),
-        "open": open_local_roles,
+        "open": open_postings,
         "new_today": 0 if first_collection else len(new_jobs),
+        "new_today_ids": [] if first_collection else [row["posting_id"] for row in new_jobs],
         "removed_today": len(removed_jobs),
         "sources": source_results,
     }
@@ -188,7 +231,7 @@ def run_pipeline(
 
     failures = sum(1 for result in source_results if not result["success"])
     successes = len(source_results) - failures
-    print(f"Run {run_date_text}: {successes}/{len(source_results)} sources succeeded; {open_local_roles} open local finance matches.")
+    print(f"Run {run_date_text}: {successes}/{len(source_results)} sources succeeded; {open_postings} open postings.")
     return {"status": summary, "new_jobs": new_jobs, "removed_jobs": removed_jobs, "issue_changes": issue_changes, "failures": failures}
 
 
@@ -199,9 +242,16 @@ def main() -> int:
     parser.add_argument("--history", type=Path, default=Path("data/history.csv"))
     parser.add_argument("--status", type=Path, default=Path("data/status.json"))
     parser.add_argument("--changes", type=Path, default=Path("data/daily_changes.md"))
+    parser.add_argument("--build-only", action="store_true", help="Rebuild history from saved raw snapshots without fetching job boards.")
     args = parser.parse_args()
+    if args.build_only:
+        config = json.loads(args.config.read_text(encoding="utf-8"))
+        rows = rebuild_history(args.raw_dir, args.history, config)
+        print(f"Rebuilt {args.history} from {args.raw_dir}: {len(rows)} postings.")
+        return 0
     result = run_pipeline(args.config, args.raw_dir, args.history, args.status, args.changes)
-    return 0 if any(source["success"] for source in result["status"]["sources"]) else 1
+    # A partial collection is useful and recorded; fail only when every source fails.
+    return 0 if result["failures"] < len(result["status"]["sources"]) else 1
 
 
 if __name__ == "__main__":

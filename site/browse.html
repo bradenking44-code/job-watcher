@@ -22,16 +22,20 @@
     <section class="page-intro">
       <p class="eyebrow eyebrow-dark">THE OPPORTUNITY BOARD</p>
       <h1>Find your next<br><em>good move.</em></h1>
-      <p class="intro-subtitle">Search local finance and accounting openings across Tulsa and Northwest Arkansas.</p>
+      <p class="intro-subtitle">Start with finance matches, then filter by employer, location and time open. Switch off the finance filter to see all tracked openings.</p>
     </section>
     <section class="browse-panel" aria-label="Job search">
       <div class="filter-bar">
-        <label class="search-field"><span class="sr-only">Search by title, employer, or location</span><span class="search-icon" aria-hidden="true">⌕</span><input id="job-search" type="search" placeholder="Title, employer, or location" autocomplete="off"></label>
+        <label class="search-field"><span class="sr-only">Search job titles</span><span class="search-icon" aria-hidden="true">⌕</span><input id="job-search" type="search" placeholder="Search job titles" autocomplete="off"></label>
         <label class="select-field"><span class="sr-only">Filter by market</span><select id="market-filter"><option value="all">All markets</option><option value="tulsa_ok">Tulsa area</option><option value="northwest_ar">Northwest Arkansas</option></select></label>
+        <label class="select-field"><span class="sr-only">Filter by employer</span><select id="employer-filter"><option value="all">All employers</option></select></label>
+        <label class="search-field location-field"><span class="sr-only">Filter by location</span><input id="location-filter" type="search" placeholder="Filter by location" autocomplete="off"></label>
+        <label class="select-field"><span class="sr-only">Filter by days open</span><select id="days-open-filter"><option value="all">Any time open</option><option value="0-7">0–7 days open</option><option value="8-30">8–30 days open</option><option value="31-90">31–90 days open</option><option value="90+">More than 90 days</option></select></label>
         <label class="select-field"><span class="sr-only">Filter by status</span><select id="status-filter"><option value="open">Open listings</option><option value="all">All tracked listings</option><option value="removed">Removed listings</option></select></label>
+        <label class="select-field"><span class="sr-only">Sort by first-seen date</span><select id="sort-filter"><option value="newest">Newest first seen</option><option value="oldest">Oldest first seen</option></select></label>
         <button class="filter-clear" id="clear-filters" type="button">Clear</button>
       </div>
-      <div class="results-toolbar"><p id="result-count" aria-live="polite">Loading listings…</p><label class="checkbox-filter"><input type="checkbox" id="finance-only" checked><span>Finance matches only</span></label></div>
+      <div class="results-toolbar"><p id="result-count" aria-live="polite">Loading listings…</p><label class="checkbox-filter"><input type="checkbox" id="finance-only" checked><span>Finance matches only</span></label><label class="checkbox-filter"><input type="checkbox" id="shortlist-only"><span>Shortlist only</span></label></div>
       <div id="job-results" class="job-grid" aria-live="polite"><div class="loading-state">Loading job history…</div></div>
     </section>
     <section class="employer-strip">
