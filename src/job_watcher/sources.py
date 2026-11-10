@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 import http.cookiejar
 import json
 import re
@@ -181,6 +182,7 @@ def fetch_workday(
                 break
 
             page_new_ids = 0
+            detail_tasks: list[tuple[int, str, str, str]] = []
             for item in items:
                 if not isinstance(item, dict):
                     continue
@@ -198,14 +200,7 @@ def fetch_workday(
                 location = str(item.get("locationsText") or "").strip()
                 if request_config.get("detail_for_multi_location_results", True) and _needs_location_detail(location) and external_path:
                     detail_url = endpoint.rsplit("/jobs", 1)[0] + external_path
-                    try:
-                        detail = request_json(detail_url)
-                        raw_details.append({"external_path": external_path, "response": detail})
-                        detailed_locations = _location_from_workday_detail(detail)
-                        if detailed_locations:
-                            location = detailed_locations
-                    except SourceFetchError as exc:
-                        warnings.append(f"Location detail unavailable for {external_id}: {exc}")
+                    detail_tasks.append((len(postings), external_id, external_path, detail_url))
 
                 career_url = str(source.get("career_url") or "").rstrip("/")
                 job_url = f"{career_url}{external_path}" if external_path else career_url
@@ -222,6 +217,25 @@ def fetch_workday(
                         "url": job_url,
                     }
                 )
+
+            # Large boards can have hundreds of generic multi-location labels.
+            # Fetch each page's details with a small concurrency cap instead of
+            # serializing every extra request across the entire board.
+            if detail_tasks:
+                with ThreadPoolExecutor(max_workers=min(4, len(detail_tasks))) as detail_pool:
+                    futures = [
+                        (posting_index, external_id, external_path, detail_pool.submit(request_json, detail_url))
+                        for posting_index, external_id, external_path, detail_url in detail_tasks
+                    ]
+                    for posting_index, external_id, external_path, future in futures:
+                        try:
+                            detail = future.result()
+                            raw_details.append({"external_path": external_path, "response": detail})
+                            detailed_locations = _location_from_workday_detail(detail)
+                            if detailed_locations:
+                                postings[posting_index]["location"] = detailed_locations
+                        except SourceFetchError as exc:
+                            warnings.append(f"Location detail unavailable for {external_id}: {exc}")
 
             # Offset results can overlap while a large board changes. Move by
             # the new IDs within this sweep, and repeat the sweep once if that
