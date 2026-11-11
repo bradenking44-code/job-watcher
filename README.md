@@ -21,7 +21,7 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, Greenhouse, and Arvest's Infor CloudSuite endpoints return JSON. Regent Bank uses Greenhouse's public Job Board API, which permits anonymous GET requests for published job data. BOK Financial's public SuccessFactors feed returns RSS/XML, so it is kept as a supplemental careers link rather than an active pipeline source; prior BOK snapshots and postings remain in the archive. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift.
+The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, Greenhouse, and Arvest's Infor CloudSuite endpoints return JSON. Regent Bank uses Greenhouse's public Job Board API, which permits anonymous GET requests for published job data. BOK Financial's public SuccessFactors feed returns RSS/XML, so it is kept as a supplemental careers link rather than an active pipeline source; its original snapshots are kept under `data/archive/raw/`, and its historical postings are rebuilt to `data/archive/history.csv`. The required `data/history.csv` contains active-source rows with only open or removed statuses. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift.
 
 | Market | Employer | Applicant tracking system | Local coverage |
 | --- | --- | --- | --- |
@@ -52,7 +52,7 @@ BOK Financial remains available through its [careers page](https://jobs.bokf.com
 
 ## Data and rebuild command
 
-The daily collector saves each successful response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful raw snapshots, so a failed source does not mark its postings removed. Retired source IDs are preserved as archived history and excluded from open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
+The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
 
 Run the collector manually:
 
@@ -96,15 +96,17 @@ pytest
 | `tests/test_sources.py` | Adapter conversion, pagination, posting dates, and source registry checks. |
 | `tests/test_history.py` | Title rule and first-seen, last-seen, removal, reappearance, and reproducibility checks. |
 | `tests/test_pipeline.py` | Source failure handling, required status fields, and same-day rerun replacement. |
-| `data/raw/` | Compressed JSON snapshot envelopes for successful responses, organized by UTC date; the BOK envelope also preserves its source RSS/XML payload. |
+| `data/raw/` | Compressed JSON snapshots for successful active-source responses, organized by UTC date. |
+| `data/archive/raw/` | Original compressed snapshots for retired sources, including the historical BOK feed payloads. |
 | `data/history.csv` | Canonical posting history. |
+| `data/archive/history.csv` | Retired-source postings, separate from the required open/removed history. |
 | `data/status.json` | Latest run summary and per-source results. |
 | `data/daily_changes.md` | The current dated report used as the body of the daily GitHub issue. |
 | `data/raw/.gitkeep`, `site/.gitkeep`, `tests/.gitkeep`, `src/job_watcher/.gitkeep`, `.github/workflows/.gitkeep` | Keep required folders visible in Git when they contain no generated files. |
 | `site/index.html` | Today page with run counts, latest changes, source status, and employer links. |
 | `site/browse.html` | Searchable job list with role, employer, location, age, and status filters plus saved stars. |
 | `site/market.html` | Local market summary and six history-based charts. |
-| `site/assets/app.js` | Browser-side data loading, filters, shortlist storage, and report calculations. |
+| `site/assets/app.js` | Browser-side data loading, filters, shortlist storage, and report calculations; archived postings load separately from canonical history. |
 | `site/assets/site.css` | Shared site colors, fonts, layout, and responsive styles. |
 | `site/sw.js` | Cache-first fallback for offline pages and last-loaded data. |
 | `site/manifest.webmanifest` | Installable web-app metadata. |

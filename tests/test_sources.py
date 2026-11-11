@@ -4,6 +4,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from job_watcher.sources import (
+    fetch_greenhouse,
     fetch_infor_cloudsuite,
     fetch_oracle_candidate_experience,
     fetch_workday,
@@ -12,6 +13,48 @@ from job_watcher.sources import (
 
 
 COMMON_FIELDS = {"posting_id", "external_id", "title", "location", "department", "posted_date", "url"}
+
+
+def test_greenhouse_job_board_maps_postings_to_common_fields(monkeypatch):
+    endpoint = "https://boards-api.greenhouse.io/v1/boards/regentbank/jobs?content=false"
+    page = {
+        "meta": {"total": 1},
+        "jobs": [{
+            "id": 8675309,
+            "title": "Portfolio Manager",
+            "location": {"name": "Tulsa, OK"},
+            "departments": [{"name": "Commercial Banking"}],
+            "first_published": "2026-11-10T12:34:56Z",
+            "absolute_url": "https://job-boards.greenhouse.io/regentbank/jobs/8675309",
+        }],
+    }
+    calls = []
+
+    def fake_request(url, body=None):
+        calls.append((url, body))
+        return page
+
+    monkeypatch.setattr("job_watcher.sources.request_json", fake_request)
+    source = {
+        "id": "regent_bank",
+        "employer": "Regent Bank",
+        "ats": "Greenhouse Job Board API",
+        "api_endpoint": endpoint,
+        "career_url": "https://job-boards.greenhouse.io/regentbank",
+    }
+    result = fetch_greenhouse(source, date(2026, 11, 11))
+
+    posting = result["postings"][0]
+    assert calls == [(endpoint, None)]
+    assert COMMON_FIELDS <= posting.keys()
+    assert posting["posting_id"] == "regent_bank:8675309"
+    assert posting["external_id"] == "8675309"
+    assert posting["title"] == "Portfolio Manager"
+    assert posting["location"] == "Tulsa, OK"
+    assert posting["department"] == "Commercial Banking"
+    assert posting["posted_date"] == "2026-11-10"
+    assert posting["url"] == page["jobs"][0]["absolute_url"]
+    assert result["total"] == 1
 
 
 def test_workday_paginates_by_returned_count_and_maps_postings(monkeypatch):

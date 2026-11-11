@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ledgerline-shell-v2';
+const CACHE_NAME = 'ledgerline-shell-v3';
 const APP_FILES = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const APP_FILES = [
   './icon.svg',
   './config/sources.json',
   './data/history.csv',
+  './data/archive/history.csv',
   './data/status.json'
 ];
 

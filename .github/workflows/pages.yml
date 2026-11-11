@@ -29,9 +29,10 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Assemble static site
         run: |
-          mkdir -p dist/data dist/config
+          mkdir -p dist/data/archive dist/config
           cp -R site/. dist/
           cp data/history.csv data/status.json dist/data/
+          cp data/archive/history.csv dist/data/archive/
           cp config/sources.json dist/config/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

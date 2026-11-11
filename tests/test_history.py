@@ -91,3 +91,44 @@ def test_reappearing_posting_keeps_first_seen_and_clears_removed_date(tmp_path):
     first_build = output.read_bytes()
     rebuild_history(raw, output, config)
     assert output.read_bytes() == first_build
+
+
+def test_retired_source_history_is_separate_from_required_open_removed_statuses(tmp_path):
+    raw = tmp_path / "raw"
+    output = tmp_path / "history.csv"
+    archive_raw = tmp_path / "archive" / "raw"
+    config = {
+        "markets": {"tulsa_ok": {"cities": ["Tulsa"]}},
+        "finance_title_terms": ["finance"],
+        "inactive_source_ids": ["bok_financial"],
+    }
+    _snapshot(raw, "2026-11-11", True, [_posting("sample:A", "Finance Analyst")])
+    bok_posting = {
+        **_posting("bok_financial:1198061800", "Finance Associate"),
+        "external_id": "1198061800",
+        "employer": "BOK Financial",
+    }
+    for day in ("2026-11-10", "2026-11-11"):
+        folder = archive_raw / day
+        folder.mkdir(parents=True, exist_ok=True)
+        snapshot = {
+            "run_date": day,
+            "source_id": "bok_financial",
+            "source_name": "BOK Financial",
+            "ats": "SAP SuccessFactors Recruiting Marketing",
+            "employer": "BOK Financial",
+            "success": True,
+            "postings": [bok_posting],
+        }
+        with gzip.open(folder / "bok_financial.json.gz", "wt", encoding="utf-8") as handle:
+            json.dump(snapshot, handle)
+
+    rows = rebuild_history(raw, output, config)
+    archived_rows = read_history(tmp_path / "archive" / "history.csv")
+
+    assert [row["posting_id"] for row in rows] == ["sample:A"]
+    assert {row["status"] for row in rows} <= {"open", "removed"}
+    assert len(archived_rows) == 1
+    assert archived_rows[0]["posting_id"] == "bok_financial:1198061800"
+    assert archived_rows[0]["status"] == "archived"
+    assert archived_rows[0]["removed_date"] == ""

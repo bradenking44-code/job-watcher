@@ -106,16 +106,19 @@ def load_raw_snapshots(
     return latest, observed, source_success_dates, sorted(successful_run_dates)
 
 
-def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) -> list[dict[str, str]]:
-    """Rebuild the CSV using only raw snapshots and the stable source config."""
-
-    latest, observed, source_success_dates, successful_run_dates = load_raw_snapshots(raw_dir)
+def _rows_from_snapshots(
+    latest: dict[str, dict[str, Any]],
+    observed: dict[str, list[str]],
+    source_success_dates: dict[str, list[str]],
+    config: dict[str, Any],
+    archived_source_ids: set[str] | None = None,
+) -> list[dict[str, str]]:
     markets = config.get("markets", {})
     terms = config.get("finance_title_terms", [])
     first_success_by_source = {
         source_id: dates[0] for source_id, dates in source_success_dates.items() if dates
     }
-    inactive_source_ids = {str(source_id) for source_id in config.get("inactive_source_ids", [])}
+    archived_source_ids = archived_source_ids or set()
     rows: list[dict[str, str]] = []
 
     for posting_id in sorted(latest):
@@ -125,7 +128,7 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
         last_seen = dates[-1]
         source_id = str(posting.get("source_id") or "")
         next_success = next((day for day in source_success_dates.get(source_id, []) if day > last_seen), "")
-        archived = source_id in inactive_source_ids
+        archived = source_id in archived_source_ids
         location = str(posting.get("location") or "")
         market_ids = market_ids_for_location(location, markets)
         row = {
@@ -149,11 +152,65 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
         }
         rows.append(row)
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8", newline="") as handle:
+    return rows
+
+
+def _write_history_csv(path: Path, rows: list[dict[str, str]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
+
+
+def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) -> list[dict[str, str]]:
+    """Rebuild active history and a separate archive from their raw snapshots."""
+
+    inactive_source_ids = {str(source_id) for source_id in config.get("inactive_source_ids", [])}
+    latest, observed, source_success_dates, _ = load_raw_snapshots(raw_dir)
+    active_latest = {
+        posting_id: posting
+        for posting_id, posting in latest.items()
+        if str(posting.get("source_id") or "") not in inactive_source_ids
+    }
+    active_observed = {
+        posting_id: days
+        for posting_id, days in observed.items()
+        if posting_id in active_latest
+    }
+    active_source_dates = {
+        source_id: dates
+        for source_id, dates in source_success_dates.items()
+        if source_id not in inactive_source_ids
+    }
+    rows = _rows_from_snapshots(active_latest, active_observed, active_source_dates, config)
+    _write_history_csv(output_path, rows)
+
+    archive_raw_dir = output_path.parent / "archive" / "raw"
+    archived_latest, archived_observed, archived_source_dates, _ = load_raw_snapshots(archive_raw_dir)
+    archived_latest = {
+        posting_id: posting
+        for posting_id, posting in archived_latest.items()
+        if str(posting.get("source_id") or "") in inactive_source_ids
+    }
+    archived_observed = {
+        posting_id: days
+        for posting_id, days in archived_observed.items()
+        if posting_id in archived_latest
+    }
+    archived_source_dates = {
+        source_id: dates
+        for source_id, dates in archived_source_dates.items()
+        if source_id in inactive_source_ids
+    }
+    archive_rows = _rows_from_snapshots(
+        archived_latest,
+        archived_observed,
+        archived_source_dates,
+        config,
+        archived_source_ids=inactive_source_ids,
+    )
+    _write_history_csv(output_path.parent / "archive" / "history.csv", archive_rows)
     return rows
 
 

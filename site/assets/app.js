@@ -1,4 +1,4 @@
-const DATA = { jobs: [], status: {}, sources: [], supplementalSources: [], candidates: [], markets: {}, financeTerms: [] };
+const DATA = { jobs: [], archiveJobs: [], status: {}, sources: [], supplementalSources: [], candidates: [], markets: {}, financeTerms: [] };
 const SHORTLIST_KEY = 'ledgerline-job-watcher-shortlist-v1';
 
 const text = (value) => (value == null ? '' : String(value)).trim();
@@ -37,7 +37,8 @@ async function fetchData() {
   const results = await Promise.allSettled([
     fetch('./data/history.csv', { cache: 'no-store' }).then((response) => { if (!response.ok) throw new Error('history'); return response.text(); }),
     fetch('./data/status.json', { cache: 'no-store' }).then((response) => { if (!response.ok) throw new Error('status'); return response.json(); }),
-    fetch('./config/sources.json', { cache: 'no-store' }).then((response) => { if (!response.ok) throw new Error('sources'); return response.json(); })
+    fetch('./config/sources.json', { cache: 'no-store' }).then((response) => { if (!response.ok) throw new Error('sources'); return response.json(); }),
+    fetch('./data/archive/history.csv', { cache: 'no-store' }).then((response) => { if (!response.ok) throw new Error('archive'); return response.text(); })
   ]);
   if (results[0].status === 'fulfilled') DATA.jobs = parseCsv(results[0].value);
   if (results[1].status === 'fulfilled') DATA.status = results[1].value;
@@ -49,6 +50,7 @@ async function fetchData() {
     DATA.markets = config.markets || {};
     DATA.financeTerms = config.finance_title_terms || [];
   }
+  if (results[3].status === 'fulfilled') DATA.archiveJobs = parseCsv(results[3].value);
   if (results.some((result) => result.status === 'rejected')) {
     showNotice('Some job data could not be loaded. If you are offline, reconnect to refresh the latest postings.');
   }
@@ -282,14 +284,15 @@ function renderBrowse() {
   const count = document.getElementById('result-count');
   if (!results) return;
 
-  const employerNames = [...new Set(DATA.jobs.map((job) => text(job.employer)).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const allJobs = [...DATA.jobs, ...DATA.archiveJobs];
+  const employerNames = [...new Set(allJobs.map((job) => text(job.employer)).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   employerNames.forEach((name) => employer.add(new Option(name, name)));
   const params = new URLSearchParams(window.location.search);
   if (['tulsa_ok', 'northwest_ar'].includes(params.get('market'))) market.value = params.get('market');
   let shortlist = readShortlist();
 
   const draw = () => {
-    let jobs = DATA.jobs.slice();
+    let jobs = allJobs.slice();
     if (status.value === 'open') jobs = jobs.filter(isOpen);
     if (status.value === 'removed') jobs = jobs.filter((job) => !isOpen(job) && !isArchived(job));
     if (status.value === 'archived') jobs = jobs.filter(isArchived);
@@ -317,7 +320,7 @@ function renderBrowse() {
     count.textContent = `${jobs.length.toLocaleString()} ${finance.checked ? 'finance ' : ''}${stateLabel} posting${jobs.length === 1 ? '' : 's'}`;
     results.replaceChildren();
     if (!jobs.length) {
-      results.append(emptyState(DATA.jobs.length ? 'No matching postings found' : 'Job history is not populated yet', DATA.jobs.length ? 'Try changing a filter or clearing the search.' : 'The daily collector will populate the history after its first run.', 'Clear filters', '#clear-filters'));
+      results.append(emptyState(allJobs.length ? 'No matching postings found' : 'Job history is not populated yet', allJobs.length ? 'Try changing a filter or clearing the search.' : 'The daily collector will populate the history after its first run.', 'Clear filters', '#clear-filters'));
     } else jobs.forEach((job) => results.append(jobCard(job, shortlist)));
   };
 
