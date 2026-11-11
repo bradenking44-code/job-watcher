@@ -31,6 +31,7 @@ def _change_report(
     run_date: str,
     baseline: bool,
     new_jobs: list[dict[str, str]],
+    reopened_jobs: list[dict[str, str]],
     removed_jobs: list[dict[str, str]],
     source_results: list[dict[str, Any]],
 ) -> str:
@@ -39,13 +40,14 @@ def _change_report(
     lines.append(f"Employer boards collected successfully: **{successes} of {len(source_results)}**.")
     if baseline:
         lines.append("This is the initial collection. Existing postings establish the baseline and are not counted as new.")
-    lines.append(f"New or reopened postings: **{len(new_jobs)}**")
+    lines.append(f"New postings: **{len(new_jobs)}**")
+    lines.append(f"Reopened postings: **{len(reopened_jobs)}**")
     lines.append(f"Removed postings: **{len(removed_jobs)}**")
-    for heading, jobs in (("New or reopened postings", new_jobs), ("Removed postings", removed_jobs)):
+    for heading, jobs in (("New postings", new_jobs), ("Reopened postings", reopened_jobs), ("Removed postings", removed_jobs)):
         if not jobs:
             continue
         lines.extend(["", f"## {heading}", ""])
-        for job in jobs[:30]:
+        for job in jobs:
             title = job.get("title") or "Untitled role"
             employer = job.get("employer") or "Employer"
             location = job.get("location") or "Location not provided"
@@ -56,10 +58,8 @@ def _change_report(
             if market:
                 details.append(market.replace(";", ", "))
             lines.append(f"- {label} — " + " · ".join(details))
-        if len(jobs) > 30:
-            lines.append(f"- …and {len(jobs) - 30} more. See `data/history.csv` for the full list.")
-    if not new_jobs and not removed_jobs:
-        lines.extend(["", "No new or removed postings were recorded in this run."])
+    if not new_jobs and not reopened_jobs and not removed_jobs:
+        lines.extend(["", "No new, reopened, or removed postings were recorded in this run."])
     failed = [result for result in source_results if not result["success"]]
     if failed:
         lines.extend(["", "## Sources that need attention", ""])
@@ -201,7 +201,12 @@ def run_pipeline(
             print(f"       {error}", file=sys.stderr)
 
     rows = rebuild_history(raw_dir, history_path, config)
-    new_jobs = _new_or_reopened_postings(raw_dir, run_date_text, rows)
+    newly_listed_jobs = _new_or_reopened_postings(raw_dir, run_date_text, rows)
+    new_jobs = [
+        row for row in newly_listed_jobs
+        if row["first_seen"] == run_date_text and row["first_run"] != "true"
+    ]
+    reopened_jobs = [row for row in newly_listed_jobs if row["first_seen"] != run_date_text]
     removed_jobs = [
         row
         for row in rows
@@ -212,7 +217,7 @@ def run_pipeline(
     dates_with_success = successful_run_dates(raw_dir)
     first_run_date = dates_with_success[0] if dates_with_success else None
     first_collection = baseline and any(result["ok"] for result in source_results)
-    issue_changes = bool(new_jobs or removed_jobs) and not first_collection
+    issue_changes = bool(new_jobs or reopened_jobs or removed_jobs) and not first_collection
     open_postings = sum(1 for row in rows if row["status"] == "open")
     summary = {
         "run_time": run_time,
@@ -227,15 +232,16 @@ def run_pipeline(
     }
     _write_json(status_path, summary)
     changes_path.parent.mkdir(parents=True, exist_ok=True)
-    changes_path.write_text(_change_report(run_date_text, first_collection, new_jobs, removed_jobs, source_results), encoding="utf-8")
+    changes_path.write_text(_change_report(run_date_text, first_collection, new_jobs, reopened_jobs, removed_jobs, source_results), encoding="utf-8")
     _set_github_output("changes", str(issue_changes).lower())
     _set_github_output("new_count", str(len(new_jobs) if not first_collection else 0))
+    _set_github_output("reopened_count", str(len(reopened_jobs)))
     _set_github_output("removed_count", str(len(removed_jobs)))
 
     failures = sum(1 for result in source_results if not result["success"])
     successes = len(source_results) - failures
     print(f"Run {run_date_text}: {successes}/{len(source_results)} sources succeeded; {open_postings} open postings.")
-    return {"status": summary, "new_jobs": new_jobs, "removed_jobs": removed_jobs, "issue_changes": issue_changes, "failures": failures}
+    return {"status": summary, "new_jobs": new_jobs, "reopened_jobs": reopened_jobs, "removed_jobs": removed_jobs, "issue_changes": issue_changes, "failures": failures}
 
 
 def main() -> int:

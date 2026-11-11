@@ -109,7 +109,10 @@ function marketIdsFor(job) {
   const location = text(job.location).toLowerCase();
   const ids = [];
   for (const [id, market] of Object.entries(DATA.markets)) {
-    if ((market.cities || []).some((city) => location.includes(text(city).toLowerCase()))) ids.push(id);
+    if ((market.cities || []).some((city) => {
+      const escaped = text(city).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp(`(^|[^a-z0-9_])${escaped}([^a-z0-9_]|$)`, 'i').test(location);
+    })) ids.push(id);
   }
   if (!ids.length && /\b(remote|work from home)\b/.test(location)) {
     if (/\b(oklahoma|ok)\b/.test(location) && DATA.markets.tulsa_ok) ids.push('tulsa_ok');
@@ -212,9 +215,9 @@ function renderToday() {
     : dateOnly(job.first_seen) === day && !truthy(job.first_run) && isOpen(job));
   const removed = DATA.jobs.filter((job) => dateOnly(job.removed_date) === day && !isOpen(job));
   const values = {
-    'metric-open': DATA.jobs.filter(isOpen).length,
-    'metric-new': fresh.length,
-    'metric-removed': removed.length,
+    'metric-open': DATA.status.open ?? DATA.jobs.filter(isOpen).length,
+    'metric-new': DATA.status.new_today ?? fresh.length,
+    'metric-removed': DATA.status.removed_today ?? removed.length,
     'metric-sources': DATA.sources.length,
     'metric-days': DATA.status.days_with_success ?? 0
   };
@@ -288,7 +291,7 @@ function renderBrowse() {
   const employerNames = [...new Set(allJobs.map((job) => text(job.employer)).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   employerNames.forEach((name) => employer.add(new Option(name, name)));
   const params = new URLSearchParams(window.location.search);
-  if (['tulsa_ok', 'northwest_ar'].includes(params.get('market'))) market.value = params.get('market');
+  if (['target', 'outside', 'all', 'tulsa_ok', 'northwest_ar'].includes(params.get('market'))) market.value = params.get('market');
   let shortlist = readShortlist();
 
   const draw = () => {
@@ -296,7 +299,9 @@ function renderBrowse() {
     if (status.value === 'open') jobs = jobs.filter(isOpen);
     if (status.value === 'removed') jobs = jobs.filter((job) => !isOpen(job) && !isArchived(job));
     if (status.value === 'archived') jobs = jobs.filter(isArchived);
-    if (market.value !== 'all') jobs = jobs.filter((job) => marketIdsFor(job).includes(market.value));
+    if (market.value === 'target') jobs = jobs.filter((job) => marketIdsFor(job).length > 0);
+    else if (market.value === 'outside') jobs = jobs.filter((job) => marketIdsFor(job).length === 0);
+    else if (market.value !== 'all') jobs = jobs.filter((job) => marketIdsFor(job).includes(market.value));
     if (employer.value !== 'all') jobs = jobs.filter((job) => text(job.employer) === employer.value);
     const locationQuery = text(location.value).toLowerCase();
     if (locationQuery) jobs = jobs.filter((job) => text(job.location).toLowerCase().includes(locationQuery));
@@ -337,7 +342,7 @@ function renderBrowse() {
   [query, market, employer, location, daysOpen, status, sort].forEach((input) => input.addEventListener(input === query || input === location ? 'input' : 'change', draw));
   [finance, shortlistOnly].forEach((input) => input.addEventListener('change', draw));
   document.getElementById('clear-filters')?.addEventListener('click', () => {
-    query.value = ''; market.value = 'all'; employer.value = 'all'; location.value = '';
+    query.value = ''; market.value = 'target'; employer.value = 'all'; location.value = '';
     daysOpen.value = 'all'; status.value = 'open'; sort.value = 'newest'; finance.checked = true; shortlistOnly.checked = false;
     draw(); query.focus();
   });

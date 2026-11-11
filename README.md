@@ -17,7 +17,7 @@ Target markets:
 - **Tulsa area:** Tulsa, Broken Arrow, Owasso, Jenks, Bixby, Sand Springs, Sapulpa, Catoosa, Claremore, and Bartlesville as an outer-area extension.
 - **Northwest Arkansas:** Bentonville, Fayetteville, Springdale, Tontitown, Rogers, Lowell, Siloam Springs, Bella Vista, Centerton, Cave Springs, and nearby communities.
 
-Only listings whose job location matches one of these markets belong in the local results. A remote role is local only when the posting says candidates may work remotely from Oklahoma or Arkansas.
+The pipeline keeps every listing returned by each active board, as the assignment requires, and marks whether its location matches either target market. Browse opens with Tulsa and Northwest Arkansas selected; its market filter can show either region, every location, or jobs outside the target markets. A remote role is local only when the posting says candidates may work remotely from Oklahoma or Arkansas.
 
 ## Employer watchlist
 
@@ -46,13 +46,13 @@ The source registry contains the public endpoint and career-site URL for each ac
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Oracle Candidate Experience JSON | Tulsa, Owasso, Tahlequah |
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Oracle Candidate Experience JSON | Catoosa, Claremore, Tahlequah, and other business locations |
 
-The job boards can also return jobs outside the target cities. Raw snapshots preserve each successful board response, while the published history keeps only postings with a target-market location. For jobs offered in several cities, the history and site show only the matching Tulsa or Northwest Arkansas location segments. This rule applies across every source, rather than assuming every job from a listed employer is local.
+The job boards can also return jobs outside the target cities. Raw snapshots preserve each successful board response, and the canonical history keeps every posting with its complete location field. The `in_market` and `market` columns identify postings with a target-market location, including a Tulsa or Northwest Arkansas city within a multi-location listing. The site opens on the two target markets while still allowing every collected posting to be browsed. This rule applies across every source, rather than assuming every job from a listed employer is local.
 
 BOK Financial remains available through its [careers page](https://jobs.bokf.com/go/) as a supplemental link. Its historical records are labeled **Archived source** because the public feed is RSS/XML and is no longer collected by the JSON-only pipeline.
 
 ## Data and rebuild command
 
-The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. Snapshots retain the board's full response; the published `data/history.csv` filters that data to locations in Tulsa or Northwest Arkansas and keeps only those local segments for multi-location postings. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its local postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes local postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
+The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. Snapshots retain the board's full response, and the published `data/history.csv` contains every posting returned by active JSON sources, including out-of-market roles and postings outside the finance title rule. The `in_market` and `market` columns support the site's Tulsa and Northwest Arkansas focus without dropping postings from the canonical history. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; it lists every new and removed posting with a link, and any reopened listings are shown in their own section. Large daily reports continue in issue comments so no postings are truncated; reruns update the date's issue and its report comments, and the next day's run closes it. Reopened postings keep their original `first_seen` date and are not counted in `new_today`.
 
 Run the collector manually:
 
@@ -98,10 +98,10 @@ pytest
 | `tests/test_pipeline.py` | Source failure handling, required status fields, and same-day rerun replacement. |
 | `data/raw/` | Compressed JSON snapshots for successful active-source responses, organized by UTC date. |
 | `data/archive/raw/` | Original compressed snapshots for retired sources, including the historical BOK feed payloads. |
-| `data/history.csv` | Canonical posting history. |
+| `data/history.csv` | Canonical history of all postings returned by active JSON sources, with finance-role and target-market flags. |
 | `data/archive/history.csv` | Retired-source postings, separate from the required open/removed history. |
 | `data/status.json` | Latest run summary and per-source results. |
-| `data/daily_changes.md` | The current dated report used as the body of the daily GitHub issue. |
+| `data/daily_changes.md` | The current dated report used for the daily GitHub issue body and continuation comments. |
 | `data/raw/.gitkeep`, `site/.gitkeep`, `tests/.gitkeep`, `src/job_watcher/.gitkeep`, `.github/workflows/.gitkeep` | Keep required folders visible in Git when they contain no generated files. |
 | `site/index.html` | Today page with run counts, latest changes, source status, and employer links. |
 | `site/browse.html` | Searchable job list with role, employer, location, age, and status filters plus saved stars. |
@@ -116,8 +116,34 @@ pytest
 
 - Fetch active employer feeds anonymously as JSON, without parsing job-board HTML. BOK Financial remains a supplemental careers link; its prior source data is archived.
 - Save successful responses, continue after a source failure, and record every board's success, count, and error in the status file.
-- Rebuild all posting rows and dates deterministically from raw data, including first-seen, last-seen, and removed dates.
+- Keep every posting returned by active sources and rebuild all posting rows and dates deterministically from raw data, including first-seen, last-seen, and removed dates.
 - Run daily with GitHub Actions, create/update a dated issue each day, close the previous day's issue, and commit raw, history, status, and change-report files.
-- Publish Today, Browse, and Markets pages with the required filters, shortlist, six history charts, web-app manifest, and service worker.
+- Publish Today, Browse, and Markets pages with the required filters, a local-first Browse view, saved shortlist, six history charts based on all tracked postings, web-app manifest, and service worker.
 - Run pytest on each push and pull request; the badge above links to the workflow.
 - The course rubric also requires at least seven distinct run dates by the due date. That condition depends on elapsed days and cannot be supplied by a code change.
+
+## Data fields
+
+`data/history.csv` is sorted by `posting_id`. The assignment's required fields are listed below; `in_market` and `market` are additional regional fields used to keep the Tulsa and Northwest Arkansas view focused while retaining every posting.
+
+| Field | Meaning |
+| --- | --- |
+| `posting_id` | Unique key combining the source ID and the employer board's posting ID. |
+| `source` | Applicant tracking system used by the posting's source. |
+| `source_id` | Posting ID assigned by that employer's board. |
+| `employer` | Employer name. |
+| `title` | Posting title. |
+| `location` | Full location value returned by the source. |
+| `department` | Department when provided by the source; otherwise empty. |
+| `posted_date` | Board's posting date when available; otherwise empty. |
+| `url` | Direct job posting or application URL. |
+| `in_role` | `true` when the title matches the finance and accounting title rule. |
+| `in_market` | `true` when the location matches Tulsa or Northwest Arkansas. |
+| `market` | Matching market IDs (`tulsa_ok`, `northwest_ar`), separated by semicolons if both match. |
+| `first_run` | `true` when the posting appeared in the source's first successful snapshot. |
+| `first_seen` | First UTC date this source listed the posting. |
+| `last_seen` | Most recent UTC date this source listed the posting. |
+| `status` | `open` or `removed`. |
+| `removed_date` | UTC date the posting was absent from a successful source snapshot; empty while open. |
+
+`data/status.json` records `run_time` (UTC), `first_run_date`, `days_with_success` (distinct UTC dates with at least one successful source), `open`, `new_today`, `removed_today`, and one `sources` entry per active board. Each source entry includes `name`, `ok`, and `count`, plus diagnostic fields. `new_today` excludes first-run baseline postings and reopened listings; reopened postings are reported separately in the daily issue.

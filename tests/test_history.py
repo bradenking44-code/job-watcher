@@ -64,7 +64,7 @@ def test_title_matching_uses_word_boundaries():
     assert not title_matches("Texas Field Representative", ["tax"])
 
 
-def test_history_keeps_only_target_market_jobs_and_localizes_multi_location_rows(tmp_path):
+def test_history_keeps_all_jobs_and_marks_target_market_matches(tmp_path):
     raw = tmp_path / "raw"
     output = tmp_path / "history.csv"
     config = {
@@ -73,14 +73,22 @@ def test_history_keeps_only_target_market_jobs_and_localizes_multi_location_rows
     }
     local = _posting("sample:local", "Finance Analyst", "Tulsa, OK; Houston, TX; Denver, CO")
     outside = _posting("sample:outside", "Finance Analyst", "Little Rock, AR")
+    outside.pop("posted_date")
+    outside.pop("department")
     _snapshot(raw, "2026-11-09", True, [local, outside])
 
     rows = rebuild_history(raw, output, config)
 
-    assert [row["posting_id"] for row in rows] == ["sample:local"]
-    assert rows[0]["location"] == "Tulsa, OK"
-    assert rows[0]["market"] == "tulsa_ok"
-    assert rows[0]["in_market"] == "true"
+    by_id = {row["posting_id"]: row for row in rows}
+    assert set(by_id) == {"sample:local", "sample:outside"}
+    assert by_id["sample:local"]["location"] == "Tulsa, OK; Houston, TX; Denver, CO"
+    assert by_id["sample:local"]["market"] == "tulsa_ok"
+    assert by_id["sample:local"]["in_market"] == "true"
+    assert by_id["sample:outside"]["location"] == "Little Rock, AR"
+    assert by_id["sample:outside"]["posted_date"] == ""
+    assert by_id["sample:outside"]["department"] == ""
+    assert by_id["sample:outside"]["market"] == ""
+    assert by_id["sample:outside"]["in_market"] == "false"
 
 
 def test_reappearing_posting_keeps_first_seen_and_clears_removed_date(tmp_path):

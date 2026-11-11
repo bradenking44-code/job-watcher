@@ -291,6 +291,7 @@ h1, h2, p { margin-top: 0; }
 .apply-link:hover { text-decoration: underline; text-underline-offset: 3px; }
 .apply-link.disabled { color: #8a928b; }
 .report-section { padding-bottom: 10px; }
+.report-scope-note { max-width: 850px; margin: -8px 0 22px; color: #66736a; font-size: 12px; line-height: 1.65; }
 .report-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .report-card { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 7px; background: #fff; }
 .report-card h3 { margin: 0 0 9px; font: 600 18px/1.25 var(--display); letter-spacing: -.045em; }

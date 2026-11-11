@@ -51,6 +51,24 @@ jobs:
             const body = fs.existsSync('data/daily_changes.md')
               ? fs.readFileSync('data/daily_changes.md', 'utf8')
               : `# Job Watcher updates — ${runDate}\n\nThe collection did not finish. See the workflow run for details.`;
+            const reportParts = [];
+            let currentPart = '';
+            for (const line of body.split('\n')) {
+              const nextLine = `${line}\n`;
+              if (currentPart && currentPart.length + nextLine.length > 48000) {
+                reportParts.push(currentPart);
+                currentPart = '';
+              }
+              currentPart += nextLine;
+            }
+            if (currentPart || !reportParts.length) reportParts.push(currentPart);
+            const issueBody = reportParts[0] + (reportParts.length > 1
+              ? `\n\n_The complete report continues in ${reportParts.length - 1} comments below._`
+              : '');
+            const continuationMarker = '<!-- job-watcher-report-chunk -->';
+            const reportComments = reportParts.slice(1).map((part, index) =>
+              `${continuationMarker}\n## Report continued (${index + 1} of ${reportParts.length - 1})\n\n${part}`
+            );
             const findIssue = async (issueTitle) => {
               const result = await github.rest.search.issuesAndPullRequests({
                 q: `repo:${context.repo.owner}/${context.repo.repo} is:issue in:title "${issueTitle}"`,
@@ -72,23 +90,57 @@ jobs:
               core.info(`Closed ${previousTitle}.`);
             }
             const current = await findIssue(title);
+            let issue;
             if (current) {
-              await github.rest.issues.update({
+              const updated = await github.rest.issues.update({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: current.number,
-                body,
+                body: issueBody,
                 state: 'open'
               });
-              core.info(`Updated ${current.html_url}.`);
+              issue = updated.data;
+              core.info(`Updated ${issue.html_url}.`);
             } else {
-              const issue = await github.rest.issues.create({
+              const created = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title,
-                body
+                body: issueBody
               });
-              core.info(`Opened ${issue.data.html_url}.`);
+              issue = created.data;
+              core.info(`Opened ${issue.html_url}.`);
+            }
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              per_page: 100
+            });
+            const oldReportComments = comments.filter((comment) => comment.body.includes(continuationMarker));
+            for (let index = 0; index < reportComments.length; index += 1) {
+              if (index < oldReportComments.length) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: oldReportComments[index].id,
+                  body: reportComments[index]
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: reportComments[index]
+                });
+              }
+            }
+            for (const stale of oldReportComments.slice(reportComments.length)) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: stale.id
+              });
             }
       - name: Commit raw snapshots, history, and status
         id: commit

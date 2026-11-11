@@ -2,7 +2,7 @@ import gzip
 import json
 from datetime import date
 
-from job_watcher.pipeline import run_pipeline
+from job_watcher.pipeline import _change_report, run_pipeline
 from job_watcher.sources import SourceFetchError
 
 
@@ -89,7 +89,7 @@ def test_pipeline_records_failures_without_raw_files_and_reruns_replace_the_day(
     assert not (raw_dir / "2026-11-10" / "first.json.gz").exists()
 
 
-def test_pipeline_reports_a_reopened_posting_as_new_again(tmp_path, monkeypatch):
+def test_pipeline_reports_reopened_posting_separately_from_new_today(tmp_path, monkeypatch):
     root = tmp_path
     config_path = root / "sources.json"
     config = {
@@ -118,7 +118,26 @@ def test_pipeline_reports_a_reopened_posting_as_new_again(tmp_path, monkeypatch)
     postings = [posting]
     reopened = run_pipeline(config_path, raw_dir, history_path, status_path, changes_path, run_date=date(2026, 11, 11))
     row = reopened["status"]
-    assert row["new_today"] == 1
-    assert row["new_today_ids"] == ["sample:A"]
-    assert reopened["new_jobs"][0]["first_seen"] == "2026-11-09"
-    assert reopened["new_jobs"][0]["last_seen"] == "2026-11-11"
+    assert row["new_today"] == 0
+    assert row["new_today_ids"] == []
+    assert reopened["new_jobs"] == []
+    assert reopened["reopened_jobs"][0]["posting_id"] == "sample:A"
+    assert reopened["reopened_jobs"][0]["first_seen"] == "2026-11-09"
+    assert reopened["reopened_jobs"][0]["last_seen"] == "2026-11-11"
+
+
+def test_daily_issue_report_lists_every_changed_posting_with_its_link():
+    new_jobs = [
+        {"title": f"New role {index}", "employer": "Sample Co.", "location": "Tulsa, OK", "url": f"https://example.test/new/{index}"}
+        for index in range(35)
+    ]
+    removed_jobs = [
+        {"title": f"Removed role {index}", "employer": "Sample Co.", "location": "Tulsa, OK", "url": f"https://example.test/removed/{index}"}
+        for index in range(33)
+    ]
+
+    report = _change_report("2026-11-11", False, new_jobs, [], removed_jobs, [{"ok": True, "success": True}])
+
+    assert report.count("https://example.test/new/") == 35
+    assert report.count("https://example.test/removed/") == 33
+    assert "and 5 more" not in report
