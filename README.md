@@ -110,6 +110,7 @@ pytest
 | `site/assets/site.css` | Shared site colors, fonts, layout, and responsive styles. |
 | `site/sw.js` | Cache-first fallback for offline pages and last-loaded data. |
 | `site/manifest.webmanifest` | Installable web-app metadata. |
+| `site/icon.svg` | App icon used by the site and installable web app. |
 | `site/icon.svg` | App and site icon. |
 
 ## Project requirements
