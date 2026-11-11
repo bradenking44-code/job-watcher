@@ -663,13 +663,15 @@ function renderMarket() {
       const href = safeUrl(source.career_url);
       const card = document.createElement(href ? 'a' : 'div'); card.className = 'market-source';
       if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
-      const names = (source.markets || []).map(marketLabel).join(' + ');
+      const marketNames = (source.markets || []).map(marketLabel).join(' + ');
+      const names = [marketNames, source.board_name].filter(Boolean).join(' · ');
       card.innerHTML = `<strong>${escapeHtml(source.employer)}</strong><span>${escapeHtml(names)}</span>`;
       sources.append(card);
     });
   }
   const count = document.getElementById('market-source-count');
-  if (count) count.textContent = `${DATA.sources.length} active boards`;
+  const employerCount = new Set(DATA.sources.map((source) => source.employer)).size;
+  if (count) count.textContent = `${DATA.sources.length} active boards · ${employerCount} employers`;
 }
 
 async function start() {
