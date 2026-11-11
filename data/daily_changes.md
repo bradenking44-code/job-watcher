@@ -1,9 +1,9 @@
 # Job Watcher updates — 2026-11-11
 
 Employer boards collected successfully: **20 of 20**.
-New postings: **564**
+New postings: **569**
 Reopened postings: **1**
-Removed postings: **545**
+Removed postings: **551**
 
 ## New postings
 
@@ -202,6 +202,7 @@ Removed postings: **545**
 - [(CAN) Produce Team Lead](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-NB-MIRAMICHI-05833-WM-SUPERCENTER/XMLNAME--CAN--Produce-Team-Lead_R-2703892) — **Walmart** · (CAN) NB MIRAMICHI 05833 WM SUPERCENTER
 - [(USA) Pharmacy Manager](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MN-BLAINE-03498-WM-SUPERCENTER/XMLNAME--USA--Pharmacy-Manager_R-2703930) — **Walmart** · (USA) MN BLAINE 03498 WM SUPERCENTER
 - [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-IN-COLUMBUS-04216-WM-SUPERCENTER/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2703964) — **Walmart** · (USA) IN COLUMBUS 04216 WM SUPERCENTER
+- [Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MT-GREAT-FALLS-07199-WM-SUPERCENTER/Technician--Facility-Services--HVAC-Refrigeration_R-2703984) — **Walmart** · (USA) MT GREAT FALLS 07199 WM SUPERCENTER
 - [Technician, Facility Services General Maintenance](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MT-GREAT-FALLS-02455-WM-SUPERCENTER/Technician--Facility-Services-General-Maintenance_R-2704001) — **Walmart** · (USA) MT GREAT FALLS 02455 WM SUPERCENTER; Great Falls, MT
 - [Food & Consumables Coach](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-NY-CICERO-05242-WM-SUPERCENTER/Food---Consumables-Coach_R-2704040-1) — **Walmart** · (USA) NY CICERO 05242 WM SUPERCENTER
 - [(USA) Freight Flow Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-NE-GRAND-ISLAND-06461-SAMS-CLUB/XMLNAME--USA--Freight-Flow-Associate_R-2704137) — **Walmart** · (USA) NE GRAND ISLAND 06461 SAM'S CLUB
@@ -210,6 +211,7 @@ Removed postings: **545**
 - [(USA) Optometrist - Sam's](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Battle-Creek-MI/XMLNAME--USA--Optometrist---Sam-s_R-2704311-1) — **Walmart** · Battle Creek, MI
 - [Coach/Ops Mgr Trainee](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-AL-GULF-SHORES-02748-WM-SUPERCENTER/Coach-Ops-Mgr-Trainee_R-2704313) — **Walmart** · (USA) AL GULF SHORES 02748 WM SUPERCENTER
 - [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-CO-AURORA-05334-WM-SUPERCENTER/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2704320) — **Walmart** · (USA) CO AURORA 05334 WM SUPERCENTER
+- [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-CO-AURORA-05334-WM-SUPERCENTER/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2704326) — **Walmart** · (USA) CO AURORA 05334 WM SUPERCENTER
 - [Technician, Facility Services General Maintenance](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MT-POLSON-02607-WM-SUPERCENTER/Technician--Facility-Services-General-Maintenance_R-2704382-1) — **Walmart** · (USA) MT POLSON 02607 WM SUPERCENTER; Kalispell, MT
 - [(USA) Overnight Stocking Coach, Non-Complex](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-FL-CRAWFORDVILLE-03307-WM-SUPERCENTER/XMLNAME--USA--Overnight-Stocking-Coach--Non-Complex_R-2704479) — **Walmart** · (USA) FL CRAWFORDVILLE 03307 WM SUPERCENTER
 - [(USA) Senior Technician, Facility Services, HVAC/Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-CA-PLEASANTON-02161-WAL-MART/XMLNAME--USA--Senior-Technician--Facility-Services--HVAC-Refrigeration_R-2704498) — **Walmart** · (USA) CA PLEASANTON 02161 WAL-MART
@@ -244,6 +246,7 @@ Removed postings: **545**
 - [(CAN) Deli Bakery Team Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-QC-LAVAL-03189-WM-SUPERCENTER/XMLNAME--CAN--Deli-Bakery-Team-Associate_R-2704813) — **Walmart** · (CAN) QC LAVAL 03189 WM SUPERCENTER
 - [(CAN) Caissier](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-QC-VILLE-DE-QUEBEC-01201-WM-SUPERCENTER/XMLNAME--CAN--Caissier_R-2704814) — **Walmart** · (CAN) QC VILLE DE QUEBEC 01201 WM SUPERCENTER
 - [Retail Pharmacy Student](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/St-Catharines-ON/Retail-Pharmacy-Student_R-2704815) — **Walmart** · St. Catharines, ON
+- [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-ND-BISMARCK-01534-WM-SUPERCENTER/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2704816) — **Walmart** · (USA) ND BISMARCK 01534 WM SUPERCENTER
 - [Bakery Lead](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-FL-PORT-CHARLOTTE-06445-SAMS-CLUB/Bakery-Lead_R-2704823) — **Walmart** · (USA) FL PORT CHARLOTTE 06445 SAM'S CLUB
 - [(CAN) Produce Stocker](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Grand-Prairie-AB/XMLNAME--CAN--Produce-Stocker_R-2704825) — **Walmart** · Grand-Prairie, AB
 - [(USA) Lead Technician, Facility Services, Exterior Services - US](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-ND-FARGO-01581-WM-SUPERCENTER/XMLNAME--USA--Lead-Technician--Facility-Services--Exterior-Services---US_R-2704826) — **Walmart** · (USA) ND FARGO 01581 WM SUPERCENTER
@@ -258,6 +261,7 @@ Removed postings: **545**
 - [(USA) GM Coach](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-SC-MOUNT-PLEASANT-00632-WM-SUPERCENTER/XMLNAME--USA--GM-Coach_R-2704905-1) — **Walmart** · (USA) SC MOUNT PLEASANT 00632 WM SUPERCENTER
 - [O/N Merchandising Lead](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-FL-PORT-ST-LUCIE-08150-SAMS-CLUB/O-N-Merchandising-Lead_R-2704912) — **Walmart** · (USA) FL PORT ST LUCIE 08150 SAM'S CLUB
 - [(USA) Overnight Stocking Coach, Non-Complex, Management](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-LA-PORT-ALLEN-01136-WM-SUPERCENTER/XMLNAME--USA--Overnight-Stocking-Coach--Non-Complex--Management_R-2704933) — **Walmart** · (USA) LA PORT ALLEN 01136 WM SUPERCENTER
+- [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-DE-WILMINGTON-05436-WAL-MART/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2704991-1) — **Walmart** · (USA) DE WILMINGTON 05436 WAL-MART
 - [Job Profile (USA) Personal Shopper - Sam's](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/San-Angelo-TX/Job-Profile--USA--Personal-Shopper---Sam-s_R-2705012) — **Walmart** · San Angelo, TX
 - [(USA) Staff Pharmacist - $25,000 Sign-On Bonus](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MO-SAINT-ROBERT-00021-WM-SUPERCENTER/XMLNAME--USA--Staff-Pharmacist----25-000-Sign-On-Bonus_R-2705013) — **Walmart** · (USA) MO SAINT ROBERT 00021 WM SUPERCENTER
 - [(USA) Freight Flow Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-VA-WOODBRIDGE-06371-SAMS-CLUB/XMLNAME--USA--Freight-Flow-Associate_R-2705017) — **Walmart** · (USA) VA WOODBRIDGE 06371 SAM'S CLUB
@@ -353,6 +357,7 @@ Removed postings: **545**
 - [(USA) Area Manager Asset Protection - All DC/FC](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-IN-MCCORDSVILLE-08972-ECOMM-FULFILLMENT-SERVICES/XMLNAME--USA--Area-Manager-Asset-Protection---All-DC-FC_R-2705305) — **Walmart** · (USA) IN MCCORDSVILLE 08972 ECOMM FULFILLMENT SERVICES
 - [Pharmacy Assistant](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-LEAMINGTON-03164-WM-SUPERCENTER/Pharmacy-Assistant_R-2705312) — **Walmart** · (CAN) ON LEAMINGTON 03164 WM SUPERCENTER
 - [Staff Pharmacist (Salary) - Sam's](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MO-MAPLEWOOD-06474-SAMS-CLUB/Staff-Pharmacist--Salary----Sam-s_R-2705315) — **Walmart** · (USA) MO MAPLEWOOD 06474 SAM'S CLUB
+- [(USA) Technician, Facility Services, HVAC-Refrigeration](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-MN-ROSEVILLE-03404-WM-SUPERCENTER/XMLNAME--USA--Technician--Facility-Services--HVAC-Refrigeration_R-2705318) — **Walmart** · (USA) MN ROSEVILLE 03404 WM SUPERCENTER
 - [(CAN) Associé à la protection des biens](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Montreal-Nord-QC/Associ--la-protection-des-biens_R-2705329) — **Walmart** · Montreal-Nord, QC
 - [(CAN) Asset Protection Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Abbotsford-BC/XMLNAME--CAN--Asset-Protection-Associate_R-2705333) — **Walmart** · Abbotsford, BC
 - [(USA) Optical Manager, Certified (ABO) – Sam’s Club](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Pittsburgh-PA/XMLNAME--USA--Optical-Manager--Certified--ABO----Sam-s-Club_R-2705337-1) — **Walmart** · Pittsburgh, PA
@@ -1035,6 +1040,7 @@ Removed postings: **545**
 - [(CAN) Associé de nuit](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Pointe-Claire-QC/XMLNAME--CAN--Associ-de-nuit_R-2701760) — **Walmart** · Pointe-Claire, QC
 - [(USA) Member Team Lead](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-TX-HOUSTON-08245-SAMS-CLUB/XMLNAME--USA--Member-Team-Lead_R-2701766) — **Walmart** · (USA) TX HOUSTON 08245 SAM'S CLUB
 - [(CAN) OMNI Customer Fulfillment Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-AB-EDMONTON-03028-WM-SUPERCENTER/XMLNAME--CAN--OMNI-Customer-Fulfillment-Associate_R-2701772) — **Walmart** · (CAN) AB EDMONTON 03028 WM SUPERCENTER
+- [Certified Pharmacy Technician, Central Fill, Health And Wellness Central Operations - Health And Wellness](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Plainfield-IN/Certified-Pharmacy-Technician--Central-Fill--Health-And-Wellness-Central-Operations---Health-And-Wellness_R-2701773) — **Walmart** · Plainfield, IN
 - [(USA) Tire & Battery Technician - Automotive](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Panama-City-FL/XMLNAME--USA--Tire---Battery-Technician---Automotive_R-2701774) — **Walmart** · Panama City, FL
 - [(CAN) Customer Service Desk Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-SK-ESTEVAN-03030-WM-SUPERCENTER/XMLNAME--CAN--Customer-Service-Desk-Associate_R-2701777) — **Walmart** · (CAN) SK ESTEVAN 03030 WM SUPERCENTER
 - [PT (CAN) Maintenance Team Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Brooks-AB/PT--CAN--Maintenance-Team-Associate_R-2701778) — **Walmart** · Brooks, AB
@@ -1079,11 +1085,16 @@ Removed postings: **545**
 - [(USA) Produce Lead](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-HI-PEARL-CITY-06410-SAMS-CLUB/XMLNAME--USA--Produce-Lead_R-2702028) — **Walmart** · (USA) HI PEARL CITY 06410 SAM'S CLUB
 - [(CAN) Stock Unloader Associate FT](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Rockland-ON/XMLNAME--CAN--Stock-Unloader-Associate-FT_R-2702033) — **Walmart** · Rockland, ON
 - [(CAN) Part-Time Fashion Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-STRATFORD-01125-WM-SUPERCENTER/XMLNAME--CAN--Part-Time-Fashion-Associate_R-2702036) — **Walmart** · (CAN) ON STRATFORD 01125 WM SUPERCENTER
+- [(CAN) Overnight Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-MISSISSAUGA-WEST-01211-WM-SUPERCENTER/XMLNAME--CAN--Overnight-Associate_R-2702039) — **Walmart** · (CAN) ON MISSISSAUGA WEST 01211 WM SUPERCENTER
 - [(CAN) Front End Checkout Team Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-MB-STEINBACH-01141-WM-SUPERCENTER/XMLNAME--CAN--Front-End-Checkout-Team-Associate_R-2702042) — **Walmart** · (CAN) MB STEINBACH 01141 WM SUPERCENTER
 - [(USA) Personal Shopper - Sam's](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-TN-CLARKSVILLE-06512-SAMS-CLUB/XMLNAME--USA--Personal-Shopper---Sam-s_R-2702043) — **Walmart** · (USA) TN CLARKSVILLE 06512 SAM'S CLUB
 - [Independent Optometrist - Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-TX-SPRING-BRANCH-03056-WM-SUPERCENTER/Independent-Optometrist---Walmart_R-2702044-1) — **Walmart** · (USA) TX SPRING BRANCH 03056 WM SUPERCENTER
 - [Consumables Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-NB-EDMUNDSTON-01033-WM-SUPERCENTER/Consumables-Associate_R-2702050) — **Walmart** · (CAN) NB EDMUNDSTON 01033 WM SUPERCENTER
+- [(USA) Store Manager - Supercenter](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-OH-MARYSVILLE-01595-WM-SUPERCENTER/XMLNAME--USA--Store-Manager---Supercenter_R-2702052-1) — **Walmart** · (USA) OH MARYSVILLE 01595 WM SUPERCENTER
+- [(CAN) Overnight Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-SCARBOROUGH-03111-WM-SUPERCENTER/XMLNAME--CAN--Overnight-Associate_R-2702056) — **Walmart** · (CAN) ON SCARBOROUGH 03111 WM SUPERCENTER
+- [(USA) Staff Pharmacist (hourly)](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-NC-LELAND-04273-WM-SUPERCENTER/XMLNAME--USA--Staff-Pharmacist--hourly-_R-2702060-1) — **Walmart** · (USA) NC LELAND 04273 WM SUPERCENTER
 - [(USA) Senior Meat Cutter](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-CA-VISALIA-07718-SAMS-CLUB/XMLNAME--USA--Senior-Meat-Cutter_R-2702062) — **Walmart** · (USA) CA VISALIA 07718 SAM'S CLUB
+- [(CAN) Front End Checkout Team Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-MB-STEINBACH-01141-WM-SUPERCENTER/XMLNAME--CAN--Front-End-Checkout-Team-Associate_R-2702070) — **Walmart** · (CAN) MB STEINBACH 01141 WM SUPERCENTER
 - [(CAN) Préposé au déchargement](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Val-DOr-QC/XMLNAME--CAN--Prpos-au-dchargement_R-2702081) — **Walmart** · Val-D'Or, QC
 - [(CAN) Overnight Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-LONDON-01157-WAL-MART/XMLNAME--CAN--Overnight-Associate_R-2702248) — **Walmart** · (CAN) ON LONDON 01157 WAL-MART
 - [(CAN) Stock Unloader Associate](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/CAN-ON-LONDON-01157-WAL-MART/XMLNAME--CAN--Stock-Unloader-Associate_R-2702265) — **Walmart** · (CAN) ON LONDON 01157 WAL-MART
