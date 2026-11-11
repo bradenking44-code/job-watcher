@@ -57,6 +57,13 @@ def market_ids_for_location(location: str, markets: dict[str, Any]) -> list[str]
     return matches
 
 
+def local_location_segments(location: str, markets: dict[str, Any]) -> list[str]:
+    """Keep only location components that match a configured target market."""
+
+    segments = [segment.strip() for segment in re.split(r"[;\n|]+", str(location or "")) if segment.strip()]
+    return [segment for segment in segments if market_ids_for_location(segment, markets)]
+
+
 def read_history(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         return []
@@ -164,15 +171,18 @@ def _write_history_csv(path: Path, rows: list[dict[str, str]]) -> None:
 
 
 def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) -> list[dict[str, str]]:
-    """Rebuild active history and a separate archive from their raw snapshots."""
+    """Rebuild local active history and a separate archive from raw snapshots."""
 
     inactive_source_ids = {str(source_id) for source_id in config.get("inactive_source_ids", [])}
+    markets = config.get("markets", {})
     latest, observed, source_success_dates, _ = load_raw_snapshots(raw_dir)
-    active_latest = {
-        posting_id: posting
-        for posting_id, posting in latest.items()
-        if str(posting.get("source_id") or "") not in inactive_source_ids
-    }
+    active_latest = {}
+    for posting_id, posting in latest.items():
+        if str(posting.get("source_id") or "") in inactive_source_ids:
+            continue
+        local_segments = local_location_segments(str(posting.get("location") or ""), markets)
+        if local_segments:
+            active_latest[posting_id] = {**posting, "location": "; ".join(local_segments)}
     active_observed = {
         posting_id: days
         for posting_id, days in observed.items()

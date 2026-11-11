@@ -206,10 +206,15 @@ function renderFooter() {
 
 function renderToday() {
   const day = runDay();
+  const newIds = Array.isArray(DATA.status.new_today_ids) ? new Set(DATA.status.new_today_ids) : null;
+  const fresh = DATA.jobs.filter((job) => newIds
+    ? newIds.has(text(job.posting_id)) && isOpen(job)
+    : dateOnly(job.first_seen) === day && !truthy(job.first_run) && isOpen(job));
+  const removed = DATA.jobs.filter((job) => dateOnly(job.removed_date) === day && !isOpen(job));
   const values = {
-    'metric-open': DATA.status.open ?? DATA.jobs.filter(isOpen).length,
-    'metric-new': DATA.status.new_today ?? 0,
-    'metric-removed': DATA.status.removed_today ?? 0,
+    'metric-open': DATA.jobs.filter(isOpen).length,
+    'metric-new': fresh.length,
+    'metric-removed': removed.length,
     'metric-sources': DATA.sources.length,
     'metric-days': DATA.status.days_with_success ?? 0
   };
@@ -220,11 +225,6 @@ function renderToday() {
   const heroSourceCount = document.getElementById('hero-source-count');
   if (heroSourceCount) heroSourceCount.textContent = String(DATA.sources.length);
 
-  const newIds = Array.isArray(DATA.status.new_today_ids) ? new Set(DATA.status.new_today_ids) : null;
-  const fresh = DATA.jobs.filter((job) => newIds
-    ? newIds.has(text(job.posting_id)) && isOpen(job)
-    : dateOnly(job.first_seen) === day && !truthy(job.first_run) && isOpen(job));
-  const removed = DATA.jobs.filter((job) => dateOnly(job.removed_date) === day && !isOpen(job));
   for (const [id, jobs, heading] of [
     ['today-new-list', fresh, 'No new postings were first seen in this run.'],
     ['today-removed-list', removed, 'No postings were removed in this run.']
@@ -245,7 +245,7 @@ function renderToday() {
       const ok = result ? (result.ok ?? result.success) : null;
       const card = document.createElement('article');
       card.className = `source-status-card${ok === false ? ' source-failed' : ok === true ? ' source-succeeded' : ''}`;
-      card.innerHTML = `<div class="source-status-head"><strong>${escapeHtml(source.employer)}</strong><span class="run-pill ${ok === false ? 'run-failed' : ok === true ? 'run-ok' : 'run-unknown'}">${ok === true ? 'SUCCESS' : ok === false ? 'FAILED' : 'NO RESULT'}</span></div><p>${ok === null ? 'No source result is recorded for the latest run.' : `${Number(result.count ?? result.postings ?? 0).toLocaleString()} postings returned`}</p>${ok === false && result.error ? `<small>${escapeHtml(result.error)}</small>` : ''}`;
+      card.innerHTML = `<div class="source-status-head"><strong>${escapeHtml(source.employer)}</strong><span class="run-pill ${ok === false ? 'run-failed' : ok === true ? 'run-ok' : 'run-unknown'}">${ok === true ? 'SUCCESS' : ok === false ? 'FAILED' : 'NO RESULT'}</span></div><p>${ok === null ? 'No source result is recorded for the latest run.' : `${Number(result.count ?? result.postings ?? 0).toLocaleString()} source listings scanned; local matches appear in Browse.`}</p>${ok === false && result.error ? `<small>${escapeHtml(result.error)}</small>` : ''}`;
       sourceStatusList.append(card);
     });
     const succeeded = DATA.sources.filter((source) => {

@@ -14,8 +14,8 @@ The title rule is intentionally broad and flags roles with finance, financial, F
 
 Target markets:
 
-- **Tulsa area:** Tulsa, Broken Arrow, Owasso, Jenks, Bixby, Sand Springs, Sapulpa, Catoosa, and Bartlesville as an outer-area extension.
-- **Northwest Arkansas:** Bentonville, Fayetteville, Springdale, Rogers, Lowell, Siloam Springs, Bella Vista, Centerton, Cave Springs, and nearby communities.
+- **Tulsa area:** Tulsa, Broken Arrow, Owasso, Jenks, Bixby, Sand Springs, Sapulpa, Catoosa, Claremore, and Bartlesville as an outer-area extension.
+- **Northwest Arkansas:** Bentonville, Fayetteville, Springdale, Tontitown, Rogers, Lowell, Siloam Springs, Bella Vista, Centerton, Cave Springs, and nearby communities.
 
 Only listings whose job location matches one of these markets belong in the local results. A remote role is local only when the posting says candidates may work remotely from Oklahoma or Arkansas.
 
@@ -46,13 +46,13 @@ The source registry contains the public endpoint and career-site URL for each ac
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — corporate careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs) | Oracle Candidate Experience JSON | Tulsa, Owasso, Tahlequah |
 | Tulsa and northeastern Oklahoma | [Cherokee Nation Businesses — enterprise careers](https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001/jobs) | Oracle Candidate Experience JSON | Catoosa, Claremore, Tahlequah, and other business locations |
 
-The job boards can also return jobs outside the target cities. The location rule above applies across all sources, rather than assuming every job from a listed employer is local.
+The job boards can also return jobs outside the target cities. Raw snapshots preserve each successful board response, while the published history keeps only postings with a target-market location. For jobs offered in several cities, the history and site show only the matching Tulsa or Northwest Arkansas location segments. This rule applies across every source, rather than assuming every job from a listed employer is local.
 
 BOK Financial remains available through its [careers page](https://jobs.bokf.com/go/) as a supplemental link. Its historical records are labeled **Archived source** because the public feed is RSS/XML and is no longer collected by the JSON-only pipeline.
 
 ## Data and rebuild command
 
-The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
+The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. Snapshots retain the board's full response; the published `data/history.csv` filters that data to locations in Tulsa or Northwest Arkansas and keeps only those local segments for multi-location postings. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its local postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes local postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
 
 Run the collector manually:
 
@@ -91,7 +91,7 @@ pytest
 | `config/sources.json` | Active employer endpoints, supplemental careers links, archived source IDs, target markets, and title terms. |
 | `src/job_watcher/__init__.py` | Marks the Python package. |
 | `src/job_watcher/sources.py` | Anonymous Workday, Greenhouse, Oracle, and Infor JSON source adapters and field conversion. |
-| `src/job_watcher/history.py` | Title/location matching and deterministic history rebuild from raw snapshots. |
+| `src/job_watcher/history.py` | Title/location matching, local-market filtering, and deterministic history rebuild from raw snapshots. |
 | `src/job_watcher/pipeline.py` | Daily collection, raw snapshot saving, status, change report, and history build. |
 | `tests/test_sources.py` | Adapter conversion, pagination, posting dates, and source registry checks. |
 | `tests/test_history.py` | Title rule and first-seen, last-seen, removal, reappearance, and reproducibility checks. |

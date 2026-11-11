@@ -64,6 +64,25 @@ def test_title_matching_uses_word_boundaries():
     assert not title_matches("Texas Field Representative", ["tax"])
 
 
+def test_history_keeps_only_target_market_jobs_and_localizes_multi_location_rows(tmp_path):
+    raw = tmp_path / "raw"
+    output = tmp_path / "history.csv"
+    config = {
+        "markets": {"tulsa_ok": {"cities": ["Tulsa"]}},
+        "finance_title_terms": ["finance"],
+    }
+    local = _posting("sample:local", "Finance Analyst", "Tulsa, OK; Houston, TX; Denver, CO")
+    outside = _posting("sample:outside", "Finance Analyst", "Little Rock, AR")
+    _snapshot(raw, "2026-11-09", True, [local, outside])
+
+    rows = rebuild_history(raw, output, config)
+
+    assert [row["posting_id"] for row in rows] == ["sample:local"]
+    assert rows[0]["location"] == "Tulsa, OK"
+    assert rows[0]["market"] == "tulsa_ok"
+    assert rows[0]["in_market"] == "true"
+
+
 def test_reappearing_posting_keeps_first_seen_and_clears_removed_date(tmp_path):
     raw = tmp_path / "raw"
     output = tmp_path / "history.csv"
