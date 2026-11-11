@@ -107,6 +107,9 @@ h1, h2, p { margin-top: 0; }
 .job-company { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
 .job-meta { flex-shrink: 0; color: #738078; font: 10px var(--mono); text-align: right; }
 .job-meta span { display: block; margin-top: 5px; }
+.job-row-regional .job-meta span { color: #42624e; font-weight: 700; }
+.job-row-international .job-meta span { color: #7d6250; }
+.job-row-regional { background: linear-gradient(90deg, rgba(237,243,232,.54), transparent 65%); }
 .loading-state, .empty-state { padding: 24px 5px; color: #77837b; font-size: 12px; line-height: 1.65; }
 .empty-state strong { display: block; margin-bottom: 5px; color: var(--ink); font: 600 16px var(--display); }
 .empty-state a { color: var(--green-2); font-weight: 700; }

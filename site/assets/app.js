@@ -1,5 +1,18 @@
 const DATA = { jobs: [], archiveJobs: [], status: {}, sources: [], supplementalSources: [], candidates: [], markets: {}, financeTerms: [] };
 const SHORTLIST_KEY = 'ledgerline-job-watcher-shortlist-v1';
+const US_STATE_NAMES = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', DC: 'District of Columbia'
+};
+const US_STATE_PATTERNS = Object.entries(US_STATE_NAMES).map(([code, name]) => ({
+  code,
+  codePattern: new RegExp(`(^|[^A-Z])${code}([^A-Z]|$)`),
+  namePattern: new RegExp(`(^|[^A-Z])${name}([^A-Z]|$)`, 'i')
+}));
+const REGIONAL_STATES = new Set(['OK', 'AR', 'KS', 'TX', 'MO', 'LA', 'MS', 'TN', 'CO', 'NM']);
+const CANADIAN_PROVINCES = ['AB', 'BC', 'MB', 'NB', 'NL', 'NS', 'NT', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'];
+const FOREIGN_LOCATION_MARKERS = ['CANADA', 'MEXICO', 'UNITED KINGDOM', 'SAUDI ARABIA', 'BELGIUM', 'JAPAN', 'THAILAND', 'INDIA', 'ARGENTINA', 'BRAZIL', 'GERMANY', 'FRANCE', 'SPAIN', 'ITALY', 'NETHERLANDS', 'IRELAND', 'AUSTRALIA', 'SINGAPORE', 'PHILIPPINES', 'INDONESIA', 'KENYA', 'NORWAY', 'SWEDEN', 'DENMARK', 'CHILE', 'PERU', 'COLOMBIA', 'SOUTH AFRICA', 'NEW ZEALAND', 'VIETNAM', 'KOREA', 'MALAYSIA', 'POLAND', 'CZECHIA', 'UAE'];
+const FOREIGN_COUNTRY_PATTERN = new RegExp(`\\b(${FOREIGN_LOCATION_MARKERS.join('|')})\\b`);
+const CANADIAN_PROVINCE_PATTERN = new RegExp(`(^|[^A-Z])(${CANADIAN_PROVINCES.join('|')})([^A-Z]|$)`);
 
 const text = (value) => (value == null ? '' : String(value)).trim();
 const truthy = (value) => ['true', '1', 'yes', 'y'].includes(text(value).toLowerCase());
@@ -124,6 +137,57 @@ function marketIdsFor(job) {
 function marketFor(job) { return marketIdsFor(job)[0] || ''; }
 function marketLabel(id) { return id === 'tulsa_ok' ? 'Tulsa area' : id === 'northwest_ar' ? 'Northwest Arkansas' : 'Other / not specified'; }
 
+function locationStateCodes(location) {
+  const upper = text(location).toUpperCase();
+  const codes = new Set();
+  for (const pattern of US_STATE_PATTERNS) if (pattern.codePattern.test(upper) || pattern.namePattern.test(upper)) codes.add(pattern.code);
+  return codes;
+}
+
+function isInternationalLocation(location) {
+  const upper = text(location).toUpperCase();
+  if (!upper) return false;
+  if (/\((CAN|MEX|ARG|BRA|GBR|JPN|IND|DEU|FRA|ESP|ITA)\)/.test(upper) || FOREIGN_COUNTRY_PATTERN.test(upper)) return true;
+  if (CANADIAN_PROVINCE_PATTERN.test(upper)) return true;
+  if (/\b(JAL|NQN|QRO|GTO|GOA|ARG)\b|\bIN\s+(KA|TN)\s+(BANGALORE|CHENNAI)\b|\b(BANGKOK|KALASIN|TALEIGAO|MUMBAI|VADODARA|BANGALORE|CHENNAI|NEUQU[EÉ]N|AÑELO|NIVELLES|BANGNA|SIKHIU|ENSTEK|WESENBERG|NAIROBI|JAKARTA|BALSA NOVA|SAO PAULO|SÃO PAULO|MOGI GUA[CÇ]U|BAN KHAO DIN|BANGLEN|HAMBURG)\b/.test(upper)) return true;
+  return false;
+}
+
+function geographyFor(job) {
+  const location = text(job.location);
+  const states = locationStateCodes(location);
+  const targetMarkets = marketIdsFor(job);
+  if (targetMarkets.length || [...states].some((state) => REGIONAL_STATES.has(state))) return 'regional';
+  if (isInternationalLocation(location)) return 'international';
+  if (/\b(USA|UNITED STATES|U\.S\.|US)\b/.test(location.toUpperCase()) || states.size) return 'other_us';
+  return 'unknown';
+}
+
+function browseMarketMatch(job, filter) {
+  if (filter === 'target') return marketIdsFor(job).length > 0;
+  if (filter === 'outside') return marketIdsFor(job).length === 0;
+  if (filter === 'region') return geographyFor(job) === 'regional';
+  if (filter === 'international') return geographyFor(job) === 'international';
+  if (filter === 'all') return true;
+  return marketIdsFor(job).includes(filter);
+}
+
+function todayLocationPriority(job) {
+  const geography = geographyFor(job);
+  return geography === 'regional' ? 0 : geography === 'international' ? 1 : geography === 'other_us' ? 2 : 3;
+}
+
+function todayLocationLabel(job) {
+  const geography = geographyFor(job);
+  if (geography === 'regional') {
+    const markets = marketIdsFor(job).map(marketLabel);
+    return markets.length ? `Regional · ${markets.join(' + ')}` : 'Regional';
+  }
+  if (geography === 'international') return 'International';
+  if (geography === 'other_us') return 'Other U.S.';
+  return 'Location not classified';
+}
+
 function isOpen(job) {
   const status = text(job.status).toLowerCase();
   return !['removed', 'closed', 'inactive', 'expired', 'archived'].includes(status) && !text(job.removed_date);
@@ -144,8 +208,11 @@ function jobRow(job) {
   const row = document.createElement(href ? 'a' : 'article');
   row.className = 'job-row';
   if (href) { row.href = href; row.target = '_blank'; row.rel = 'noopener noreferrer'; }
-  const market = marketIdsFor(job).map(marketLabel).join(' + ') || 'Location not classified';
-  row.innerHTML = `<span><span class="job-title">${escapeHtml(job.title || 'Untitled role')}</span><span class="job-company">${escapeHtml(job.employer || 'Employer')} · ${escapeHtml(job.location || market)}</span></span><span class="job-meta">${escapeHtml(localDate(job.posted_date || job.first_seen))}<span>${escapeHtml(market)}</span></span>`;
+  const geography = geographyFor(job);
+  if (geography === 'regional') row.classList.add('job-row-regional');
+  if (geography === 'international') row.classList.add('job-row-international');
+  const place = marketIdsFor(job).map(marketLabel).join(' + ') || job.location || 'Location not classified';
+  row.innerHTML = `<span><span class="job-title">${escapeHtml(job.title || 'Untitled role')}</span><span class="job-company">${escapeHtml(job.employer || 'Employer')} · ${escapeHtml(job.location || place)}</span></span><span class="job-meta">${escapeHtml(localDate(job.posted_date || job.first_seen))}<span>${escapeHtml(todayLocationLabel(job))}</span></span>`;
   return row;
 }
 
@@ -237,7 +304,7 @@ function renderToday() {
     if (!list) continue;
     list.replaceChildren();
     if (!jobs.length) list.append(emptyState('Nothing to report', heading, 'Browse open postings'));
-    else jobs.sort((a, b) => text(a.title).localeCompare(text(b.title))).forEach((job) => list.append(jobRow(job)));
+    else jobs.sort((a, b) => todayLocationPriority(a) - todayLocationPriority(b) || text(a.title).localeCompare(text(b.title))).forEach((job) => list.append(jobRow(job)));
   }
 
   const sourceStatusList = document.getElementById('source-status-list');
@@ -296,7 +363,7 @@ function renderBrowse() {
   const employerNames = [...new Set(allJobs.map((job) => text(job.employer)).filter(Boolean))].sort((a, b) => a.localeCompare(b));
   employerNames.forEach((name) => employer.add(new Option(name, name)));
   const params = new URLSearchParams(window.location.search);
-  if (['target', 'outside', 'all', 'tulsa_ok', 'northwest_ar'].includes(params.get('market'))) market.value = params.get('market');
+  if (['target', 'outside', 'all', 'tulsa_ok', 'northwest_ar', 'region', 'international'].includes(params.get('market'))) market.value = params.get('market');
   let shortlist = readShortlist();
 
   const setText = (id, value) => {
@@ -342,12 +409,9 @@ function renderBrowse() {
       return sort.value === 'oldest' ? comparison : -comparison;
     };
     matches.sort(compareByDate);
-    let jobs = matches;
-    if (market.value === 'target') jobs = matches.filter((job) => marketIdsFor(job).length > 0);
-    else if (market.value === 'outside') jobs = matches.filter((job) => marketIdsFor(job).length === 0);
-    else if (market.value !== 'all') jobs = matches.filter((job) => marketIdsFor(job).includes(market.value));
+    const jobs = matches.filter((job) => browseMarketMatch(job, market.value));
     const stateLabel = status.value === 'open' ? 'open' : status.value === 'removed' ? 'removed' : status.value === 'archived' ? 'archived' : 'tracked';
-    const marketLabelText = market.value === 'target' ? 'Tulsa + Northwest Arkansas' : market.value === 'outside' ? 'other locations' : market.value === 'tulsa_ok' ? 'Tulsa area' : market.value === 'northwest_ar' ? 'Northwest Arkansas' : 'all locations';
+    const marketLabelText = market.value === 'target' ? 'Tulsa + Northwest Arkansas' : market.value === 'outside' ? 'other locations' : market.value === 'tulsa_ok' ? 'Tulsa area' : market.value === 'northwest_ar' ? 'Northwest Arkansas' : market.value === 'region' ? 'surrounding region' : market.value === 'international' ? 'international' : 'all locations';
     count.textContent = `${jobs.length.toLocaleString()} ${finance.checked ? 'finance ' : ''}${stateLabel} posting${jobs.length === 1 ? '' : 's'} · ${marketLabelText}`;
     results.replaceChildren();
     if (!jobs.length) {
@@ -415,17 +479,31 @@ function renderBrowse() {
   }
 }
 
+function marketJobsFor(id) {
+  return DATA.jobs.filter((job) => {
+    if (!isOpen(job) || !roleMatch(job)) return false;
+    if (id === 'region' || id === 'international') return geographyFor(job) === (id === 'region' ? 'regional' : 'international');
+    return marketIdsFor(job).includes(id);
+  });
+}
+
 function renderMarketCard(id, title, cityDescription, featured = false) {
-  const jobs = DATA.jobs.filter((job) => isOpen(job) && roleMatch(job) && marketIdsFor(job).includes(id));
+  const jobs = marketJobsFor(id);
   const byEmployer = new Map();
   jobs.forEach((job) => byEmployer.set(text(job.employer) || 'Other employers', (byEmployer.get(text(job.employer) || 'Other employers') || 0) + 1));
   const top = [...byEmployer.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
   const max = top.length ? top[0][1] : 1;
-  const chart = top.length ? top.map(([name, value]) => `<div class="bar-row"><span class="bar-name">${escapeHtml(name)}</span><span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.max(6, value / max * 100)}%"></span></span><span class="bar-number">${value}</span></div>`).join('') : '<div class="chart-empty">No open local finance matches in this history.</div>';
-  const sourceCount = DATA.sources.filter((source) => (source.markets || []).includes(id)).length;
+  const chart = top.length ? top.map(([name, value]) => `<div class="bar-row"><span class="bar-name">${escapeHtml(name)}</span><span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.max(6, value / max * 100)}%"></span></span><span class="bar-number">${value}</span></div>`).join('') : '<div class="chart-empty">No open finance matches in this view yet.</div>';
+  const sourceCount = id === 'tulsa_ok' || id === 'northwest_ar'
+    ? DATA.sources.filter((source) => (source.markets || []).includes(id)).length
+    : new Set(jobs.map((job) => text(job.source_id)).filter(Boolean)).size;
+  const sourceCaption = id === 'tulsa_ok' || id === 'northwest_ar' ? 'watched employer boards' : 'employer boards with matches';
+  const detail = id === 'region' ? 'Oklahoma · Arkansas · Kansas · Texas · Missouri · nearby states' : id === 'international' ? 'Postings located outside the United States' : cityDescription;
+  const eyebrow = id === 'tulsa_ok' ? 'OKLAHOMA' : id === 'northwest_ar' ? 'ARKANSAS' : id === 'region' ? 'REGIONAL AREA' : 'GLOBAL OPPORTUNITIES';
+  const watermark = id === 'tulsa_ok' ? 'TUL' : id === 'northwest_ar' ? 'NWA' : id === 'region' ? 'REG' : 'INTL';
   const section = document.createElement('article');
   section.className = `market-card${featured ? ' featured' : ''}`;
-  section.innerHTML = `<div class="market-cities" aria-hidden="true">${id === 'tulsa_ok' ? 'TUL' : 'NWA'}</div><div class="market-card-head"><div><p class="eyebrow">${id === 'tulsa_ok' ? 'OKLAHOMA' : 'ARKANSAS'}</p><h2>${escapeHtml(title)}</h2><p class="market-count-label">${escapeHtml(cityDescription)}</p></div><span class="market-index">0${featured ? '1' : '2'}</span></div><div class="market-big-number">${jobs.length}</div><p class="market-count-label">open finance matches</p><div class="market-chart">${chart}</div><div class="market-card-footer"><span>${sourceCount} employer boards</span><a class="text-link${featured ? ' light-link' : ''}" href="./browse.html?market=${id}">Browse market →</a></div>`;
+  section.innerHTML = `<div class="market-cities" aria-hidden="true">${watermark}</div><div class="market-card-head"><div><p class="eyebrow">${eyebrow}</p><h2>${escapeHtml(title)}</h2><p class="market-count-label">${escapeHtml(detail)}</p></div><span class="market-index">0${featured ? '1' : id === 'northwest_ar' ? '2' : id === 'region' ? '3' : '4'}</span></div><div class="market-big-number">${jobs.length.toLocaleString()}</div><p class="market-count-label">open finance matches</p><div class="market-chart">${chart}</div><div class="market-card-footer"><span>${sourceCount} ${sourceCaption}</span><a class="text-link${featured ? ' light-link' : ''}" href="./browse.html?market=${id}">Browse market →</a></div>`;
   return section;
 }
 
@@ -574,6 +652,8 @@ function renderMarket() {
     grid.replaceChildren();
     grid.append(renderMarketCard('tulsa_ok', 'Tulsa area', 'Tulsa · Broken Arrow · Tahlequah · Bartlesville', true));
     grid.append(renderMarketCard('northwest_ar', 'Northwest Arkansas', 'Bentonville · Fayetteville · Springdale'));
+    grid.append(renderMarketCard('region', 'Surrounding region', 'Oklahoma · Arkansas · Kansas · Texas · Missouri'));
+    grid.append(renderMarketCard('international', 'International', 'Openings outside the United States'));
   }
   renderHistoryReport();
   const sources = document.getElementById('market-source-list');
