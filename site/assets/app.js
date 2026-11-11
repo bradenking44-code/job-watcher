@@ -149,9 +149,10 @@ function jobRow(job) {
   return row;
 }
 
-function jobCard(job, shortlist) {
+function jobCard(job, shortlist, beyondLocal = false) {
   const article = document.createElement('article');
   article.className = 'job-card';
+  if (beyondLocal) article.classList.add('job-card-beyond');
   const href = applicationUrl(job);
   const id = text(job.posting_id);
   const starred = shortlist.has(id);
@@ -164,7 +165,7 @@ function jobCard(job, shortlist) {
     : '<span class="apply-link disabled">Application link unavailable</span>';
   article.innerHTML = `
     <div class="job-card-top">
-      <span class="job-badge ${badgeClass}">${badgeText}${roleMatch(job) ? ' · Finance match' : ''}</span>
+        <span class="job-card-badges"><span class="job-badge ${badgeClass}">${badgeText}${roleMatch(job) ? ' · Finance match' : ''}</span>${beyondLocal ? '<span class="job-badge beyond-market-badge">Beyond local focus</span>' : ''}</span>
       <span class="job-card-actions">
         <span class="job-date">First seen ${escapeHtml(localDate(job.first_seen))}</span>
         <button class="star-button" type="button" data-star-id="${escapeHtml(id)}" aria-pressed="${starred}" aria-label="${starred ? 'Remove from shortlist' : 'Save to shortlist'}" title="${starred ? 'Remove from shortlist' : 'Save to shortlist'}">${starred ? '★' : '☆'}</button>
@@ -285,6 +286,10 @@ function renderBrowse() {
   const shortlistOnly = document.getElementById('shortlist-only');
   const results = document.getElementById('job-results');
   const count = document.getElementById('result-count');
+  const beyondSection = document.getElementById('beyond-region');
+  const beyondCountLabel = document.getElementById('beyond-region-count-label');
+  const beyondResults = document.getElementById('beyond-region-results');
+  const focusButtons = [...document.querySelectorAll('[data-market-choice]')];
   if (!results) return;
 
   const allJobs = [...DATA.jobs, ...DATA.archiveJobs];
@@ -294,42 +299,79 @@ function renderBrowse() {
   if (['target', 'outside', 'all', 'tulsa_ok', 'northwest_ar'].includes(params.get('market'))) market.value = params.get('market');
   let shortlist = readShortlist();
 
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+  const currentOpen = DATA.jobs.filter(isOpen);
+  const localOpen = currentOpen.filter((job) => marketIdsFor(job).length > 0);
+  const beyondOpen = currentOpen.filter((job) => marketIdsFor(job).length === 0);
+  setText('focus-local-open', localOpen.length.toLocaleString());
+  setText('focus-local-finance', localOpen.filter(roleMatch).length.toLocaleString());
+  setText('focus-beyond-open', beyondOpen.length.toLocaleString());
+  setText('focus-beyond-finance', beyondOpen.filter(roleMatch).length.toLocaleString());
+
+  const updateFocusState = () => {
+    focusButtons.forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.marketChoice === market.value));
+    });
+  };
+
   const draw = () => {
-    let jobs = allJobs.slice();
-    if (status.value === 'open') jobs = jobs.filter(isOpen);
-    if (status.value === 'removed') jobs = jobs.filter((job) => !isOpen(job) && !isArchived(job));
-    if (status.value === 'archived') jobs = jobs.filter(isArchived);
-    if (market.value === 'target') jobs = jobs.filter((job) => marketIdsFor(job).length > 0);
-    else if (market.value === 'outside') jobs = jobs.filter((job) => marketIdsFor(job).length === 0);
-    else if (market.value !== 'all') jobs = jobs.filter((job) => marketIdsFor(job).includes(market.value));
-    if (employer.value !== 'all') jobs = jobs.filter((job) => text(job.employer) === employer.value);
+    let matches = allJobs.slice();
+    if (status.value === 'open') matches = matches.filter(isOpen);
+    if (status.value === 'removed') matches = matches.filter((job) => !isOpen(job) && !isArchived(job));
+    if (status.value === 'archived') matches = matches.filter(isArchived);
+    if (employer.value !== 'all') matches = matches.filter((job) => text(job.employer) === employer.value);
     const locationQuery = text(location.value).toLowerCase();
-    if (locationQuery) jobs = jobs.filter((job) => text(job.location).toLowerCase().includes(locationQuery));
+    if (locationQuery) matches = matches.filter((job) => text(job.location).toLowerCase().includes(locationQuery));
     const titleQuery = text(query.value).toLowerCase();
-    if (titleQuery) jobs = jobs.filter((job) => text(job.title).toLowerCase().includes(titleQuery));
-    if (finance.checked) jobs = jobs.filter(roleMatch);
-    if (shortlistOnly.checked) jobs = jobs.filter((job) => shortlist.has(text(job.posting_id)));
+    if (titleQuery) matches = matches.filter((job) => text(job.title).toLowerCase().includes(titleQuery));
+    if (finance.checked) matches = matches.filter(roleMatch);
+    if (shortlistOnly.checked) matches = matches.filter((job) => shortlist.has(text(job.posting_id)));
     if (daysOpen.value !== 'all') {
       const [min, max] = daysOpen.value === '90+' ? [91, Infinity] : daysOpen.value.split('-').map(Number);
-      jobs = jobs.filter((job) => {
+      matches = matches.filter((job) => {
         if (isArchived(job)) return false;
         const duration = daysBetween(job.first_seen, isOpen(job) ? runDay() : (job.removed_date || runDay()));
         return duration !== null && duration >= min && duration <= max;
       });
     }
-    jobs.sort((a, b) => {
+    const compareByDate = (a, b) => {
       const comparison = dateOnly(a.first_seen).localeCompare(dateOnly(b.first_seen)) || text(a.posting_id).localeCompare(text(b.posting_id));
       return sort.value === 'oldest' ? comparison : -comparison;
-    });
+    };
+    matches.sort(compareByDate);
+    let jobs = matches;
+    if (market.value === 'target') jobs = matches.filter((job) => marketIdsFor(job).length > 0);
+    else if (market.value === 'outside') jobs = matches.filter((job) => marketIdsFor(job).length === 0);
+    else if (market.value !== 'all') jobs = matches.filter((job) => marketIdsFor(job).includes(market.value));
     const stateLabel = status.value === 'open' ? 'open' : status.value === 'removed' ? 'removed' : status.value === 'archived' ? 'archived' : 'tracked';
-    count.textContent = `${jobs.length.toLocaleString()} ${finance.checked ? 'finance ' : ''}${stateLabel} posting${jobs.length === 1 ? '' : 's'}`;
+    const marketLabelText = market.value === 'target' ? 'Tulsa + Northwest Arkansas' : market.value === 'outside' ? 'other locations' : market.value === 'tulsa_ok' ? 'Tulsa area' : market.value === 'northwest_ar' ? 'Northwest Arkansas' : 'all locations';
+    count.textContent = `${jobs.length.toLocaleString()} ${finance.checked ? 'finance ' : ''}${stateLabel} posting${jobs.length === 1 ? '' : 's'} · ${marketLabelText}`;
     results.replaceChildren();
     if (!jobs.length) {
       results.append(emptyState(allJobs.length ? 'No matching postings found' : 'Job history is not populated yet', allJobs.length ? 'Try changing a filter or clearing the search.' : 'The daily collector will populate the history after its first run.', 'Clear filters', '#clear-filters'));
     } else jobs.forEach((job) => results.append(jobCard(job, shortlist)));
+
+    updateFocusState();
+    if (beyondSection && beyondResults) {
+      const showBeyondPreview = market.value === 'target';
+      beyondSection.hidden = !showBeyondPreview;
+      if (showBeyondPreview) {
+        const outsideMatches = matches.filter((job) => marketIdsFor(job).length === 0);
+        setText('beyond-region-count', outsideMatches.length.toLocaleString());
+        if (beyondCountLabel) beyondCountLabel.textContent = `${finance.checked ? 'finance ' : ''}${stateLabel} posting${outsideMatches.length === 1 ? '' : 's'}`;
+        const browseButton = document.getElementById('browse-beyond-all');
+        if (browseButton) browseButton.innerHTML = `Explore all ${outsideMatches.length.toLocaleString()} broader result${outsideMatches.length === 1 ? '' : 's'} <span aria-hidden="true">↗</span>`;
+        beyondResults.replaceChildren();
+        if (outsideMatches.length) outsideMatches.slice(0, 3).forEach((job) => beyondResults.append(jobCard(job, shortlist, true)));
+        else beyondResults.append(emptyState('No wider-market matches', 'Try clearing a filter to see more openings outside the regional focus.', 'Clear filters', '#clear-filters'));
+      }
+    }
   };
 
-  results.addEventListener('click', (event) => {
+  const toggleShortlist = (event) => {
     const button = event.target.closest('[data-star-id]');
     if (!button) return;
     event.preventDefault();
@@ -338,9 +380,21 @@ function renderBrowse() {
     if (shortlist.has(id)) shortlist.delete(id); else shortlist.add(id);
     saveShortlist(shortlist);
     draw();
-  });
+  };
+  results.addEventListener('click', toggleShortlist);
+  beyondResults?.addEventListener('click', toggleShortlist);
   [query, market, employer, location, daysOpen, status, sort].forEach((input) => input.addEventListener(input === query || input === location ? 'input' : 'change', draw));
   [finance, shortlistOnly].forEach((input) => input.addEventListener('change', draw));
+  focusButtons.forEach((button) => button.addEventListener('click', () => {
+    market.value = button.dataset.marketChoice;
+    draw();
+    document.querySelector('.browse-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+  document.getElementById('browse-beyond-all')?.addEventListener('click', () => {
+    market.value = 'outside';
+    draw();
+    document.querySelector('.browse-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   document.getElementById('clear-filters')?.addEventListener('click', () => {
     query.value = ''; market.value = 'target'; employer.value = 'all'; location.value = '';
     daysOpen.value = 'all'; status.value = 'open'; sort.value = 'newest'; finance.checked = true; shortlistOnly.checked = false;

@@ -278,6 +278,68 @@ h1, h2, p { margin-top: 0; }
 .source-status-head strong { font-size: 11px; line-height: 1.4; }
 .source-status-card p { margin: 9px 0 0; color: #758078; font: 9px var(--mono); }
 .source-status-card small { display: block; margin-top: 8px; color: #89593e; font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; }
+
+.regional-focus { margin: -8px 0 22px; padding: 21px; border: 1px solid var(--line); border-radius: 7px; background: #e9eee5; }
+.regional-focus-head { display: flex; align-items: end; justify-content: space-between; gap: 25px; margin-bottom: 17px; }
+.regional-focus-head .eyebrow { margin-bottom: 8px; }
+.regional-focus-head h2, .beyond-region-head h2 { margin: 0; font: 600 23px var(--display); letter-spacing: -.055em; }
+.regional-focus-copy { max-width: 400px; margin: 0; color: #65736a; font-size: 11px; line-height: 1.65; }
+.focus-market-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 10px; }
+.focus-market-card { position: relative; display: grid; min-width: 0; min-height: 151px; padding: 17px 19px; border: 1px solid #dbe3d8; border-radius: 5px; background: #fbfcfa; color: var(--ink); text-align: left; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+.focus-market-card:hover { transform: translateY(-2px); border-color: #92aa97; }
+.focus-market-card[aria-pressed="true"] { border-color: var(--green); background: var(--green); color: #f8faf5; }
+.focus-market-card.focus-market-beyond[aria-pressed="true"] { border-color: #365d49; background: #294b3c; }
+.focus-market-kicker { display: flex; align-items: center; gap: 9px; color: #718077; font: 9px var(--mono); letter-spacing: .08em; }
+.focus-market-card[aria-pressed="true"] .focus-market-kicker { color: #c2d1c5; }
+.focus-market-tag { padding: 4px 6px; border-radius: 3px; background: #eef1e9; color: #68766c; font: 8px var(--mono); letter-spacing: .03em; }
+.focus-market-card[aria-pressed="true"] .focus-market-tag { background: rgba(194,237,121,.14); color: var(--lime); }
+.focus-market-name { margin-top: 10px; font: 600 18px var(--display); letter-spacing: -.04em; }
+.focus-market-numbers { display: flex; align-items: baseline; gap: 7px; margin-top: 8px; }
+.focus-market-numbers b { color: var(--green-2); font: 600 25px/.95 var(--display); letter-spacing: -.06em; }
+.focus-market-numbers span, .focus-market-detail { color: #76837a; font-size: 10px; }
+.focus-market-card[aria-pressed="true"] .focus-market-numbers b { color: var(--lime); }
+.focus-market-card[aria-pressed="true"] .focus-market-numbers span, .focus-market-card[aria-pressed="true"] .focus-market-detail { color: #c4d0c7; }
+.focus-market-detail { margin-top: 4px; }
+.focus-market-detail b { color: #496b53; font-weight: 700; }
+.focus-market-card[aria-pressed="true"] .focus-market-detail b { color: #e2f2cb; }
+.focus-market-action { position: absolute; right: 18px; bottom: 18px; color: #52735a; font-size: 10px; font-weight: 700; }
+.focus-market-action i { margin-left: 4px; font: normal 13px var(--mono); }
+.focus-market-card[aria-pressed="true"] .focus-market-action { color: var(--lime); }
+.focus-footnote { margin: 11px 2px 0; color: #77847b; font-size: 9px; line-height: 1.5; }
+.beyond-region { margin: 22px 0 0; padding: 23px; border: 1px solid #dce3da; border-radius: 7px; background: #edf0e9; }
+.beyond-region-head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 17px; }
+.beyond-region-head .eyebrow { margin-bottom: 8px; }
+.beyond-region-head p:not(.eyebrow) { max-width: 610px; margin: 8px 0 0; color: #68756e; font-size: 11px; line-height: 1.65; }
+.beyond-region-aside { display: grid; flex: 0 0 auto; grid-template-columns: auto auto; align-items: baseline; column-gap: 8px; }
+.beyond-region-aside strong { color: #65756a; font: 600 25px/.95 var(--display); letter-spacing: -.06em; text-align: right; }
+.beyond-region-aside > span { color: #748177; font: 9px var(--mono); }
+.beyond-region-aside button { grid-column: 1 / -1; margin-top: 11px; padding: 9px 11px; border: 1px solid #d6dfd4; border-radius: 4px; background: #f9faf7; color: #385846; font-size: 10px; font-weight: 700; }
+.beyond-region-aside button:hover { border-color: #8ea690; background: white; }
+.beyond-region-aside button span { margin-left: 6px; font: 13px var(--mono); }
+.beyond-region-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.job-card-beyond { border-color: #dce3da; background: #f9faf7; }
+.job-card-beyond:hover { border-color: #bdcdbd; }
+.job-card-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.job-badge.beyond-market-badge { background: #f2e8dc; color: #805c39; }
+.beyond-region[hidden] { display: none; }
+
+@media (max-width: 900px) {
+  .regional-focus-head { align-items: start; flex-direction: column; gap: 10px; }
+  .regional-focus-copy { max-width: 650px; }
+  .beyond-region-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 680px) {
+  .regional-focus { margin-top: -6px; padding: 16px; }
+  .regional-focus-head h2, .beyond-region-head h2 { font-size: 20px; }
+  .focus-market-grid { grid-template-columns: 1fr; }
+  .focus-market-card { min-height: 144px; padding: 15px; }
+  .focus-market-action { right: 15px; bottom: 15px; }
+  .beyond-region { padding: 17px; }
+  .beyond-region-head { align-items: start; flex-direction: column; gap: 14px; }
+  .beyond-region-aside { grid-template-columns: auto auto; }
+  .beyond-region-aside strong { text-align: left; }
+  .beyond-region-grid { grid-template-columns: 1fr; }
+}
 .run-pill { flex: 0 0 auto; padding: 3px 5px; border-radius: 3px; font: 8px var(--mono); letter-spacing: .02em; }
 .run-ok { background: #edf3e8; color: #42624e; }
 .run-failed { background: #f8e9e1; color: #89593e; }

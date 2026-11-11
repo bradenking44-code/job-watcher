@@ -17,7 +17,7 @@ Target markets:
 - **Tulsa area:** Tulsa, Broken Arrow, Owasso, Jenks, Bixby, Sand Springs, Sapulpa, Catoosa, Claremore, and Bartlesville as an outer-area extension.
 - **Northwest Arkansas:** Bentonville, Fayetteville, Springdale, Tontitown, Rogers, Lowell, Siloam Springs, Bella Vista, Centerton, Cave Springs, and nearby communities.
 
-The pipeline keeps every listing returned by each active board, as the assignment requires, and marks whether its location matches either target market. Browse opens with Tulsa and Northwest Arkansas selected; its market filter can show either region, every location, or jobs outside the target markets. A remote role is local only when the posting says candidates may work remotely from Oklahoma or Arkansas.
+The pipeline keeps every listing returned by each active board, as the assignment requires, and marks whether its location matches either target market. Browse opens with Tulsa and Northwest Arkansas selected, with a separate preview for other or unclassified locations so regional roles stay prominent while broader openings remain visible. Its market filter can show either region, every location, or postings outside the target markets. Remote roles are local only when the posting says candidates may work remotely from Oklahoma or Arkansas.
 
 ## Employer watchlist
 

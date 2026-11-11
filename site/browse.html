@@ -22,12 +22,35 @@
     <section class="page-intro">
       <p class="eyebrow eyebrow-dark">THE OPPORTUNITY BOARD</p>
       <h1>Find your next<br><em>good move.</em></h1>
-      <p class="intro-subtitle">Start with finance matches, then filter by employer, location and time open. Switch off the finance filter to see all tracked openings.</p>
+      <p class="intro-subtitle">Tulsa and Northwest Arkansas lead the search. Other openings from the same employers stay easy to explore in a separate wider-market view.</p>
+    </section>
+    <section class="regional-focus" aria-labelledby="regional-focus-title">
+      <div class="regional-focus-head">
+        <div><p class="eyebrow eyebrow-dark">A LOCAL-FIRST SEARCH</p><h2 id="regional-focus-title">Close to home, with a wider view.</h2></div>
+        <p class="regional-focus-copy">Start with Tulsa and Northwest Arkansas. The broader lane keeps other employer openings visible without mixing them into your local results.</p>
+      </div>
+      <div class="focus-market-grid">
+        <button class="focus-market-card focus-market-local" id="focus-local" type="button" data-market-choice="target" aria-pressed="true">
+          <span class="focus-market-kicker">YOUR HOME MARKETS <span class="focus-market-tag">PRIMARY VIEW</span></span>
+          <strong class="focus-market-name">Tulsa + Northwest Arkansas</strong>
+          <span class="focus-market-numbers"><b id="focus-local-open">—</b><span>open postings</span></span>
+          <span class="focus-market-detail"><b id="focus-local-finance">—</b> finance matches · local</span>
+          <span class="focus-market-action">Browse regional jobs <i aria-hidden="true">↗</i></span>
+        </button>
+        <button class="focus-market-card focus-market-beyond" id="focus-beyond" type="button" data-market-choice="outside" aria-pressed="false">
+          <span class="focus-market-kicker">WIDER OPPORTUNITIES <span class="focus-market-tag">ALSO INCLUDED</span></span>
+          <strong class="focus-market-name">Other locations</strong>
+          <span class="focus-market-numbers"><b id="focus-beyond-open">—</b><span>open postings</span></span>
+          <span class="focus-market-detail"><b id="focus-beyond-finance">—</b> finance matches · beyond the local focus</span>
+          <span class="focus-market-action">Explore broader roles <i aria-hidden="true">→</i></span>
+        </button>
+      </div>
+      <p class="focus-footnote">Counts update with the latest run. “Other locations” also includes listings whose location does not match either focus market.</p>
     </section>
     <section class="browse-panel" aria-label="Job search">
       <div class="filter-bar">
         <label class="search-field"><span class="sr-only">Search job titles</span><span class="search-icon" aria-hidden="true">⌕</span><input id="job-search" type="search" placeholder="Search job titles" autocomplete="off"></label>
-        <label class="select-field"><span class="sr-only">Filter by market</span><select id="market-filter"><option value="target" selected>Tulsa + Northwest Arkansas</option><option value="tulsa_ok">Tulsa area</option><option value="northwest_ar">Northwest Arkansas</option><option value="all">All locations</option><option value="outside">Outside target markets</option></select></label>
+        <label class="select-field"><span class="sr-only">Filter by market</span><select id="market-filter"><option value="target" selected>Tulsa + Northwest Arkansas</option><option value="tulsa_ok">Tulsa area</option><option value="northwest_ar">Northwest Arkansas</option><option value="all">All locations</option><option value="outside">Other / unclassified locations</option></select></label>
         <label class="select-field"><span class="sr-only">Filter by employer</span><select id="employer-filter"><option value="all">All employers</option></select></label>
         <label class="search-field location-field"><span class="sr-only">Filter by location</span><input id="location-filter" type="search" placeholder="Filter by location" autocomplete="off"></label>
         <label class="select-field"><span class="sr-only">Filter by days open</span><select id="days-open-filter"><option value="all">Any time open</option><option value="0-7">0–7 days open</option><option value="8-30">8–30 days open</option><option value="31-90">31–90 days open</option><option value="90+">More than 90 days</option></select></label>
@@ -37,6 +60,17 @@
       </div>
       <div class="results-toolbar"><p id="result-count" aria-live="polite">Loading listings…</p><label class="checkbox-filter"><input type="checkbox" id="finance-only" checked><span>Finance matches only</span></label><label class="checkbox-filter"><input type="checkbox" id="shortlist-only"><span>Shortlist only</span></label></div>
       <div id="job-results" class="job-grid" aria-live="polite"><div class="loading-state">Loading job history…</div></div>
+    </section>
+    <section class="beyond-region" id="beyond-region" aria-labelledby="beyond-region-title" hidden>
+      <div class="beyond-region-head">
+        <div>
+          <p class="eyebrow eyebrow-dark">THE WIDER WATCHLIST</p>
+          <h2 id="beyond-region-title">Further afield, still relevant.</h2>
+          <p>These openings from watched employers sit outside the regional view or do not have a matched local location. Your search and filters apply here too.</p>
+        </div>
+        <div class="beyond-region-aside"><strong id="beyond-region-count">—</strong><span id="beyond-region-count-label">matching postings</span><button id="browse-beyond-all" type="button">Explore all broader results <span aria-hidden="true">↗</span></button></div>
+      </div>
+      <div id="beyond-region-results" class="job-grid beyond-region-grid" aria-live="polite"></div>
     </section>
     <section class="employer-strip">
       <div><p class="eyebrow eyebrow-dark">NO LISTING YET?</p><h2>Go straight to the source.</h2><p>Explore employer boards directly, or browse local finance listings collected each day.</p></div>
