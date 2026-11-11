@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-11T02:11:37Z",
+  "run_time": "2026-11-11T02:22:33Z",
   "run_date": "2026-11-11",
   "first_run_date": "2026-11-09",
   "days_with_success": 3,
-  "open": 4445,
-  "new_today": 558,
+  "open": 4444,
+  "new_today": 559,
   "new_today_ids": [
     "aaon:JR102996",
     "aaon:JR104026",
@@ -234,6 +234,7 @@
     "walmart:R-2704783",
     "walmart:R-2704798",
     "walmart:R-2704801",
+    "walmart:R-2704804",
     "walmart:R-2704813",
     "walmart:R-2704814",
     "walmart:R-2704815",
@@ -565,7 +566,7 @@
     "williams:R112969",
     "williams:R112993"
   ],
-  "removed_today": 537,
+  "removed_today": 539,
   "sources": [
     {
       "name": "ONEOK",
@@ -578,7 +579,7 @@
       "total": 104,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.58
+      "elapsed_seconds": 5.24
     },
     {
       "name": "Williams",
@@ -591,7 +592,7 @@
       "total": 128,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 29.05
+      "elapsed_seconds": 17.12
     },
     {
       "name": "Helmerich & Payne",
@@ -604,7 +605,7 @@
       "total": 62,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.61
+      "elapsed_seconds": 5.02
     },
     {
       "name": "AAON",
@@ -617,7 +618,7 @@
       "total": 230,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.76
+      "elapsed_seconds": 5.41
     },
     {
       "name": "TD Williamson",
@@ -630,7 +631,7 @@
       "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.97
+      "elapsed_seconds": 3.85
     },
     {
       "name": "Simmons Bank",
@@ -643,7 +644,7 @@
       "total": 150,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 10.2
+      "elapsed_seconds": 12.38
     },
     {
       "name": "Airgas",
@@ -656,7 +657,7 @@
       "total": 418,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 33.61
+      "elapsed_seconds": 33.25
     },
     {
       "name": "ConocoPhillips",
@@ -669,7 +670,7 @@
       "total": 21,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.42
+      "elapsed_seconds": 1.74
     },
     {
       "name": "UMB Bank",
@@ -682,7 +683,7 @@
       "total": 163,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 29.35
+      "elapsed_seconds": 11.32
     },
     {
       "name": "Regent Bank",
@@ -708,20 +709,20 @@
       "total": 22,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.65
+      "elapsed_seconds": 0.54
     },
     {
       "name": "Walmart",
       "ok": true,
-      "count": 2002,
+      "count": 2001,
       "source_id": "walmart",
       "employer": "Walmart",
       "success": true,
-      "postings": 2002,
+      "postings": 2001,
       "total": 2000,
       "warnings": 3,
       "error": "",
-      "elapsed_seconds": 398.19
+      "elapsed_seconds": 164.8
     },
     {
       "name": "Tyson Foods",
@@ -734,7 +735,7 @@
       "total": 12,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.31
+      "elapsed_seconds": 1.44
     },
     {
       "name": "J.B. Hunt",
@@ -747,7 +748,7 @@
       "total": 442,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 27.73
+      "elapsed_seconds": 37.37
     },
     {
       "name": "University of Arkansas",
@@ -760,7 +761,7 @@
       "total": 133,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.47
+      "elapsed_seconds": 6.95
     },
     {
       "name": "George's Inc.",
@@ -773,7 +774,7 @@
       "total": 118,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.79
+      "elapsed_seconds": 3.64
     },
     {
       "name": "Ingredion",
@@ -786,7 +787,7 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 21.06
+      "elapsed_seconds": 12.51
     },
     {
       "name": "ONE Gas",
@@ -799,7 +800,7 @@
       "total": 29,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.82
+      "elapsed_seconds": 1.13
     },
     {
       "name": "Cherokee Nation Businesses",
@@ -812,7 +813,7 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.6
+      "elapsed_seconds": 0.83
     },
     {
       "name": "Cherokee Nation Businesses",
@@ -825,7 +826,7 @@
       "total": 108,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.02
+      "elapsed_seconds": 1.98
     }
   ]
 }

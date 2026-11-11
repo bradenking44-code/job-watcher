@@ -1,8 +1,8 @@
 # Job Watcher updates — 2026-11-11
 
 Employer boards collected successfully: **20 of 20**.
-New or reopened postings: **558**
-Removed postings: **537**
+New or reopened postings: **559**
+Removed postings: **539**
 
 ## New or reopened postings
 
@@ -36,7 +36,7 @@ Removed postings: **537**
 - [Gas Technician Support, Line Locate](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs/job/10500) — **ONE Gas** · Mustang, OK, United States
 - [Instrumentation & Electric Technician (Stanton, Midland, Big Spring, TX areas)](https://oneok.wd1.myworkdayjobs.com/en-US/ONEOK/job/Stanton-TX/Instrumentation---Electric-Technician--Stanton--Midland--Big-Spring--TX-areas-_R8916-1) — **ONEOK** · Stanton, TX
 - [Lead Operator USW](https://oneok.wd1.myworkdayjobs.com/en-US/ONEOK/job/Kansas-City-KS/Lead-Operator-USW_R9199-1) — **ONEOK** · Kansas City, KS
-- …and 528 more. See `data/history.csv` for the full list.
+- …and 529 more. See `data/history.csv` for the full list.
 
 ## Removed postings
 
@@ -70,4 +70,4 @@ Removed postings: **537**
 - [(USA) Auto Care Center Coach](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Mount-Pleasant-PA/XMLNAME--USA--Auto-Care-Center-Coach_R-2596577-1) — **Walmart** · Mount Pleasant, PA
 - [Technician, Facility Services, Power Washing - $2,000 Sign-On Bonus](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-FL-CRESTVIEW-00944-WM-SUPERCENTER/Technician--Facility-Services--Power-Washing_R-2598692-1) — **Walmart** · (USA) FL CRESTVIEW 00944 WM SUPERCENTER
 - [Principal, Software Engineer - Platform Engineering](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-Crossman-Respect-Building-CA-SUNNYVALE-Home-Office/XMLNAME--USA--Principal--Software-Engineer_R-2612711-1) — **Walmart** · (USA) Crossman Respect Building CA SUNNYVALE Home Office
-- …and 507 more. See `data/history.csv` for the full list.
+- …and 509 more. See `data/history.csv` for the full list.
