@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_on": "2026-11-09",
+  "checked_on": "2026-11-11",
   "markets": {
     "tulsa_ok": {
       "name": "Tulsa area",
@@ -232,13 +232,13 @@
       "career_url": "https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers"
     },
     {
-      "id": "university_of_arkansas",
-      "employer": "University of Arkansas",
-      "markets": ["northwest_ar"],
-      "locality_hint": "Fayetteville",
+      "id": "saint_francis_health_system",
+      "employer": "Saint Francis Health System",
+      "markets": ["tulsa_ok"],
+      "locality_hint": "Tulsa and northeastern Oklahoma",
       "ats": "Workday",
-      "api_endpoint": "https://uasys.wd5.myworkdayjobs.com/wday/cxs/uasys/UAF_External_Career_Site/jobs",
-      "career_url": "https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site"
+      "api_endpoint": "https://saintfrancis.wd115.myworkdayjobs.com/wday/cxs/saintfrancis/External/jobs",
+      "career_url": "https://saintfrancis.wd115.myworkdayjobs.com/en-US/External"
     },
     {
       "id": "georges",
@@ -294,7 +294,7 @@
       "career_url": "https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001"
     }
   ],
-  "inactive_source_ids": ["bok_financial"],
+  "inactive_source_ids": ["bok_financial", "university_of_arkansas"],
   "supplemental_sources": [],
   "discovery_candidates": []
 }

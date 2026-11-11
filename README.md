@@ -21,7 +21,7 @@ The pipeline keeps every listing returned by each active board, as the assignmen
 
 ## Employer watchlist
 
-The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, Greenhouse, and Arvest's Infor CloudSuite endpoints return JSON. Regent Bank uses Greenhouse's public Job Board API, which permits anonymous GET requests for published job data. BOK Financial's public SuccessFactors feed returns RSS/XML and is not collected by the JSON-only pipeline; its original snapshots remain under `data/archive/raw/`, and its historical postings are rebuilt to `data/archive/history.csv`. The required `data/history.csv` contains active-source rows with only open or removed statuses. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift.
+The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, Greenhouse, and Arvest's Infor CloudSuite endpoints return JSON. Regent Bank uses Greenhouse's public Job Board API, which permits anonymous GET requests for published job data. BOK Financial's public SuccessFactors feed returns RSS/XML and is not collected by the JSON-only pipeline; its original snapshots remain under `data/archive/raw/`, and its historical postings are rebuilt to `data/archive/history.csv`. The retired University of Arkansas board's snapshots and postings are also preserved separately in the archive. The required `data/history.csv` contains active-source rows with only open or removed statuses. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift.
 
 | Market | Employer | Applicant tracking system | Local coverage |
 | --- | --- | --- | --- |
@@ -39,7 +39,7 @@ The source registry contains the public endpoint and career-site URL for each ac
 | Northwest Arkansas | [Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal) | Workday JSON | Bentonville and nearby offices |
 | Northwest Arkansas | [Tyson Foods](https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1) | Workday JSON | Springdale and nearby offices |
 | Northwest Arkansas | [J.B. Hunt](https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers) | Workday JSON | Lowell and nearby offices |
-| Northwest Arkansas | [University of Arkansas](https://uasys.wd5.myworkdayjobs.com/en-US/UAF_External_Career_Site) | Workday JSON | Fayetteville |
+| Tulsa | [Saint Francis Health System](https://saintfrancis.wd115.myworkdayjobs.com/en-US/External) | Workday JSON | Tulsa and northeastern Oklahoma |
 | Northwest Arkansas | [George's Inc.](https://georgesinc.wd5.myworkdayjobs.com/en-US/JoinGeorges) | Workday JSON | Springdale |
 | Tulsa | [Ingredion](https://ingredion.wd1.myworkdayjobs.com/en-US/IngredionCareers) | Workday JSON | Tulsa-area openings |
 | Tulsa | [ONE Gas](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs) | Oracle Candidate Experience JSON | Tulsa |
@@ -97,7 +97,7 @@ pytest
 | `tests/test_history.py` | Title rule and first-seen, last-seen, removal, reappearance, and reproducibility checks. |
 | `tests/test_pipeline.py` | Source failure handling, required status fields, and same-day rerun replacement. |
 | `data/raw/` | Compressed JSON snapshots for successful active-source responses, organized by UTC date. |
-| `data/archive/raw/` | Original compressed snapshots for retired sources, including the historical BOK feed payloads. |
+| `data/archive/raw/` | Original compressed snapshots for retired sources, including BOK Financial and the University of Arkansas. |
 | `data/history.csv` | Canonical history of all postings returned by active JSON sources, with finance-role and target-market flags. |
 | `data/archive/history.csv` | Retired-source postings, separate from the required open/removed history. |
 | `data/status.json` | Latest run summary and per-source results. |
