@@ -269,9 +269,28 @@ function sourceCard(source) {
 function renderFooter() {
   const lastRun = document.getElementById('last-updated');
   const footer = document.getElementById('footer-data-state');
+  const boardNote = document.getElementById('footer-board-note');
   const label = DATA.status.run_time ? `Last run · ${localDateTime(DATA.status.run_time)}` : 'Awaiting first data run';
   if (lastRun) lastRun.textContent = label;
   if (footer) footer.textContent = DATA.status.run_time ? `Last collection: ${localDateTime(DATA.status.run_time)} (your local time)` : 'Waiting for the first successful data run.';
+  if (boardNote) {
+    const boards = DATA.sources.filter((source) => source.employer === 'Cherokee Nation Businesses' && source.board_name);
+    boardNote.replaceChildren(document.createTextNode('Cherokee Nation Businesses: '));
+    boards.forEach((source, index) => {
+      if (index) boardNote.append(document.createTextNode(' · '));
+      const href = safeUrl(source.career_url);
+      if (href) {
+        const link = document.createElement('a');
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = source.board_name;
+        boardNote.append(link);
+      } else {
+        boardNote.append(document.createTextNode(source.board_name));
+      }
+    });
+  }
   if (!DATA.status.run_time && !DATA.jobs.length) showNotice('The site is published. Listings will appear after the collector completes its first successful run.');
 }
 

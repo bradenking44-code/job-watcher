@@ -192,9 +192,11 @@ h1, h2, p { margin-top: 0; }
 .market-source span { color: #7c897f; font: 9px var(--mono); text-align: right; }
 .market-source:hover { border-color: #8daa94; }
 
-.site-footer { display: flex; justify-content: space-between; gap: 18px; align-items: center; padding: 22px max(5vw, calc((100vw - 1280px) / 2)); background: #e9ede6; color: #77847b; font-size: 10px; }
+.site-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 18px; align-items: center; padding: 22px max(5vw, calc((100vw - 1280px) / 2)); background: #e9ede6; color: #77847b; font-size: 10px; }
 .footer-brand { color: var(--green); text-decoration: none; font: 10px var(--mono); letter-spacing: .04em; white-space: nowrap; }
 .footer-brand span { color: #89a48f; }
+.footer-board-note a { color: inherit; text-decoration-color: #aab7aa; text-underline-offset: 2px; }
+.footer-board-note a:hover { color: var(--green); }
 
 @media (max-width: 900px) {
   .site-header { padding: 0 24px; }
