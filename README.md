@@ -64,7 +64,7 @@ Rebuild the history from the saved raw files without making network requests:
 python -m job_watcher.pipeline --build-only
 ```
 
-The scheduled GitHub Actions workflow runs daily at 12:17 UTC (6:17 a.m. Central Standard Time or 7:17 a.m. Central Daylight Time), commits raw snapshots, history, status, and the daily change report. The Pages workflow publishes when data changes. Dates use UTC, history rows are sorted by `posting_id`, and a date counts once even if the workflow is rerun.
+The scheduled GitHub Actions workflow runs daily at 12:17 UTC (6:17 a.m. Central Standard Time or 7:17 a.m. Central Daylight Time), commits raw snapshots, history, status, and the daily change report, then dispatches the Pages workflow to publish the updated data. Dates use UTC, history rows are sorted by `posting_id`, and a date counts once even if the workflow is rerun.
 
 ## Development
 
@@ -80,8 +80,8 @@ pytest
 | Path | Purpose |
 | --- | --- |
 | `.gitignore` | Excludes local environments, caches, and build output. |
-| `.github/workflows/daily-pipeline.yml` | Daily collection, daily issue creation/update, previous-issue close, and data commit. |
-| `.github/workflows/pages.yml` | Builds and publishes the static site with GitHub Pages. |
+| `.github/workflows/daily-pipeline.yml` | Daily collection, daily issue creation/update, previous-issue close, data commit, and Pages deployment dispatch. |
+| `.github/workflows/pages.yml` | Builds and publishes the static site with GitHub Pages when dispatched or when site/data/config files change. |
 | `.github/workflows/tests.yml` | Runs pytest on pushes and pull requests. |
 | `pyproject.toml` | Python project metadata and pytest configuration. |
 | `README.md` | Project setup, target role and market, and operating instructions. |
