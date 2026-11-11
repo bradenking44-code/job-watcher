@@ -1,10 +1,10 @@
 {
-  "run_time": "2026-11-11T03:45:02Z",
+  "run_time": "2026-11-11T06:07:55Z",
   "run_date": "2026-11-11",
   "first_run_date": "2026-11-09",
   "days_with_success": 3,
-  "open": 4310,
-  "new_today": 566,
+  "open": 4907,
+  "new_today": 620,
   "new_today_ids": [
     "aaon:JR102996",
     "aaon:JR104026",
@@ -50,17 +50,20 @@
     "walmart:R-2525702",
     "walmart:R-2525829",
     "walmart:R-2543005",
+    "walmart:R-2550498",
     "walmart:R-2552646",
     "walmart:R-2554207",
     "walmart:R-2565340",
     "walmart:R-2568910",
     "walmart:R-2587302",
     "walmart:R-2590195",
+    "walmart:R-2599558",
     "walmart:R-2608839",
     "walmart:R-2614698",
     "walmart:R-2617928",
     "walmart:R-2620566",
     "walmart:R-2622924",
+    "walmart:R-2626329",
     "walmart:R-2626992",
     "walmart:R-2627798",
     "walmart:R-2630033",
@@ -73,8 +76,10 @@
     "walmart:R-2645129",
     "walmart:R-2645914",
     "walmart:R-2646007",
+    "walmart:R-2646032",
     "walmart:R-2652991",
     "walmart:R-2653703",
+    "walmart:R-2655198",
     "walmart:R-2655791",
     "walmart:R-2656792",
     "walmart:R-2656999",
@@ -83,12 +88,16 @@
     "walmart:R-2664340",
     "walmart:R-2665243",
     "walmart:R-2665697",
+    "walmart:R-2666581",
     "walmart:R-2666604",
     "walmart:R-2668472",
     "walmart:R-2668560",
+    "walmart:R-2669796",
     "walmart:R-2671018",
     "walmart:R-2672162",
     "walmart:R-2672907",
+    "walmart:R-2673754",
+    "walmart:R-2676060",
     "walmart:R-2676062",
     "walmart:R-2676802",
     "walmart:R-2677476",
@@ -100,10 +109,13 @@
     "walmart:R-2683472",
     "walmart:R-2684978",
     "walmart:R-2685044",
+    "walmart:R-2685563",
     "walmart:R-2685647",
     "walmart:R-2686326",
     "walmart:R-2686341",
     "walmart:R-2686452",
+    "walmart:R-2686460",
+    "walmart:R-2686465",
     "walmart:R-2687337",
     "walmart:R-2687797",
     "walmart:R-2688571",
@@ -112,7 +124,6 @@
     "walmart:R-2689491",
     "walmart:R-2690193",
     "walmart:R-2690212",
-    "walmart:R-2690725",
     "walmart:R-2690930",
     "walmart:R-2691049",
     "walmart:R-2691517",
@@ -122,6 +133,7 @@
     "walmart:R-2694109",
     "walmart:R-2694250",
     "walmart:R-2695299",
+    "walmart:R-2696006",
     "walmart:R-2696156",
     "walmart:R-2696476",
     "walmart:R-2696912",
@@ -134,13 +146,13 @@
     "walmart:R-2699254",
     "walmart:R-2699679",
     "walmart:R-2700021",
-    "walmart:R-2700031",
     "walmart:R-2700099",
     "walmart:R-2700164",
     "walmart:R-2700165",
     "walmart:R-2700199",
     "walmart:R-2700205",
     "walmart:R-2700225",
+    "walmart:R-2700265",
     "walmart:R-2700266",
     "walmart:R-2700272",
     "walmart:R-2700294",
@@ -189,6 +201,7 @@
     "walmart:R-2702589",
     "walmart:R-2702673",
     "walmart:R-2702684",
+    "walmart:R-2702727",
     "walmart:R-2702794",
     "walmart:R-2702923",
     "walmart:R-2703646",
@@ -197,18 +210,12 @@
     "walmart:R-2703823",
     "walmart:R-2703892",
     "walmart:R-2703930",
-    "walmart:R-2703964",
-    "walmart:R-2703984",
-    "walmart:R-2704001",
     "walmart:R-2704040",
     "walmart:R-2704137",
     "walmart:R-2704205",
     "walmart:R-2704226",
     "walmart:R-2704311",
     "walmart:R-2704313",
-    "walmart:R-2704320",
-    "walmart:R-2704326",
-    "walmart:R-2704382",
     "walmart:R-2704479",
     "walmart:R-2704498",
     "walmart:R-2704515",
@@ -242,7 +249,6 @@
     "walmart:R-2704813",
     "walmart:R-2704814",
     "walmart:R-2704815",
-    "walmart:R-2704816",
     "walmart:R-2704823",
     "walmart:R-2704825",
     "walmart:R-2704826",
@@ -257,7 +263,6 @@
     "walmart:R-2704905",
     "walmart:R-2704912",
     "walmart:R-2704933",
-    "walmart:R-2704991",
     "walmart:R-2705012",
     "walmart:R-2705013",
     "walmart:R-2705017",
@@ -352,8 +357,9 @@
     "walmart:R-2705300",
     "walmart:R-2705305",
     "walmart:R-2705312",
+    "walmart:R-2705313",
     "walmart:R-2705315",
-    "walmart:R-2705318",
+    "walmart:R-2705323",
     "walmart:R-2705329",
     "walmart:R-2705333",
     "walmart:R-2705337",
@@ -477,6 +483,7 @@
     "walmart:R-2705815",
     "walmart:R-2705821",
     "walmart:R-2705826",
+    "walmart:R-2705831",
     "walmart:R-2705842",
     "walmart:R-2705849",
     "walmart:R-2705854",
@@ -492,7 +499,6 @@
     "walmart:R-2705887",
     "walmart:R-2705889",
     "walmart:R-2705892",
-    "walmart:R-2705893",
     "walmart:R-2705899",
     "walmart:R-2705900",
     "walmart:R-2705908",
@@ -570,10 +576,58 @@
     "walmart:R-2706222",
     "walmart:R-2706223",
     "walmart:R-2706230",
+    "walmart:R-2706236",
     "walmart:R-2706238",
+    "walmart:R-2706242",
+    "walmart:R-2706246",
+    "walmart:R-2706259",
+    "walmart:R-2706260",
+    "walmart:R-2706261",
+    "walmart:R-2706262",
+    "walmart:R-2706264",
+    "walmart:R-2706265",
+    "walmart:R-2706269",
+    "walmart:R-2706271",
+    "walmart:R-2706276",
+    "walmart:R-2706281",
+    "walmart:R-2706283",
+    "walmart:R-2706287",
+    "walmart:R-2706289",
+    "walmart:R-2706294",
+    "walmart:R-2706297",
+    "walmart:R-2706302",
+    "walmart:R-2706305",
+    "walmart:R-2706309",
+    "walmart:R-2706310",
+    "walmart:R-2706312",
+    "walmart:R-2706313",
+    "walmart:R-2706314",
+    "walmart:R-2706321",
+    "walmart:R-2706324",
+    "walmart:R-2706327",
+    "walmart:R-2706331",
+    "walmart:R-2706336",
+    "walmart:R-2706343",
+    "walmart:R-2706345",
+    "walmart:R-2706347",
+    "walmart:R-2706349",
+    "walmart:R-2706351",
+    "walmart:R-2706352",
+    "walmart:R-2706353",
+    "walmart:R-2706354",
+    "walmart:R-2706355",
+    "walmart:R-2706356",
+    "walmart:R-2706373",
+    "walmart:R-2706375",
+    "walmart:R-2706392",
+    "walmart:R-2706409",
+    "walmart:R-2706412",
+    "walmart:R-2706419",
+    "walmart:R-2706422",
+    "walmart:R-2706432",
     "williams:R112993"
   ],
-  "removed_today": 551,
+  "removed_today": 615,
   "sources": [
     {
       "name": "ONEOK",
@@ -586,33 +640,33 @@
       "total": 104,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.57
+      "elapsed_seconds": 10.11
     },
     {
       "name": "Williams",
       "ok": true,
-      "count": 128,
+      "count": 127,
       "source_id": "williams",
       "employer": "Williams",
       "success": true,
-      "postings": 128,
-      "total": 128,
+      "postings": 127,
+      "total": 127,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 12.56
+      "elapsed_seconds": 20.25
     },
     {
       "name": "Helmerich & Payne",
       "ok": true,
-      "count": 62,
+      "count": 61,
       "source_id": "helmerich_payne",
       "employer": "Helmerich & Payne",
       "success": true,
-      "postings": 62,
-      "total": 62,
+      "postings": 61,
+      "total": 61,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 5.26
+      "elapsed_seconds": 4.59
     },
     {
       "name": "AAON",
@@ -625,7 +679,7 @@
       "total": 230,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.09
+      "elapsed_seconds": 7.67
     },
     {
       "name": "TD Williamson",
@@ -638,7 +692,7 @@
       "total": 57,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 6.9
+      "elapsed_seconds": 3.33
     },
     {
       "name": "Simmons Bank",
@@ -651,7 +705,7 @@
       "total": 150,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.82
+      "elapsed_seconds": 12.39
     },
     {
       "name": "Airgas",
@@ -664,20 +718,20 @@
       "total": 418,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 40.58
+      "elapsed_seconds": 37.59
     },
     {
       "name": "ConocoPhillips",
       "ok": true,
-      "count": 21,
+      "count": 19,
       "source_id": "conocophillips",
       "employer": "ConocoPhillips",
       "success": true,
-      "postings": 21,
-      "total": 21,
+      "postings": 19,
+      "total": 19,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 3.11
+      "elapsed_seconds": 4.88
     },
     {
       "name": "UMB Bank",
@@ -690,7 +744,7 @@
       "total": 163,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 10.33
+      "elapsed_seconds": 15.06
     },
     {
       "name": "Regent Bank",
@@ -703,20 +757,20 @@
       "total": 11,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.12
+      "elapsed_seconds": 0.3
     },
     {
       "name": "Arvest Bank",
       "ok": true,
-      "count": 22,
+      "count": 17,
       "source_id": "arvest_bank",
       "employer": "Arvest Bank",
       "success": true,
-      "postings": 22,
-      "total": 22,
+      "postings": 17,
+      "total": 17,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.13
+      "elapsed_seconds": 0.85
     },
     {
       "name": "Walmart",
@@ -729,7 +783,7 @@
       "total": 2000,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 77.16
+      "elapsed_seconds": 72.02
     },
     {
       "name": "Tyson Foods",
@@ -742,7 +796,7 @@
       "total": 12,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.2
+      "elapsed_seconds": 3.64
     },
     {
       "name": "J.B. Hunt",
@@ -755,20 +809,20 @@
       "total": 442,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 22.07
+      "elapsed_seconds": 21.16
     },
     {
-      "name": "University of Arkansas",
+      "name": "Saint Francis Health System",
       "ok": true,
-      "count": 133,
-      "source_id": "university_of_arkansas",
-      "employer": "University of Arkansas",
+      "count": 607,
+      "source_id": "saint_francis_health_system",
+      "employer": "Saint Francis Health System",
       "success": true,
-      "postings": 133,
-      "total": 133,
+      "postings": 607,
+      "total": 607,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 7.76
+      "elapsed_seconds": 7.18
     },
     {
       "name": "George's Inc.",
@@ -781,7 +835,7 @@
       "total": 118,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 2.9
+      "elapsed_seconds": 3.91
     },
     {
       "name": "Ingredion",
@@ -794,20 +848,20 @@
       "total": 229,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 13.22
+      "elapsed_seconds": 11.94
     },
     {
       "name": "ONE Gas",
       "ok": true,
-      "count": 29,
+      "count": 28,
       "source_id": "one_gas",
       "employer": "ONE Gas",
       "success": true,
-      "postings": 29,
-      "total": 29,
+      "postings": 28,
+      "total": 28,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.88
+      "elapsed_seconds": 0.98
     },
     {
       "name": "Cherokee Nation Businesses",
@@ -820,7 +874,7 @@
       "total": 6,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 0.81
+      "elapsed_seconds": 0.84
     },
     {
       "name": "Cherokee Nation Businesses",
@@ -833,7 +887,7 @@
       "total": 108,
       "warnings": 0,
       "error": "",
-      "elapsed_seconds": 1.93
+      "elapsed_seconds": 1.89
     }
   ]
 }
