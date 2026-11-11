@@ -145,7 +145,8 @@ def run_pipeline(
     # cannot survive a later failure. Snapshots from inactive sources stay archived.
     active_source_ids = {str(source["id"]) for source in config.get("sources", [])}
     for old_snapshot in daily_dir.glob("*.json.gz"):
-        if old_snapshot.stem in active_source_ids:
+        source_id = old_snapshot.name.removesuffix(".json.gz")
+        if source_id in active_source_ids:
             old_snapshot.unlink()
 
     source_results: list[dict[str, Any]] = []
