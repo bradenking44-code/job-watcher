@@ -6,7 +6,6 @@ from urllib.parse import unquote, urlparse
 from job_watcher.sources import (
     fetch_infor_cloudsuite,
     fetch_oracle_candidate_experience,
-    fetch_successfactors_rss,
     fetch_workday,
     parse_posted_date,
 )
@@ -293,28 +292,6 @@ def test_parse_posted_date_handles_relative_labels():
     assert parse_posted_date("Posted 3 Days Ago", date(2026, 11, 9)) == "2026-11-06"
 
 
-def test_successfactors_rss_maps_public_bok_postings(monkeypatch):
-    xml = """<?xml version="1.0"?><rss><channel><item>
-      <id>REQ-17</id><title>FP&amp;A Analyst (Tulsa, OK)</title>
-      <location>Tulsa, OK</location><job_function>Finance &amp; Administration</job_function>
-      <link>https://jobs.example.test/job/17</link>
-    </item></channel></rss>"""
-    monkeypatch.setattr("job_watcher.sources.request_text", lambda _url: xml)
-    result = fetch_successfactors_rss({
-        "id": "bok",
-        "employer": "BOK Financial",
-        "career_url": "https://jobs.example.test",
-        "api_endpoint": "https://jobs.example.test/feed.xml",
-    })
-
-    posting = result["postings"][0]
-    assert COMMON_FIELDS <= posting.keys()
-    assert posting["posting_id"] == "bok:REQ-17"
-    assert posting["title"] == "FP&A Analyst"
-    assert posting["location"] == "Tulsa, OK"
-    assert posting["url"] == "https://jobs.example.test/job/17"
-
-
 def test_infor_maps_arvest_json_postings(monkeypatch):
     page = {
         "dataViewSet": {
@@ -357,7 +334,7 @@ def test_infor_maps_arvest_json_postings(monkeypatch):
 def test_configured_sources_use_supported_structured_adapters():
     config_path = Path(__file__).parents[1] / "config" / "sources.json"
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    supported = {"Workday", "Oracle Cloud Recruiting", "SAP SuccessFactors Recruiting Marketing", "Infor CloudSuite HCM"}
+    supported = {"Workday", "Oracle Cloud Recruiting", "Greenhouse Job Board API", "Infor CloudSuite HCM"}
     sources = config["sources"]
 
     assert len(sources) >= 15

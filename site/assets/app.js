@@ -1,4 +1,4 @@
-const DATA = { jobs: [], status: {}, sources: [], candidates: [], markets: {}, financeTerms: [] };
+const DATA = { jobs: [], status: {}, sources: [], supplementalSources: [], candidates: [], markets: {}, financeTerms: [] };
 const SHORTLIST_KEY = 'ledgerline-job-watcher-shortlist-v1';
 
 const text = (value) => (value == null ? '' : String(value)).trim();
@@ -44,6 +44,7 @@ async function fetchData() {
   if (results[2].status === 'fulfilled') {
     const config = results[2].value;
     DATA.sources = config.sources || [];
+    DATA.supplementalSources = config.supplemental_sources || [];
     DATA.candidates = config.discovery_candidates || [];
     DATA.markets = config.markets || {};
     DATA.financeTerms = config.finance_title_terms || [];
@@ -120,8 +121,10 @@ function marketLabel(id) { return id === 'tulsa_ok' ? 'Tulsa area' : id === 'nor
 
 function isOpen(job) {
   const status = text(job.status).toLowerCase();
-  return !['removed', 'closed', 'inactive', 'expired'].includes(status) && !text(job.removed_date);
+  return !['removed', 'closed', 'inactive', 'expired', 'archived'].includes(status) && !text(job.removed_date);
 }
+
+function isArchived(job) { return text(job.status).toLowerCase() === 'archived'; }
 
 function applicationUrl(job) {
   const direct = safeUrl(job.url);
@@ -147,14 +150,16 @@ function jobCard(job, shortlist) {
   const href = applicationUrl(job);
   const id = text(job.posting_id);
   const starred = shortlist.has(id);
-  const days = daysBetween(job.first_seen, isOpen(job) ? runDay() : (job.removed_date || runDay()));
+  const days = isArchived(job) ? null : daysBetween(job.first_seen, isOpen(job) ? runDay() : (job.removed_date || runDay()));
+  const badgeText = isArchived(job) ? 'Archived source' : isOpen(job) ? 'Open' : 'Removed';
+  const badgeClass = isArchived(job) ? 'archived' : isOpen(job) ? '' : 'removed';
   const market = marketIdsFor(job).map(marketLabel).join(' + ') || 'Other / not specified';
   const applyMarkup = href
     ? `<a class="apply-link" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">Apply / view posting <span aria-hidden="true">↗</span></a>`
     : '<span class="apply-link disabled">Application link unavailable</span>';
   article.innerHTML = `
     <div class="job-card-top">
-      <span class="job-badge ${isOpen(job) ? '' : 'removed'}">${isOpen(job) ? 'Open' : 'Removed'}${roleMatch(job) ? ' · Finance match' : ''}</span>
+      <span class="job-badge ${badgeClass}">${badgeText}${roleMatch(job) ? ' · Finance match' : ''}</span>
       <span class="job-card-actions">
         <span class="job-date">First seen ${escapeHtml(localDate(job.first_seen))}</span>
         <button class="star-button" type="button" data-star-id="${escapeHtml(id)}" aria-pressed="${starred}" aria-label="${starred ? 'Remove from shortlist' : 'Save to shortlist'}" title="${starred ? 'Remove from shortlist' : 'Save to shortlist'}">${starred ? '★' : '☆'}</button>
@@ -162,7 +167,7 @@ function jobCard(job, shortlist) {
     </div>
     <span class="job-title">${escapeHtml(job.title || 'Untitled role')}</span>
     <span class="job-company">${escapeHtml(job.employer || 'Employer')}</span>
-    <div class="job-card-bottom"><span>${escapeHtml(job.location || market)} · ${days == null ? 'Days open unknown' : `${Math.max(0, days)} days open`}</span>${applyMarkup}</div>`;
+    <div class="job-card-bottom"><span>${escapeHtml(job.location || market)} · ${days == null ? (isArchived(job) ? 'Historical record; source no longer collected' : 'Days open unknown') : `${Math.max(0, days)} days open`}</span>${applyMarkup}</div>`;
   return article;
 }
 
@@ -177,10 +182,13 @@ function sourceCard(source) {
   const href = safeUrl(source.career_url);
   const card = document.createElement(href ? 'a' : 'div');
   const pending = Boolean(source.status);
-  card.className = `source-card${pending ? ' source-card-pending' : ''}`;
+  const supplemental = Boolean(source.status_label);
+  card.className = `source-card${pending ? ' source-card-pending' : ''}${supplemental ? ' source-card-supplemental' : ''}`;
   if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
   const label = source.board_name ? `${source.employer} · ${source.board_name}` : source.employer;
-  const state = pending ? '<span class="source-status">DISCOVERY</span>' : '';
+  const state = source.status_label
+    ? `<span class="source-status source-status-supplemental">${escapeHtml(source.status_label)}</span>`
+    : pending ? '<span class="source-status">DISCOVERY</span>' : '';
   card.innerHTML = `<strong>${escapeHtml(label)}</strong><span class="source-card-meta">${state}<span class="source-arrow" aria-hidden="true">↗</span></span>`;
   return card;
 }
@@ -238,13 +246,16 @@ function renderToday() {
       card.innerHTML = `<div class="source-status-head"><strong>${escapeHtml(source.employer)}</strong><span class="run-pill ${ok === false ? 'run-failed' : ok === true ? 'run-ok' : 'run-unknown'}">${ok === true ? 'SUCCESS' : ok === false ? 'FAILED' : 'NO RESULT'}</span></div><p>${ok === null ? 'No source result is recorded for the latest run.' : `${Number(result.count ?? result.postings ?? 0).toLocaleString()} postings returned`}</p>${ok === false && result.error ? `<small>${escapeHtml(result.error)}</small>` : ''}`;
       sourceStatusList.append(card);
     });
-    const succeeded = (DATA.status.sources || []).filter((item) => item.ok ?? item.success).length;
+    const succeeded = DATA.sources.filter((source) => {
+      const result = results.get(source.id);
+      return result && (result.ok ?? result.success);
+    }).length;
     const summary = document.getElementById('source-status-summary');
     if (summary) summary.textContent = `${succeeded} of ${DATA.sources.length} boards succeeded · ${DATA.sources.length - succeeded} need attention`;
   }
 
   const sources = document.getElementById('source-cards');
-  if (sources) { sources.replaceChildren(); [...DATA.sources, ...DATA.candidates].forEach((source) => sources.append(sourceCard(source))); }
+  if (sources) { sources.replaceChildren(); [...DATA.sources, ...DATA.supplementalSources, ...DATA.candidates].forEach((source) => sources.append(sourceCard(source))); }
 }
 
 function readShortlist() {
@@ -280,7 +291,8 @@ function renderBrowse() {
   const draw = () => {
     let jobs = DATA.jobs.slice();
     if (status.value === 'open') jobs = jobs.filter(isOpen);
-    if (status.value === 'removed') jobs = jobs.filter((job) => !isOpen(job));
+    if (status.value === 'removed') jobs = jobs.filter((job) => !isOpen(job) && !isArchived(job));
+    if (status.value === 'archived') jobs = jobs.filter(isArchived);
     if (market.value !== 'all') jobs = jobs.filter((job) => marketIdsFor(job).includes(market.value));
     if (employer.value !== 'all') jobs = jobs.filter((job) => text(job.employer) === employer.value);
     const locationQuery = text(location.value).toLowerCase();
@@ -292,6 +304,7 @@ function renderBrowse() {
     if (daysOpen.value !== 'all') {
       const [min, max] = daysOpen.value === '90+' ? [91, Infinity] : daysOpen.value.split('-').map(Number);
       jobs = jobs.filter((job) => {
+        if (isArchived(job)) return false;
         const duration = daysBetween(job.first_seen, isOpen(job) ? runDay() : (job.removed_date || runDay()));
         return duration !== null && duration >= min && duration <= max;
       });
@@ -300,7 +313,7 @@ function renderBrowse() {
       const comparison = dateOnly(a.first_seen).localeCompare(dateOnly(b.first_seen)) || text(a.posting_id).localeCompare(text(b.posting_id));
       return sort.value === 'oldest' ? comparison : -comparison;
     });
-    const stateLabel = status.value === 'open' ? 'open' : status.value === 'removed' ? 'removed' : 'tracked';
+    const stateLabel = status.value === 'open' ? 'open' : status.value === 'removed' ? 'removed' : status.value === 'archived' ? 'archived' : 'tracked';
     count.textContent = `${jobs.length.toLocaleString()} ${finance.checked ? 'finance ' : ''}${stateLabel} posting${jobs.length === 1 ? '' : 's'}`;
     results.replaceChildren();
     if (!jobs.length) {
@@ -330,7 +343,7 @@ function renderBrowse() {
   const links = document.getElementById('browse-source-links');
   if (links) {
     links.replaceChildren();
-    [...DATA.sources, ...DATA.candidates].forEach((source) => {
+    [...DATA.sources, ...DATA.supplementalSources, ...DATA.candidates].forEach((source) => {
       const href = safeUrl(source.career_url);
       if (!href) return;
       const a = document.createElement('a'); a.className = 'source-pill'; a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
@@ -504,17 +517,17 @@ function renderMarket() {
   const sources = document.getElementById('market-source-list');
   if (sources) {
     sources.replaceChildren();
-    DATA.sources.forEach((source) => {
+    [...DATA.sources, ...DATA.supplementalSources].forEach((source) => {
       const href = safeUrl(source.career_url);
       const card = document.createElement(href ? 'a' : 'div'); card.className = 'market-source';
       if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
-      const names = (source.markets || []).map(marketLabel).join(' + ');
+      const names = `${(source.markets || []).map(marketLabel).join(' + ')}${source.status_label ? ' · supplemental link' : ''}`;
       card.innerHTML = `<strong>${escapeHtml(source.employer)}</strong><span>${escapeHtml(names)}</span>`;
       sources.append(card);
     });
   }
   const count = document.getElementById('market-source-count');
-  if (count) count.textContent = `${DATA.sources.length} active boards · ${DATA.candidates.length} to validate`;
+  if (count) count.textContent = `${DATA.sources.length} active boards · ${DATA.supplementalSources.length} supplemental links · ${DATA.candidates.length} to validate`;
 }
 
 async function start() {

@@ -181,14 +181,14 @@
       "career_url": "https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal"
     },
     {
-      "id": "bok_financial",
-      "employer": "BOK Financial",
+      "id": "regent_bank",
+      "employer": "Regent Bank",
       "markets": ["tulsa_ok"],
-      "locality_hint": "Tulsa-area openings",
-      "ats": "SAP SuccessFactors Recruiting Marketing",
-      "api_type": "successfactors_rss",
-      "api_endpoint": "https://jobs.bokf.com/xml/",
-      "career_url": "https://jobs.bokf.com/go/"
+      "locality_hint": "Tulsa-area banking and finance openings",
+      "ats": "Greenhouse Job Board API",
+      "api_type": "greenhouse_job_board",
+      "api_endpoint": "https://boards-api.greenhouse.io/v1/boards/regentbank/jobs?content=false",
+      "career_url": "https://job-boards.greenhouse.io/regentbank"
     },
     {
       "id": "arvest_bank",
@@ -290,6 +290,16 @@
       "site_number": "CX_4001",
       "api_endpoint": "https://ejvp.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/recruitingCEJobRequisitions",
       "career_url": "https://ejvp.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_4001"
+    }
+  ],
+  "inactive_source_ids": ["bok_financial"],
+  "supplemental_sources": [
+    {
+      "id": "bok_financial",
+      "employer": "BOK Financial",
+      "markets": ["tulsa_ok"],
+      "career_url": "https://jobs.bokf.com/go/",
+      "status_label": "CAREERS LINK"
     }
   ],
   "discovery_candidates": []

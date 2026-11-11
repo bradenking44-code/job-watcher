@@ -12,7 +12,6 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urljoin, urlparse
 from urllib.request import HTTPRedirectHandler, HTTPCookieProcessor, Request, build_opener, urlopen
-from xml.etree import ElementTree
 
 
 USER_AGENT = "job-watcher/0.1 (+https://github.com/bradenking44-code/job-watcher)"
@@ -65,28 +64,6 @@ def request_json(url: str, body: dict[str, Any] | None = None) -> dict[str, Any]
                 raise SourceFetchError(f"Could not read JSON from {url}: {exc}") from exc
         time.sleep(min(2**attempt, 8))
     raise SourceFetchError(f"Could not read JSON from {url}")
-
-
-def request_text(url: str) -> str:
-    """Read a public text feed, retrying transient HTTP and network failures."""
-
-    request = Request(
-        url,
-        headers={"Accept": "application/rss+xml, application/xml, text/xml", "User-Agent": USER_AGENT},
-    )
-    for attempt in range(4):
-        try:
-            with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
-                return response.read().decode("utf-8-sig")
-        except HTTPError as exc:
-            transient = exc.code == 429 or 500 <= exc.code < 600
-            if not transient or attempt == 3:
-                raise SourceFetchError(f"HTTP {exc.code} from {url}") from exc
-        except (URLError, TimeoutError) as exc:
-            if attempt == 3:
-                raise SourceFetchError(f"Could not read feed from {url}: {exc}") from exc
-        time.sleep(min(2**attempt, 8))
-    raise SourceFetchError(f"Could not read feed from {url}")
 
 
 def parse_posted_date(value: Any, run_date: date) -> str:
@@ -365,6 +342,75 @@ def _oracle_locations(item: dict[str, Any]) -> str:
     return "; ".join(values)
 
 
+def fetch_greenhouse(source: dict[str, Any], run_date: date) -> dict[str, Any]:
+    """Fetch a public Greenhouse Job Board API response and normalize its jobs."""
+
+    page = request_json(source["api_endpoint"])
+    jobs = page.get("jobs")
+    if not isinstance(jobs, list):
+        raise SourceFetchError(f"Greenhouse response did not contain jobs for {source['id']}")
+
+    meta = page.get("meta") or {}
+    try:
+        total = int(meta.get("total", len(jobs)))
+    except (AttributeError, TypeError, ValueError):
+        total = len(jobs)
+    if total > len(jobs):
+        raise SourceFetchError(
+            f"Greenhouse returned {len(jobs)} of {total} reported jobs for {source['id']}"
+        )
+    total = max(total, len(jobs))
+
+    postings: list[dict[str, Any]] = []
+    for item in jobs:
+        if not isinstance(item, dict):
+            raise SourceFetchError(f"Greenhouse returned a malformed job for {source['id']}")
+        external_id = str(item.get("id") or "").strip()
+        if not external_id:
+            raise SourceFetchError(f"Greenhouse job is missing its ID for {source['id']}")
+
+        location_value = item.get("location") or {}
+        if isinstance(location_value, dict):
+            location = str(location_value.get("name") or "").strip()
+        elif isinstance(location_value, list):
+            location = "; ".join(
+                str(value.get("name") if isinstance(value, dict) else value).strip()
+                for value in location_value
+                if value
+            )
+        else:
+            location = str(location_value).strip()
+
+        departments = item.get("departments") or []
+        department_names = []
+        if isinstance(departments, list):
+            department_names = [
+                str(value.get("name") or "").strip()
+                for value in departments
+                if isinstance(value, dict) and value.get("name")
+            ]
+        department = "; ".join(department_names) or str(item.get("department") or "").strip()
+        posting_url = str(item.get("absolute_url") or "").strip()
+        if not posting_url:
+            posting_url = f"{str(source.get('career_url') or '').rstrip('/')}/jobs/{external_id}"
+        posted_raw = item.get("first_published") or item.get("updated_at")
+
+        postings.append(
+            {
+                "posting_id": f"{source['id']}:{external_id}",
+                "external_id": external_id,
+                "title": str(item.get("title") or "").strip(),
+                "location": location,
+                "department": department,
+                "posted_date": parse_posted_date(posted_raw, run_date),
+                "posted_label": str(posted_raw or ""),
+                "url": posting_url,
+            }
+        )
+
+    return {"postings": postings, "total": total, "raw_pages": [page], "warnings": []}
+
+
 def fetch_oracle_candidate_experience(
     source: dict[str, Any],
     request_config: dict[str, Any],
@@ -473,60 +519,6 @@ def fetch_oracle_candidate_experience(
         warnings.append(f"Skipped {duplicate_items} duplicate postings returned across overlapping pages")
 
     return {"postings": postings, "total": total if total is not None else len(postings), "raw_pages": pages, "raw_details": [], "warnings": warnings}
-
-
-def fetch_successfactors_rss(source: dict[str, Any]) -> dict[str, Any]:
-    """Fetch the public SAP SuccessFactors RSS/XML job feed."""
-
-    feed_text = request_text(source["api_endpoint"])
-    try:
-        root = ElementTree.fromstring(feed_text)
-    except ElementTree.ParseError as exc:
-        raise SourceFetchError(f"Invalid RSS/XML response from {source['api_endpoint']}: {exc}") from exc
-
-    channel = root.find("channel")
-    if channel is None:
-        raise SourceFetchError(f"RSS response did not contain a channel for {source['id']}")
-
-    postings: list[dict[str, Any]] = []
-    seen_ids: set[str] = set()
-    for item in channel.findall("item"):
-        external_id = str(item.findtext("id") or item.findtext("guid") or "").strip()
-        if not external_id:
-            continue
-        if external_id in seen_ids:
-            continue
-        seen_ids.add(external_id)
-
-        title = str(item.findtext("title") or "").strip()
-        location = str(item.findtext("location") or "").strip()
-        # BOK includes the full location in parentheses in RSS titles as well
-        # as in its separate location field. Keep the title clean for role matching.
-        location_suffix = f" ({location})" if location else ""
-        if location_suffix and title.endswith(location_suffix):
-            title = title[: -len(location_suffix)].strip()
-
-        postings.append(
-            {
-                "posting_id": f"{source['id']}:{external_id}",
-                "external_id": external_id,
-                "title": title,
-                "location": location,
-                "department": str(item.findtext("job_function") or "").strip(),
-                "posted_date": "",
-                "posted_label": "",
-                "url": str(item.findtext("link") or source.get("career_url") or "").strip(),
-            }
-        )
-
-    return {
-        "postings": postings,
-        "total": len(postings),
-        # Preserve the source response as received; the pipeline compresses it
-        # with the other public API snapshots.
-        "raw_pages": [{"xml": feed_text}],
-        "warnings": [],
-    }
 
 
 def request_infor_json(url: str, opener: Any, expected_host: str) -> dict[str, Any]:
@@ -711,10 +703,10 @@ def fetch_infor_cloudsuite(
 
 def fetch_source(source: dict[str, Any], config: dict[str, Any], run_date: date) -> dict[str, Any]:
     api_type = source.get("api_type")
+    if api_type == "greenhouse_job_board":
+        return fetch_greenhouse(source, run_date)
     if api_type == "oracle_candidate_experience":
         return fetch_oracle_candidate_experience(source, config.get("oracle_request", {}), run_date)
-    if api_type == "successfactors_rss":
-        return fetch_successfactors_rss(source)
     if api_type == "infor_cloudsuite":
         return fetch_infor_cloudsuite(source, config.get("infor_request", {}), run_date)
     if api_type == "workday_cxs" or source.get("ats", "").lower() == "workday":

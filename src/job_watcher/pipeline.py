@@ -141,10 +141,12 @@ def run_pipeline(
     baseline = not previous_success_dates
     daily_dir = raw_dir / run_date_text
     daily_dir.mkdir(parents=True, exist_ok=True)
-    # A manual or scheduled rerun replaces this date's snapshots. In particular,
-    # an old successful file must not survive a later failed fetch on the same day.
+    # A rerun replaces this date's active-source snapshots so an old success
+    # cannot survive a later failure. Snapshots from inactive sources stay archived.
+    active_source_ids = {str(source["id"]) for source in config.get("sources", [])}
     for old_snapshot in daily_dir.glob("*.json.gz"):
-        old_snapshot.unlink()
+        if old_snapshot.stem in active_source_ids:
+            old_snapshot.unlink()
 
     source_results: list[dict[str, Any]] = []
     for source in config.get("sources", []):

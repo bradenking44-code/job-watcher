@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ledgerline-shell-v1';
+const CACHE_NAME = 'ledgerline-shell-v2';
 const APP_FILES = [
   './',
   './index.html',

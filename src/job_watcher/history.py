@@ -115,6 +115,7 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
     first_success_by_source = {
         source_id: dates[0] for source_id, dates in source_success_dates.items() if dates
     }
+    inactive_source_ids = {str(source_id) for source_id in config.get("inactive_source_ids", [])}
     rows: list[dict[str, str]] = []
 
     for posting_id in sorted(latest):
@@ -124,6 +125,7 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
         last_seen = dates[-1]
         source_id = str(posting.get("source_id") or "")
         next_success = next((day for day in source_success_dates.get(source_id, []) if day > last_seen), "")
+        archived = source_id in inactive_source_ids
         location = str(posting.get("location") or "")
         market_ids = market_ids_for_location(location, markets)
         row = {
@@ -142,8 +144,8 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
             "first_run": str(first_seen == first_success_by_source.get(source_id, "")).lower(),
             "first_seen": first_seen,
             "last_seen": last_seen,
-            "status": "removed" if next_success else "open",
-            "removed_date": next_success,
+            "status": "archived" if archived else "removed" if next_success else "open",
+            "removed_date": "" if archived else next_success,
         }
         rows.append(row)
 

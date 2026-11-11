@@ -119,7 +119,8 @@ h1, h2, p { margin-top: 0; }
 .source-card-meta { display: flex; flex: 0 0 auto; align-items: center; gap: 7px; }
 .source-card .source-arrow { color: var(--green-2); font: 15px var(--mono); }
 .source-card .source-status { padding: 3px 5px; border-radius: 3px; background: #f1efe6; color: #796b3f; font: 8px var(--mono); letter-spacing: .02em; }
-.source-card-pending { border-style: dashed; }
+.source-card .source-status-supplemental { background: #edf0f4; color: #5f6977; }
+.source-card-pending, .source-card-supplemental { border-style: dashed; }
 .source-arrow { color: var(--green-2) !important; font-size: 15px !important; }
 .notice-bar { margin: 0 0 35px; padding: 13px 16px; border-left: 3px solid var(--orange); background: #fff0e6; color: #70462f; font-size: 12px; line-height: 1.55; }
 .notice-bar[hidden] { display: none; }
@@ -148,6 +149,7 @@ h1, h2, p { margin-top: 0; }
 .job-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 13px; }
 .job-badge { display: inline-flex; align-items: center; min-height: 21px; padding: 0 8px; border-radius: 20px; background: #edf3e8; color: #42624e; font: 9px var(--mono); }
 .job-badge.removed { background: #f4e9e2; color: #89593e; }
+.job-badge.archived { background: #eeeef2; color: #626375; }
 .job-date { color: #87928a; font: 9px var(--mono); }
 .job-card .job-title { font-size: 14px; }
 .job-card .job-company { margin-top: 6px; }

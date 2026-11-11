@@ -8,7 +8,7 @@ A daily job-market tracker for finance students looking for finance and accounti
 
 ## Target roles and locations
 
-The active watchlist covers 20 public job-board feeds across 19 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. BOK Financial and Arvest Bank are monitored alongside the other employers. The homepage displays all 20 boards. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` after their public endpoints are verified.
+The active watchlist covers 20 public JSON job-board feeds across 19 employers. It includes employers whose own finance teams hire locally, banks with local finance and banking roles, and Cherokee Nation Businesses’ corporate and enterprise career boards. Regent Bank and Arvest Bank are monitored alongside the other employers. BOK Financial remains a supplemental careers link, with its previously collected postings retained as archived history. The homepage displays the 20 active boards and supplemental links. This is a practical starting set, not every employer in either region; additional boards can be added to `config/sources.json` after their public endpoints are verified.
 
 The title rule is intentionally broad and flags roles with finance, financial, FP&A, accounting, accounts payable or receivable, treasury, tax, audit, controller, credit, underwriting, investment, portfolio, wealth, banking, loan, budget, billing, payroll, or revenue-accounting language. It is a title-based screen, so flagged postings should be reviewed before applying.
 
@@ -21,7 +21,7 @@ Only listings whose job location matches one of these markets belong in the loca
 
 ## Employer watchlist
 
-The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, and Arvest's Infor CloudSuite endpoint return JSON. BOK Financial's public SuccessFactors feed returns RSS/XML; the collector parses that structured feed and does not read job-board HTML. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift. The assignment asks every source to return JSON; BOK's RSS/XML feed is a documented exception to that source-format requirement.
+The source registry contains the public endpoint and career-site URL for each active board. Workday, Oracle Candidate Experience, Greenhouse, and Arvest's Infor CloudSuite endpoints return JSON. Regent Bank uses Greenhouse's public Job Board API, which permits anonymous GET requests for published job data. BOK Financial's public SuccessFactors feed returns RSS/XML, so it is kept as a supplemental careers link rather than an active pipeline source; prior BOK snapshots and postings remain in the archive. Arvest's anonymous access flow does not require an account; the collector follows its cookie-backed assertion and paginates the JSON results. Cherokee Nation Businesses and ONE Gas use Oracle Candidate Experience; Cherokee Nation Businesses has separate corporate and enterprise career sites. Job counts change, so the pipeline paginates and records the result of each run. Workday boards can change while offset pages are being read; after a repeat scan, the collector keeps the distinct union when it meets the latest reported total and records a warning, instead of failing the whole board for a small count drift.
 
 | Market | Employer | Applicant tracking system | Local coverage |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ The source registry contains the public endpoint and career-site URL for each ac
 | Tulsa | [Airgas](https://airliquidehr.wd3.myworkdayjobs.com/en-US/AirgasExternalCareer) | Workday JSON | Tulsa-area openings |
 | Tulsa outer area | [ConocoPhillips](https://conocophillips.wd1.myworkdayjobs.com/en-US/External) | Workday JSON | Bartlesville |
 | Tulsa | [UMB Bank](https://umb.wd1.myworkdayjobs.com/en-US/UMBExternal) | Workday JSON | Tulsa-area openings |
-| Tulsa | [BOK Financial](https://jobs.bokf.com/go/) | SuccessFactors public RSS/XML | Tulsa banking, finance, treasury, and early-career roles |
+| Tulsa | [Regent Bank](https://job-boards.greenhouse.io/regentbank) | Greenhouse Job Board API JSON | Tulsa banking, credit, loan, and finance roles |
 | Tulsa and Northwest Arkansas | [Arvest Bank](https://www.arvest.com/careers) | Infor CloudSuite JSON | Oklahoma and Northwest Arkansas openings |
 | Northwest Arkansas | [Walmart](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal) | Workday JSON | Bentonville and nearby offices |
 | Northwest Arkansas | [Tyson Foods](https://tysonfoods.wd5.myworkdayjobs.com/en-US/TSN1) | Workday JSON | Springdale and nearby offices |
@@ -48,9 +48,11 @@ The source registry contains the public endpoint and career-site URL for each ac
 
 The job boards can also return jobs outside the target cities. The location rule above applies across all sources, rather than assuming every job from a listed employer is local.
 
+BOK Financial remains available through its [careers page](https://jobs.bokf.com/go/) as a supplemental link. Its historical records are labeled **Archived source** because the public feed is RSS/XML and is no longer collected by the JSON-only pipeline.
+
 ## Data and rebuild command
 
-The daily collector saves each successful response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful raw snapshots, so a failed source does not mark its postings removed. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
+The daily collector saves each successful response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful raw snapshots, so a failed source does not mark its postings removed. Retired source IDs are preserved as archived history and excluded from open-job counts. A dated GitHub issue is opened every day, including days with no changes; reruns update that date's issue, and the next day's run closes it. The daily new count includes postings that reappear after a successful run had removed them; the history keeps their original `first_seen` date and restores their open status.
 
 Run the collector manually:
 
@@ -86,9 +88,9 @@ pytest
 | `pyproject.toml` | Python project metadata and pytest configuration. |
 | `README.md` | Project setup, target role and market, and operating instructions. |
 | `SUBMISSION.txt` | Four-line course submission with the student name, ID, repository, and live site. |
-| `config/sources.json` | Employer endpoints, target markets, and title terms. |
+| `config/sources.json` | Active employer endpoints, supplemental careers links, archived source IDs, target markets, and title terms. |
 | `src/job_watcher/__init__.py` | Marks the Python package. |
-| `src/job_watcher/sources.py` | Anonymous Workday, Oracle, SuccessFactors, and Infor source adapters and field conversion. |
+| `src/job_watcher/sources.py` | Anonymous Workday, Greenhouse, Oracle, and Infor JSON source adapters and field conversion. |
 | `src/job_watcher/history.py` | Title/location matching and deterministic history rebuild from raw snapshots. |
 | `src/job_watcher/pipeline.py` | Daily collection, raw snapshot saving, status, change report, and history build. |
 | `tests/test_sources.py` | Adapter conversion, pagination, posting dates, and source registry checks. |
@@ -110,7 +112,7 @@ pytest
 
 ## Project requirements
 
-- Fetch public feeds anonymously, without parsing job-board HTML. BOK Financial uses RSS/XML rather than the JSON format specified in the assignment.
+- Fetch active employer feeds anonymously as JSON, without parsing job-board HTML. BOK Financial remains a supplemental careers link; its prior source data is archived.
 - Save successful responses, continue after a source failure, and record every board's success, count, and error in the status file.
 - Rebuild all posting rows and dates deterministically from raw data, including first-seen, last-seen, and removed dates.
 - Run daily with GitHub Actions, create/update a dated issue each day, close the previous day's issue, and commit raw, history, status, and change-report files.
