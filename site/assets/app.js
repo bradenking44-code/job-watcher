@@ -659,17 +659,17 @@ function renderMarket() {
   const sources = document.getElementById('market-source-list');
   if (sources) {
     sources.replaceChildren();
-    [...DATA.sources, ...DATA.supplementalSources].forEach((source) => {
+    DATA.sources.forEach((source) => {
       const href = safeUrl(source.career_url);
       const card = document.createElement(href ? 'a' : 'div'); card.className = 'market-source';
       if (href) { card.href = href; card.target = '_blank'; card.rel = 'noopener noreferrer'; }
-      const names = `${(source.markets || []).map(marketLabel).join(' + ')}${source.status_label ? ' · supplemental link' : ''}`;
+      const names = (source.markets || []).map(marketLabel).join(' + ');
       card.innerHTML = `<strong>${escapeHtml(source.employer)}</strong><span>${escapeHtml(names)}</span>`;
       sources.append(card);
     });
   }
   const count = document.getElementById('market-source-count');
-  if (count) count.textContent = `${DATA.sources.length} active boards · ${DATA.supplementalSources.length} supplemental links · ${DATA.candidates.length} to validate`;
+  if (count) count.textContent = `${DATA.sources.length} active boards`;
 }
 
 async function start() {

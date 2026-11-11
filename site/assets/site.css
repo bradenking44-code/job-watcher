@@ -186,7 +186,7 @@ h1, h2, p { margin-top: 0; }
 .market-card-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); color: #78847b; font-size: 10px; }
 .market-cities { position: absolute; top: 85px; right: 21px; width: 130px; color: rgba(23,55,44,.07); font: 700 62px/.92 var(--display); letter-spacing: -.12em; text-align: right; pointer-events: none; }
 .watchlist-section { margin-top: 44px; padding-bottom: 50px; }
-.market-source-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.market-source-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .market-source { display: flex; justify-content: space-between; gap: 12px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 4px; background: white; text-decoration: none; }
 .market-source strong { font-size: 10px; }
 .market-source span { color: #7c897f; font: 9px var(--mono); text-align: right; }
@@ -203,6 +203,7 @@ h1, h2, p { margin-top: 0; }
   .hero-copy { padding: 50px 7%; }
   .hero-side { padding: 32px 9%; }
   .source-grid { grid-template-columns: repeat(3, 1fr); }
+  .market-source-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .filter-bar { grid-template-columns: minmax(180px, 1fr) 170px 170px auto; }
   .site-footer { padding: 20px 24px; }
 }

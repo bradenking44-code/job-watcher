@@ -295,14 +295,6 @@
     }
   ],
   "inactive_source_ids": ["bok_financial"],
-  "supplemental_sources": [
-    {
-      "id": "bok_financial",
-      "employer": "BOK Financial",
-      "markets": ["tulsa_ok"],
-      "career_url": "https://jobs.bokf.com/go/",
-      "status_label": "CAREERS LINK"
-    }
-  ],
+  "supplemental_sources": [],
   "discovery_candidates": []
 }
