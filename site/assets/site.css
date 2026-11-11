@@ -171,31 +171,20 @@ h1, h2, p { margin-top: 0; }
 .market-intro { padding-bottom: 28px; }
 .market-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .market-card { position: relative; overflow: hidden; min-height: 350px; padding: 24px; border: 1px solid var(--line); border-radius: 7px; background: white; }
-.market-card.featured { background: var(--green); color: white; border-color: var(--green); }
 .market-card-head { position: relative; z-index: 1; display: flex; align-items: start; justify-content: space-between; gap: 14px; }
 .market-card .eyebrow { margin-bottom: 10px; }
 .market-card h2 { margin: 0; font: 600 24px var(--display); letter-spacing: -.06em; }
-.market-card.featured .eyebrow { color: #aebfb2; }
-.market-card.featured .market-card-head p { color: #c0cdc3; }
 .market-index { color: #93a198; font: 11px var(--mono); }
 .market-big-number { margin: 26px 0 2px; font: 600 58px/.95 var(--display); letter-spacing: -.09em; }
-.market-card.featured .market-big-number { color: var(--lime); }
 .market-count-label { margin: 0; color: #77847c; font: 10px var(--mono); }
-.market-card.featured .market-count-label { color: #b9c9bf; }
 .market-chart { display: grid; gap: 12px; margin-top: 27px; }
 .bar-row { display: grid; grid-template-columns: minmax(85px, .7fr) 1.3fr 23px; gap: 9px; align-items: center; font-size: 10px; }
 .bar-name { overflow: hidden; color: #66736b; text-overflow: ellipsis; white-space: nowrap; }
-.featured .bar-name { color: #c2cec6; }
 .bar-track { height: 6px; overflow: hidden; border-radius: 8px; background: #edf0eb; }
-.featured .bar-track { background: rgba(255,255,255,.13); }
 .bar-fill { height: 100%; border-radius: inherit; background: #74a284; }
-.featured .bar-fill { background: var(--lime); }
 .bar-number { color: #78857d; font: 10px var(--mono); text-align: right; }
-.featured .bar-number { color: #c9d5cc; }
 .market-card-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); color: #78847b; font-size: 10px; }
-.featured .market-card-footer { border-color: rgba(255,255,255,.16); color: #bdc9c1; }
 .market-cities { position: absolute; top: 85px; right: 21px; width: 130px; color: rgba(23,55,44,.07); font: 700 62px/.92 var(--display); letter-spacing: -.12em; text-align: right; pointer-events: none; }
-.featured .market-cities { color: rgba(194,237,121,.08); }
 .watchlist-section { margin-top: 44px; padding-bottom: 50px; }
 .market-source-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .market-source { display: flex; justify-content: space-between; gap: 12px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 4px; background: white; text-decoration: none; }

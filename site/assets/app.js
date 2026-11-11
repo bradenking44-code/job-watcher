@@ -487,7 +487,7 @@ function marketJobsFor(id) {
   });
 }
 
-function renderMarketCard(id, title, cityDescription, featured = false) {
+function renderMarketCard(id, title, cityDescription, index) {
   const jobs = marketJobsFor(id);
   const byEmployer = new Map();
   jobs.forEach((job) => byEmployer.set(text(job.employer) || 'Other employers', (byEmployer.get(text(job.employer) || 'Other employers') || 0) + 1));
@@ -502,8 +502,8 @@ function renderMarketCard(id, title, cityDescription, featured = false) {
   const eyebrow = id === 'tulsa_ok' ? 'OKLAHOMA' : id === 'northwest_ar' ? 'ARKANSAS' : id === 'region' ? 'REGIONAL AREA' : 'GLOBAL OPPORTUNITIES';
   const watermark = id === 'tulsa_ok' ? 'TUL' : id === 'northwest_ar' ? 'NWA' : id === 'region' ? 'REG' : 'INTL';
   const section = document.createElement('article');
-  section.className = `market-card${featured ? ' featured' : ''}`;
-  section.innerHTML = `<div class="market-cities" aria-hidden="true">${watermark}</div><div class="market-card-head"><div><p class="eyebrow">${eyebrow}</p><h2>${escapeHtml(title)}</h2><p class="market-count-label">${escapeHtml(detail)}</p></div><span class="market-index">0${featured ? '1' : id === 'northwest_ar' ? '2' : id === 'region' ? '3' : '4'}</span></div><div class="market-big-number">${jobs.length.toLocaleString()}</div><p class="market-count-label">open finance matches</p><div class="market-chart">${chart}</div><div class="market-card-footer"><span>${sourceCount} ${sourceCaption}</span><a class="text-link${featured ? ' light-link' : ''}" href="./browse.html?market=${id}">Browse market →</a></div>`;
+  section.className = 'market-card';
+  section.innerHTML = `<div class="market-cities" aria-hidden="true">${watermark}</div><div class="market-card-head"><div><p class="eyebrow">${eyebrow}</p><h2>${escapeHtml(title)}</h2><p class="market-count-label">${escapeHtml(detail)}</p></div><span class="market-index">0${index}</span></div><div class="market-big-number">${jobs.length.toLocaleString()}</div><p class="market-count-label">open finance matches</p><div class="market-chart">${chart}</div><div class="market-card-footer"><span>${sourceCount} ${sourceCaption}</span><a class="text-link" href="./browse.html?market=${id}">Browse market →</a></div>`;
   return section;
 }
 
@@ -650,10 +650,10 @@ function renderMarket() {
   const grid = document.getElementById('market-grid');
   if (grid) {
     grid.replaceChildren();
-    grid.append(renderMarketCard('tulsa_ok', 'Tulsa area', 'Tulsa · Broken Arrow · Tahlequah · Bartlesville', true));
-    grid.append(renderMarketCard('northwest_ar', 'Northwest Arkansas', 'Bentonville · Fayetteville · Springdale'));
-    grid.append(renderMarketCard('region', 'Surrounding region', 'Oklahoma · Arkansas · Kansas · Texas · Missouri'));
-    grid.append(renderMarketCard('international', 'International', 'Openings outside the United States'));
+    grid.append(renderMarketCard('tulsa_ok', 'Tulsa area', 'Tulsa · Broken Arrow · Tahlequah · Bartlesville', 1));
+    grid.append(renderMarketCard('northwest_ar', 'Northwest Arkansas', 'Bentonville · Fayetteville · Springdale', 2));
+    grid.append(renderMarketCard('region', 'Surrounding region', 'Oklahoma · Arkansas · Kansas · Texas · Missouri', 3));
+    grid.append(renderMarketCard('international', 'International', 'Openings outside the United States', 4));
   }
   renderHistoryReport();
   const sources = document.getElementById('market-source-list');
