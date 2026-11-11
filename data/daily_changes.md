@@ -1,8 +1,8 @@
 # Job Watcher updates — 2026-11-11
 
 Employer boards collected successfully: **20 of 20**.
-New or reopened postings: **539**
-Removed postings: **518**
+New or reopened postings: **550**
+Removed postings: **529**
 
 ## New or reopened postings
 
@@ -36,7 +36,7 @@ Removed postings: **518**
 - [Manager Trainee](https://jbhunt.wd501.myworkdayjobs.com/en-US/Careers/job/Ambridge-PA---43-Century-Drive/Manager-Trainee_00652257) — **J.B. Hunt** · Ambridge, PA - 43 Century Drive
 - [Gas Technician, Customer Service Field](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs/job/10451) — **ONE Gas** · Ardmore, OK, United States
 - [Foreman, C&M](https://ibedqy.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ONEGas-Careers/jobs/job/10484) — **ONE Gas** · Stillwater, OK, United States
-- …and 509 more. See `data/history.csv` for the full list.
+- …and 520 more. See `data/history.csv` for the full list.
 
 ## Removed postings
 
@@ -69,5 +69,5 @@ Removed postings: **518**
 - [Master Plumber, Facility Services](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-SC-SUMMERVILLE-01037-WM-SUPERCENTER/Master-Plumber--Facility-Services_R-2587740-1) — **Walmart** · (USA) SC SUMMERVILLE 01037 WM SUPERCENTER
 - [Staff Pharmacist ($30,000 Sign-on Bonus + Relocation)](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-LA-VILLE-PLATTE-00312-WM-SUPERCENTER/XMLNAME--USA--Staff-Pharmacist_R-2595562) — **Walmart** · (USA) LA VILLE PLATTE 00312 WM SUPERCENTER
 - [(USA) Auto Care Center Coach](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/Mount-Pleasant-PA/XMLNAME--USA--Auto-Care-Center-Coach_R-2596577-1) — **Walmart** · Mount Pleasant, PA
-- [Principal, Software Engineer - Platform Engineering](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-Crossman-Respect-Building-CA-SUNNYVALE-Home-Office/XMLNAME--USA--Principal--Software-Engineer_R-2612711-1) — **Walmart** · (USA) Crossman Respect Building CA SUNNYVALE Home Office
-- …and 488 more. See `data/history.csv` for the full list.
+- [Technician, Facility Services, Power Washing - $2,000 Sign-On Bonus](https://walmart.wd504.myworkdayjobs.com/en-US/WalmartExternal/job/USA-FL-CRESTVIEW-00944-WM-SUPERCENTER/Technician--Facility-Services--Power-Washing_R-2598692-1) — **Walmart** · (USA) FL CRESTVIEW 00944 WM SUPERCENTER
+- …and 499 more. See `data/history.csv` for the full list.
