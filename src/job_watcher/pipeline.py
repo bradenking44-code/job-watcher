@@ -141,12 +141,12 @@ def run_pipeline(
     baseline = not previous_success_dates
     daily_dir = raw_dir / run_date_text
     daily_dir.mkdir(parents=True, exist_ok=True)
-    # A rerun replaces this date's active-source snapshots so an old success
-    # cannot survive a later failure. Retired-source snapshots live under data/archive/raw.
+    # Keep successful snapshots from earlier attempts on this date. A new
+    # success overwrites that source's snapshot; a failed retry preserves it.
     active_source_ids = {str(source["id"]) for source in config.get("sources", [])}
     for old_snapshot in daily_dir.glob("*.json.gz"):
         source_id = old_snapshot.name.removesuffix(".json.gz")
-        if source_id in active_source_ids:
+        if source_id not in active_source_ids:
             old_snapshot.unlink()
 
     source_results: list[dict[str, Any]] = []

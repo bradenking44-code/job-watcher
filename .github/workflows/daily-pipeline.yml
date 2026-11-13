@@ -2,7 +2,8 @@ name: Daily job collection
 
 on:
   schedule:
-    - cron: "17 12 * * *"
+    # Morning collection plus same-day recovery windows (UTC).
+    - cron: "17 12,18,23 * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -22,7 +23,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Check whether today's collection is complete
+        id: check
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          config = json.loads(Path("config/sources.json").read_text())
+          status_path = Path("data/status.json")
+          status = json.loads(status_path.read_text()) if status_path.exists() else {}
+          today = datetime.now(timezone.utc).date().isoformat()
+          expected = len(config.get("sources", []))
+          sources = status.get("sources", [])
+          complete = (
+              status.get("run_date") == today
+              and len(sources) == expected
+              and expected > 0
+              and all(source.get("ok") for source in sources)
+          )
+          print(f"Today's collection complete: {complete} ({sum(bool(source.get('ok')) for source in sources)}/{expected} sources)")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"skip={'true' if complete else 'false'}\n")
+          PY
+
   collect:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
