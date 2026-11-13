@@ -185,7 +185,8 @@ jobs:
             echo "No data changes to commit."
             echo "pushed=false" >> "$GITHUB_OUTPUT"
           else
-            git commit -m "Update job watcher data $(date -u +%F)"
+            RUN_DATE=$(python -c 'import json; print(json.load(open("data/status.json", encoding="utf-8"))["run_date"])')
+            git commit -m "Update job watcher data $RUN_DATE"
             git push
             echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
