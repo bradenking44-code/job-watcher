@@ -52,7 +52,7 @@ BOK Financial is no longer shown in the live watchlist or collected. Its histori
 
 ## Data and rebuild command
 
-The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<UTC date>/<source>.json.gz`. Snapshots retain the board's full response, and the published `data/history.csv` contains every posting returned by active JSON sources, including out-of-market roles and postings outside the finance title rule. The `in_market` and `market` columns support the site's Tulsa and Northwest Arkansas focus without dropping postings from the canonical history. A failed source writes no raw snapshot; its status and error remain in `data/status.json`. The history build only uses successful active-source snapshots, so a failed source does not mark its postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; it lists every new and removed posting with a link, and any reopened listings are shown in their own section. Large daily reports continue in issue comments so no postings are truncated; reruns update the date's issue and its report comments, and the next day's run closes it. Reopened postings keep their original `first_seen` date and are not counted in `new_today`.
+The daily collector saves each successful active-source response in a compressed JSON snapshot under `data/raw/<Central date>/<source>.json.gz`. Snapshots retain the board's full response, and the published `data/history.csv` contains every posting returned by active JSON sources, including out-of-market roles and postings outside the finance title rule. The `in_market` and `market` columns support the site's Tulsa and Northwest Arkansas focus without dropping postings from the canonical history. A failed fetch writes no new snapshot; if an earlier attempt for that Central date succeeded, its snapshot remains until replaced by a later success. The history build only uses successful active-source snapshots, so a failed source does not mark its postings removed. Retired-source snapshots stay under `data/archive/raw/` and rebuild separately to `data/archive/history.csv`; they do not change the required open/removed history or open-job counts. A dated GitHub issue is opened every day, including days with no changes; it lists every new and removed posting with a link, and any reopened listings are shown in their own section. Large daily reports continue in issue comments so no postings are truncated; reruns update the date's issue and its report comments, and the next day's run closes it. Reopened postings keep their original `first_seen` date and are not counted in `new_today`.
 
 Run the collector manually:
 
@@ -66,7 +66,7 @@ Rebuild the history from the saved raw files without making network requests:
 python -m job_watcher.pipeline --build-only
 ```
 
-The scheduled GitHub Actions workflow runs daily at 12:17 UTC (6:17 a.m. Central Standard Time or 7:17 a.m. Central Daylight Time), commits raw snapshots, history, status, and the daily change report, then dispatches the Pages workflow to publish the updated data. Dates use UTC, history rows are sorted by `posting_id`, and a date counts once even if the workflow is rerun.
+The GitHub Actions workflow checks at 12:17, 18:17, and 23:17 UTC (6:17 a.m., 12:17 p.m., and 5:17 p.m. Central Standard Time; one hour later during daylight time). It retries the collection until all active boards succeed for the Central calendar date, then skips later checks. Each successful run commits raw snapshots, history, status, and the daily change report, then dispatches the Pages workflow to publish the updated data. Run timestamps remain UTC; snapshot dates use the Central calendar date, history rows are sorted by `posting_id`, and a date counts once even if the workflow is retried.
 
 ## Development
 
@@ -96,7 +96,7 @@ pytest
 | `tests/test_sources.py` | Adapter conversion, pagination, posting dates, and source registry checks. |
 | `tests/test_history.py` | Title rule and first-seen, last-seen, removal, reappearance, and reproducibility checks. |
 | `tests/test_pipeline.py` | Source failure handling, required status fields, and same-day rerun replacement. |
-| `data/raw/` | Compressed JSON snapshots for successful active-source responses, organized by UTC date. |
+| `data/raw/` | Compressed JSON snapshots for successful active-source responses, organized by Central date. |
 | `data/archive/raw/` | Original compressed snapshots for retired sources, including BOK Financial and the University of Arkansas. |
 | `data/history.csv` | Canonical history of all postings returned by active JSON sources, with finance-role and target-market flags. |
 | `data/archive/history.csv` | Retired-source postings, separate from the required open/removed history. |
@@ -142,9 +142,9 @@ pytest
 | `in_market` | `true` when the location matches Tulsa or Northwest Arkansas. |
 | `market` | Matching market IDs (`tulsa_ok`, `northwest_ar`), separated by semicolons if both match. |
 | `first_run` | `true` when the posting appeared in the source's first successful snapshot. |
-| `first_seen` | First UTC date this source listed the posting. |
-| `last_seen` | Most recent UTC date this source listed the posting. |
+| `first_seen` | First Central date this source listed the posting. |
+| `last_seen` | Most recent Central date this source listed the posting. |
 | `status` | `open` or `removed`. |
-| `removed_date` | UTC date the posting was absent from a successful source snapshot; empty while open. |
+| `removed_date` | Central date the posting was absent from a successful source snapshot; empty while open. |
 
-`data/status.json` records `run_time` (UTC), `first_run_date`, `days_with_success` (distinct UTC dates with at least one successful source), `open`, `new_today`, `removed_today`, and one `sources` entry per active board. Each source entry includes `name`, `ok`, and `count`, plus diagnostic fields. `new_today` excludes first-run baseline postings and reopened listings; reopened postings are reported separately in the daily issue.
+`data/status.json` records `run_time` (UTC), `first_run_date`, `days_with_success` (distinct Central dates with at least one successful source), `open`, `new_today`, `removed_today`, and one `sources` entry per active board. Each source entry includes `name`, `ok`, and `count`, plus diagnostic fields. `new_today` excludes first-run baseline postings and reopened listings; reopened postings are reported separately in the daily issue.

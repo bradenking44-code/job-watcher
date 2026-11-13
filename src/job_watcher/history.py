@@ -215,7 +215,7 @@ def rebuild_history(raw_dir: Path, output_path: Path, config: dict[str, Any]) ->
 
 
 def successful_run_dates(raw_dir: Path) -> list[str]:
-    """List distinct UTC run dates with at least one successful source."""
+    """List distinct Central run dates with at least one successful source."""
 
     dates: set[str] = set()
     for path in sorted(raw_dir.rglob("*.json.gz")):

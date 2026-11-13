@@ -5,13 +5,6 @@ on:
     # Morning collection plus same-day recovery windows (UTC).
     - cron: "17 12,18,23 * * *"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "config/**"
-      - "src/**"
-      - "pyproject.toml"
-      - ".github/workflows/daily-pipeline.yml"
 
 permissions:
   contents: write
@@ -36,13 +29,14 @@ jobs:
           python - <<'PY'
           import json
           import os
-          from datetime import datetime, timezone
+          from datetime import datetime
           from pathlib import Path
+          from zoneinfo import ZoneInfo
 
           config = json.loads(Path("config/sources.json").read_text())
           status_path = Path("data/status.json")
           status = json.loads(status_path.read_text()) if status_path.exists() else {}
-          today = datetime.now(timezone.utc).date().isoformat()
+          today = datetime.now(ZoneInfo("America/Chicago")).date().isoformat()
           expected = len(config.get("sources", []))
           sources = status.get("sources", [])
           complete = (

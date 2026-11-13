@@ -18,7 +18,7 @@ def _posting(source_id, external_id, title):
     }
 
 
-def test_pipeline_records_failures_without_raw_files_and_reruns_replace_the_day(tmp_path, monkeypatch):
+def test_pipeline_records_failures_and_reruns_preserve_prior_successes(tmp_path, monkeypatch):
     root = tmp_path
     config_path = root / "sources.json"
     config = {
@@ -74,8 +74,7 @@ def test_pipeline_records_failures_without_raw_files_and_reruns_replace_the_day(
     assert {"run_time", "first_run_date", "days_with_success", "open", "new_today", "removed_today", "sources"} <= status.keys()
     assert all({"name", "ok", "count"} <= entry.keys() for entry in status["sources"])
 
-    # A same-day rerun removes stale files before collecting. If the first
-    # source now fails, its prior same-day response must not survive.
+    # A failed retry preserves a source's earlier successful snapshot for the day.
     source_data["second"] = [_posting("second", "B", "Office Coordinator")]
     fail_second = False
     monkeypatch.setattr(
@@ -86,7 +85,10 @@ def test_pipeline_records_failures_without_raw_files_and_reruns_replace_the_day(
     )
     rerun = run_pipeline(config_path, raw_dir, history_path, status_path, changes_path, run_date=date(2026, 11, 10))
     assert rerun["status"]["days_with_success"] == 2
-    assert not (raw_dir / "2026-11-10" / "first.json.gz").exists()
+    with gzip.open(raw_dir / "2026-11-10" / "first.json.gz", "rt", encoding="utf-8") as handle:
+        first_snapshot = json.load(handle)
+    assert first_snapshot["success"] is True
+    assert len(first_snapshot["postings"]) == 2
 
 
 def test_pipeline_reports_reopened_posting_separately_from_new_today(tmp_path, monkeypatch):

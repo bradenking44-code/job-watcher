@@ -11,6 +11,7 @@ import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from .history import rebuild_history, successful_run_dates
 from .sources import SourceFetchError, fetch_source
@@ -134,7 +135,7 @@ def run_pipeline(
     run_date: date | None = None,
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    run_date = run_date or datetime.now(timezone.utc).date()
+    run_date = run_date or datetime.now(ZoneInfo("America/Chicago")).date()
     run_date_text = run_date.isoformat()
     run_time = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     previous_success_dates = successful_run_dates(raw_dir) if raw_dir.exists() else []

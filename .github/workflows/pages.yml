@@ -1,6 +1,9 @@
 name: Deploy GitHub Pages
 
 on:
+  schedule:
+    # Redeploy the latest collection at the same-day recovery windows.
+    - cron: "17 12,18,23 * * *"
   push:
     branches: [main]
     paths:

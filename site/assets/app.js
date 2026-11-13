@@ -639,7 +639,7 @@ function renderHistoryReport() {
     ),
     reportSection(
       `${removedTotal.toLocaleString()} postings were removed from tracked boards`,
-      'A posting is counted on the UTC date when its source returned a successful snapshot without that posting. Failed source requests do not mark jobs removed.',
+      'A posting is counted on the Central date when its source returned a successful snapshot without that posting. Failed source requests do not mark jobs removed.',
       barChart(removedRows), 'report-removed'
     ),
     reportSection(
@@ -649,7 +649,7 @@ function renderHistoryReport() {
     ),
     reportSection(
       lifetimeMedian === null ? 'There are no completed posting lifetimes yet' : `Median posting lifetime: ${Number.isInteger(lifetimeMedian) ? lifetimeMedian : lifetimeMedian.toFixed(1)} days`,
-      'Lifetime is the removed UTC date minus the first-seen UTC date. First-run postings are omitted because their true start dates are unknown.',
+      'Lifetime is the removed Central date minus the first-seen Central date. First-run postings are omitted because their true start dates are unknown.',
       barChart(lifetimeBuckets), 'report-lifetime'
     ),
     reportSection(
